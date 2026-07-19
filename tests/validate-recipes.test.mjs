@@ -38,6 +38,12 @@ test("accepts a valid Recipe", async () => {
 for (const [name, recipe, filename, rule] of [
 	["filename", valid, "Quick Pasta.md", "lowercase-kebab-case filename"],
 	[
+		"non-Markdown filename",
+		valid,
+		"quick-pasta.mdx",
+		"lowercase-kebab-case filename",
+	],
+	[
 		"unknown field",
 		valid.replace("title:", "Author: Me\ntitle:"),
 		"quick-pasta.md",

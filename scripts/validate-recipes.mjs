@@ -123,8 +123,11 @@ function validateRecipe(filename, source) {
 }
 
 export async function validateCollection(directory) {
-	const directoryEntries = await readdir(directory);
-	const files = directoryEntries.filter((file) => file.endsWith(".md")).sort();
+	const directoryEntries = await readdir(directory, { withFileTypes: true });
+	const files = directoryEntries
+		.filter((entry) => entry.isFile())
+		.map((entry) => entry.name)
+		.sort();
 	const errors = await Promise.all(
 		files.map(async (file) =>
 			validateRecipe(file, await readFile(join(directory, file), "utf8")),
