@@ -1,6 +1,6 @@
 ---
-title: Greens and beans
-summary: Silky beans and greens for a fast one-pan supper.
+title: Haricots blancs aux légumes verts
+summary: Des haricots fondants et des légumes verts pour un dîner rapide à une seule poêle.
 prep_time: 10 min
 cook_time: 15 min
 servings: 4
@@ -11,16 +11,16 @@ tags:
   - pantry
 ---
 
-## Ingredients
+## Ingrédients
 
-- 2 tins butter beans
-- 200 g greens
-- 2 garlic cloves
-- 1 lemon
-- 3 tbsp olive oil
+- 2 boîtes de haricots blancs
+- 200 g de légumes verts
+- 2 gousses d'ail
+- 1 citron
+- 3 c. à soupe d'huile d'olive
 
-## Method
+## Préparation
 
-1. Soften the garlic in oil over medium heat.
-2. Add the beans with a splash of water and simmer until glossy.
-3. Stir in the greens to wilt, then finish with lemon.
+1. Faites revenir l'ail dans l'huile à feu moyen.
+2. Ajoutez les haricots avec un peu d'eau et laissez mijoter jusqu'à ce qu'ils soient brillants.
+3. Incorporez les légumes verts, puis terminez avec le citron.

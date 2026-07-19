@@ -1,6 +1,6 @@
 ---
-title: Cinnamon oats
-summary: Warm oats with apple and toasted seeds.
+title: Porridge à la cannelle
+summary: Des flocons d'avoine chauds avec de la pomme et des graines grillées.
 prep_time: 5 min
 cook_time: 10 min
 servings: 2
@@ -9,15 +9,15 @@ tags:
   - pantry
 ---
 
-## Ingredients
+## Ingrédients
 
-- 100 g rolled oats
-- 500 ml milk or water
-- 1 apple, grated
-- 1 tsp cinnamon
-- 2 tbsp toasted seeds
+- 100 g de flocons d'avoine
+- 500 ml de lait ou d'eau
+- 1 pomme râpée
+- 1 c. à café de cannelle
+- 2 c. à soupe de graines grillées
 
-## Method
+## Préparation
 
-1. Simmer the oats, milk, apple, and cinnamon for 8 minutes, stirring often.
-2. Divide between bowls and scatter over the seeds.
+1. Faites mijoter le tout 8 min en remuant souvent.
+2. Répartissez dans des bols et parsemez de graines.

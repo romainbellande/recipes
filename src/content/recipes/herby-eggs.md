@@ -1,6 +1,6 @@
 ---
-title: Herby eggs
-summary: Soft scrambled eggs with a bright handful of herbs.
+title: Œufs brouillés aux herbes
+summary: Des œufs brouillés crémeux avec une généreuse poignée d'herbes fraîches.
 prep_time: 5 min
 cook_time: 8 min
 servings: 2
@@ -10,15 +10,15 @@ tags:
   - weeknight
 ---
 
-## Ingredients
+## Ingrédients
 
-- 4 eggs
-- 1 tbsp butter
-- 1 handful soft herbs
-- Salt and pepper
+- 4 œufs
+- 1 c. à soupe de beurre
+- 1 poignée d'herbes fraîches
+- Sel et poivre
 
-## Method
+## Préparation
 
-1. Whisk the eggs with a pinch of salt.
-2. Melt the butter in a low pan, add the eggs, and stir slowly until softly set.
-3. Fold through the herbs and season with pepper.
+1. Fouettez les œufs avec une pincée de sel.
+2. Faites fondre le beurre. Ajoutez les œufs et remuez jusqu'à ce qu'ils prennent.
+3. Ajoutez les herbes et assaisonnez de poivre.

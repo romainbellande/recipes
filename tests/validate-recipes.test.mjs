@@ -6,8 +6,8 @@ import test from "node:test";
 import { validateCollection } from "../scripts/validate-recipes.mjs";
 
 const valid = `---
-title: Quick pasta
-summary: A dependable supper.
+title: Pâtes rapides
+summary: Un dîner fiable.
 prep_time: 10 min
 cook_time: 20 min
 servings: 4
@@ -16,13 +16,13 @@ tags:
   - weeknight
 ---
 
-## Ingredients
+## Ingrédients
 
-- 400 g pasta
+- 400 g de pâtes
 
-## Method
+## Préparation
 
-1. Boil the pasta.
+1. Faites cuire les pâtes.
 `;
 
 async function collection(recipe = valid, name = "quick-pasta.md") {
@@ -51,31 +51,31 @@ for (const [name, recipe, filename, rule] of [
   ],
   [
     "array field",
-    valid.replace("title: Quick pasta", "title: [Quick pasta]"),
+    valid.replace("title: Pâtes rapides", "title: [Pâtes rapides]"),
     "quick-pasta.md",
     "title must be a scalar or block list",
   ],
   [
     "missing field",
-    valid.replace("summary: A dependable supper.\n", ""),
+    valid.replace("summary: Un dîner fiable.\n", ""),
     "quick-pasta.md",
     "missing required front-matter field: summary",
   ],
   [
     "empty title",
-    valid.replace("title: Quick pasta", "title:"),
+    valid.replace("title: Pâtes rapides", "title:"),
     "quick-pasta.md",
     "title must be a non-empty string",
   ],
   [
     "duration",
-    valid.replace("prep_time: 10 min", "prep_time: soon"),
+    valid.replace("prep_time: 10 min", "prep_time: bientôt"),
     "quick-pasta.md",
     "prep_time must be a duration",
   ],
   [
     "servings",
-    valid.replace("servings: 4", "servings: plenty"),
+    valid.replace("servings: 4", "servings: beaucoup"),
     "quick-pasta.md",
     "servings must be a number or range",
   ],
@@ -100,27 +100,27 @@ for (const [name, recipe, filename, rule] of [
   [
     "image path",
     valid.replace(
-      "---\n\n## Ingredients",
-      "image: https://example.com/pasta.jpg\n---\n\n## Ingredients",
+      "---\n\n## Ingrédients",
+      "image: https://example.com/pasta.jpg\n---\n\n## Ingrédients",
     ),
     "quick-pasta.md",
     "repository-local image path",
   ],
   [
     "ingredients",
-    valid.replace("## Ingredients", "## Shopping"),
+    valid.replace("## Ingrédients", "## Courses"),
     "quick-pasta.md",
-    "exactly one ## Ingredients section",
+    "exactly one ## Ingrédients section",
   ],
   [
     "method",
-    valid.replace("1. Boil the pasta.", "- Boil the pasta."),
+    valid.replace("1. Faites cuire les pâtes.", "- Faites cuire les pâtes."),
     "quick-pasta.md",
-    "numbered Method steps",
+    "numbered steps",
   ],
   [
     "body H1",
-    valid.replace("## Ingredients", "# Quick pasta\n\n## Ingredients"),
+    valid.replace("## Ingrédients", "# Pâtes rapides\n\n## Ingrédients"),
     "quick-pasta.md",
     "body must not contain an H1",
   ],

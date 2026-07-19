@@ -1,6 +1,6 @@
 ---
-title: Lemony broccoli
-summary: Charred broccoli with a quick lemon dressing.
+title: Brocoli au citron
+summary: Du brocoli rôti avec une vinaigrette rapide au citron.
 prep_time: 5 min
 cook_time: 15 min
 servings: 4
@@ -10,15 +10,15 @@ tags:
   - weeknight
 ---
 
-## Ingredients
+## Ingrédients
 
-- 2 heads broccoli
-- 2 tbsp olive oil
-- 1 lemon
-- Salt and pepper
+- 2 têtes de brocoli
+- 2 c. à soupe d'huile d'olive
+- 1 citron
+- Sel et poivre
 
-## Method
+## Préparation
 
-1. Heat the oven to 220°C and cut the broccoli into florets.
-2. Toss with oil, salt, and pepper.
-3. Roast until charred at the edges, then finish with lemon.
+1. Préchauffez le four à 220 °C et détaillez le brocoli en fleurettes.
+2. Mélangez avec l'huile, le sel et le poivre.
+3. Faites rôtir jusqu'à ce que les bords soient grillés, puis terminez avec le citron.
