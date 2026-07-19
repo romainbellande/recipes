@@ -1,7 +1,7 @@
 // @ts-check
-import { defineConfig } from 'astro/config';
+import { defineConfig } from "astro/config";
 
 export default defineConfig({
-	site: 'https://romainbellande.github.io',
-	base: '/recipes',
+	site: "https://romainbellande.github.io",
+	base: "/recipes",
 });

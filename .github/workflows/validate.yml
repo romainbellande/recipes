@@ -1,7 +1,7 @@
 ---
 name: Recipe validation and production build
 
-'on':
+"on":
   pull_request:
 
 permissions:

@@ -1,7 +1,7 @@
 ---
 name: Deploy Cookbook
 
-'on':
+"on":
   push:
     branches: [master]
 
