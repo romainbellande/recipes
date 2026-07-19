@@ -13,7 +13,7 @@ const requiredFields = [
 const allowedFields = new Set([...requiredFields, "image"]);
 const courses = new Set(["breakfast", "main", "side", "dessert"]);
 const qualifiers = new Set(["weeknight", "make-ahead", "vegetarian", "pantry"]);
-const duration = /^(?:(?:[1-9]\d*) hr(?: [1-9]\d* min)?|[1-9]\d* min)$/;
+const duration = /^(?:(?:[1-9]\d*) h(?: [1-9]\d* min)?|[1-9]\d* min)$/;
 const servings = /^[1-9]\d*(?:\s*[–-]\s*[1-9]\d*)?$/;
 
 function parseRecipe(source) {
@@ -74,7 +74,7 @@ function validateRecipe(filename, source) {
   }
   for (const field of ["prep_time", "cook_time"])
     if (typeof fields[field] === "string" && !duration.test(fields[field]))
-      fail(`${field} must be a duration such as "20 min" or "1 hr 15 min"`);
+      fail(`${field} must be a duration such as "20 min" or "1 h 15 min"`);
   if (typeof fields.servings === "string" && !servings.test(fields.servings))
     fail('servings must be a number or range such as "4" or "2-4"');
   if (!Array.isArray(fields.tags) || !fields.tags.length)
@@ -97,12 +97,12 @@ function validateRecipe(filename, source) {
       /^https?:/i.test(fields.image))
   )
     fail("image must be a repository-local image path beginning with /");
-  const ingredientSections = [...body.matchAll(/^## Ingredients\s*$/gm)];
-  const methodSections = [...body.matchAll(/^## Method\s*$/gm)];
+  const ingredientSections = [...body.matchAll(/^## Ingrédients\s*$/gm)];
+  const methodSections = [...body.matchAll(/^## Préparation\s*$/gm)];
   if (ingredientSections.length !== 1)
-    fail("require exactly one ## Ingredients section");
+    fail("require exactly one ## Ingrédients section");
   if (methodSections.length !== 1)
-    fail("require exactly one ## Method section");
+    fail("require exactly one ## Préparation section");
   if (ingredientSections.length === 1 && methodSections.length === 1) {
     const ingredients = body
       .slice(
@@ -114,9 +114,9 @@ function validateRecipe(filename, source) {
       .slice(methodSections[0].index + methodSections[0][0].length)
       .trim();
     if (!/^\s*-\s+.+/m.test(ingredients))
-      fail("Ingredients must contain bullet items");
+      fail("Ingrédients must contain bullet items");
     if (!/^\s*1\.\s+.+/m.test(method) || !/^\s*\d+\.\s+.+/m.test(method))
-      fail("Method must contain numbered Method steps");
+      fail("Préparation must contain numbered steps");
   }
   if (/^# /m.test(body)) fail("Recipe body must not contain an H1");
   return errors;

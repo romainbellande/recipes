@@ -1,18 +1,29 @@
 ---
 import { getCollection } from "astro:content";
 
+const tagLabels: Record<string, string> = {
+  breakfast: "Petit-déjeuner",
+  main: "Plat principal",
+  side: "Accompagnement",
+  dessert: "Dessert",
+  weeknight: "Rapide en semaine",
+  "make-ahead": "À préparer à l'avance",
+  vegetarian: "Végétarien",
+  pantry: "Du placard",
+};
 const durationMinutes = (value: string) => {
-  const hours = Number(value.match(/(\d+) hr/)?.[1] ?? 0);
+  const hours = Number(value.match(/(\d+) h/)?.[1] ?? 0);
   const minutes = Number(value.match(/(\d+) min/)?.[1] ?? 0);
   return hours * 60 + minutes;
 };
 const displayDuration = (minutes: number) =>
-  `${minutes >= 60 ? `${Math.floor(minutes / 60)} hr${minutes % 60 ? ` ${minutes % 60} min` : ""}` : `${minutes} min`}`;
+  `${minutes >= 60 ? `${Math.floor(minutes / 60)} h${minutes % 60 ? ` ${minutes % 60} min` : ""}` : `${minutes} min`}`;
 const recipeParts = (body: string) => {
-  const [ingredientsPart = "", methodPart = ""] = body.split(/^## Method\s*$/m);
+  const [ingredientsPart = "", methodPart = ""] =
+    body.split(/^## Préparation\s*$/m);
   return {
     ingredients: ingredientsPart
-      .replace(/^## Ingredients\s*$/m, "")
+      .replace(/^## Ingrédients\s*$/m, "")
       .trim()
       .split("\n")
       .filter((line) => line.startsWith("- "))
@@ -44,25 +55,25 @@ const recipes = (await getCollection("recipes"))
 const serializedRecipes = JSON.stringify(recipes).replace(/</g, "\\u003c");
 ---
 
-<html lang="en">
+<html lang="fr">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width" />
     <meta
       name="description"
-      content="A small, open collection of dependable everyday Recipes."
+      content="Une petite Collection ouverte de Recettes fiables pour tous les jours."
     />
-    <title>Recipes</title>
+    <title>Recettes</title>
   </head>
   <body>
-    <a class="skip-link" href="#recipe">Skip to Recipe</a>
+    <a class="skip-link" href="#recipe">Aller à la Recette</a>
     <header class="site-header">
-      <a href="/recipes/">Recipes</a><span>Everyday cooking</span>
+      <a href="/recipes/">Recettes</a><span>Cuisine du quotidien</span>
     </header>
     <main class="cookbook" id="browse-view">
       <nav class="collection" aria-labelledby="collection-title">
-        <p class="eyebrow">The Collection</p>
-        <h1 id="collection-title">Everyday Recipes</h1>
+        <p class="eyebrow">La Collection</p>
+        <h1 id="collection-title">Recettes du quotidien</h1>
         <ol>
           {
             recipes.map((recipe, index) => (
@@ -79,10 +90,10 @@ const serializedRecipes = JSON.stringify(recipes).replace(/</g, "\\u003c");
                     <strong>{recipe.title}</strong>
                     <small>{recipe.summary}</small>
                     <small>
-                      {recipe.total_time} · serves {recipe.servings} ·{" "}
-                      {recipe.course}
+                      {recipe.total_time} · pour {recipe.servings} personnes ·{" "}
+                      {tagLabels[recipe.course]}
                       {recipe.qualifiers.length
-                        ? ` · ${recipe.qualifiers.join(", ")}`
+                        ? ` · ${recipe.qualifiers.map((tag) => tagLabels[tag]).join(", ")}`
                         : ""}
                     </small>
                   </>
@@ -101,34 +112,41 @@ const serializedRecipes = JSON.stringify(recipes).replace(/</g, "\\u003c");
               data-recipe-panel={index}
               aria-labelledby={`title-${index}`}
             >
-              <p class="eyebrow">{recipe.tags.join(" · ")}</p>
+              <p class="eyebrow">
+                {recipe.tags.map((tag) => tagLabels[tag]).join(" · ")}
+              </p>
               <h2 id={`title-${index}`}>{recipe.title}</h2>
               <p class="summary">{recipe.summary}</p>
               {recipe.image && (
-                <img src={recipe.image} alt={`Finished ${recipe.title}`} />
+                <img src={recipe.image} alt={`${recipe.title} terminé`} />
               )}
               <dl class="metadata">
                 <div>
                   <>
-                    <dt>Course</dt>
-                    <dd>{recipe.course}</dd>
+                    <dt>Type de plat</dt>
+                    <dd>{tagLabels[recipe.course]}</dd>
                   </>
                 </div>
                 {recipe.qualifiers.length > 0 && (
                   <div>
-                    <dt>Qualifiers</dt>
-                    <dd>{recipe.qualifiers.join(", ")}</dd>
+                    <dt>Caractéristiques</dt>
+                    <dd>
+                      {recipe.qualifiers
+                        .map((tag) => tagLabels[tag])
+                        .join(", ")}
+                    </dd>
                   </div>
                 )}
               </dl>
               <button class="primary" type="button" data-cook={index}>
-                Enter cook mode<span class="sr-only"> for {recipe.title}</span>
+                Passer en mode cuisine
+                <span class="sr-only"> pour {recipe.title}</span>
               </button>
               <div class="recipe-body">
                 <>
                   <section aria-labelledby={`ingredients-${index}`}>
                     <>
-                      <h3 id={`ingredients-${index}`}>Ingredients</h3>
+                      <h3 id={`ingredients-${index}`}>Ingrédients</h3>
                       <ul>
                         {recipe.ingredients.map((ingredient) => (
                           <li>{ingredient}</li>
@@ -138,7 +156,7 @@ const serializedRecipes = JSON.stringify(recipes).replace(/</g, "\\u003c");
                   </section>
                   <section aria-labelledby={`method-${index}`}>
                     <>
-                      <h3 id={`method-${index}`}>Method</h3>
+                      <h3 id={`method-${index}`}>Préparation</h3>
                       <ol>
                         {recipe.steps.map((step) => (
                           <li>{step}</li>
@@ -155,16 +173,16 @@ const serializedRecipes = JSON.stringify(recipes).replace(/</g, "\\u003c");
     </main>
     <main class="cook-mode" id="cook-view" hidden>
       <button class="text-button" type="button" id="exit-cook"
-        >← Exit cook mode</button
+        >← Quitter le mode cuisine</button
       >
       <section class="cook-layout" aria-labelledby="cook-title">
         <aside>
-          <p class="eyebrow">Now cooking</p><h1 id="cook-title"></h1><nav
-            aria-label="Method steps"
+          <p class="eyebrow">En cuisine</p><h1 id="cook-title"></h1><nav
+            aria-label="Étapes de préparation"
           >
             <ol id="step-nav"></ol>
           </nav><details>
-            <summary>Ingredients</summary><ul id="cook-ingredients"></ul>
+            <summary>Ingrédients</summary><ul id="cook-ingredients"></ul>
           </details>
         </aside>
         <section class="current-step" aria-live="polite">
@@ -176,9 +194,9 @@ const serializedRecipes = JSON.stringify(recipes).replace(/</g, "\\u003c");
       </section>
     </main>
     <footer>
-      Recipe content © Recipes contributors, licensed under <a
+      Contenu des Recettes © contributeurs de Recettes, sous licence <a
         href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a
-      >. Changes must be indicated. <a
+      >. Les modifications doivent être indiquées. <a
         href="https://github.com/romainbellande/recipes">Source</a
       >
     </footer>
@@ -221,11 +239,13 @@ const serializedRecipes = JSON.stringify(recipes).replace(/</g, "\\u003c");
       function showStep(index) {
         step = index;
         const recipe = recipes[selected];
-        count.textContent = `Step ${step + 1} of ${recipe.steps.length}`;
-        stepTitle.textContent = "Current step";
+        count.textContent = `Étape ${step + 1} sur ${recipe.steps.length}`;
+        stepTitle.textContent = "Étape en cours";
         stepText.textContent = recipe.steps[step];
         next.textContent =
-          step === recipe.steps.length - 1 ? "Finish Recipe" : "Next step";
+          step === recipe.steps.length - 1
+            ? "Terminer la Recette"
+            : "Étape suivante";
         stepNav
           .querySelectorAll("button")
           .forEach((button, buttonIndex) =>

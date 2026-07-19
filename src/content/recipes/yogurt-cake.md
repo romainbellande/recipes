@@ -1,6 +1,6 @@
 ---
-title: Yogurt cake
-summary: A simple citrus cake measured with a yogurt pot.
+title: Gâteau au yaourt
+summary: Un gâteau au citron simple, mesuré avec un pot de yaourt.
 prep_time: 15 min
 cook_time: 40 min
 servings: 8
@@ -9,16 +9,16 @@ tags:
   - make-ahead
 ---
 
-## Ingredients
+## Ingrédients
 
-- 1 pot plain yogurt
-- 2 pots sugar
-- 3 pots flour
-- 2 eggs
-- 1 lemon
+- 1 pot de yaourt nature
+- 2 pots de sucre
+- 3 pots de farine
+- 2 œufs
+- 1 citron
 
-## Method
+## Préparation
 
-1. Heat the oven to 180°C and line a loaf tin.
-2. Whisk the yogurt, sugar, eggs, and lemon zest together, then fold in the flour.
-3. Bake until a skewer comes out clean.
+1. Préchauffez le four à 180 °C et chemisez un moule à cake.
+2. Fouettez yaourt, sucre, œufs et zeste, puis incorporez la farine.
+3. Faites cuire jusqu'à ce qu'une lame ressorte propre.

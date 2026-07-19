@@ -6,24 +6,26 @@ import test from "node:test";
 
 const run = promisify(execFile);
 
-test("builds a Cookbook with its Recipes and cook mode", async () => {
+test("builds a Cookbook with French Recipes and cook mode", async () => {
   await run("npm", ["run", "build"]);
   const page = await readFile("dist/index.html", "utf8");
   assert.equal((page.match(/data-recipe="\d+"/g) ?? []).length, 12);
-  assert.match(page, /<dt[^>]*>Course<\/dt><dd[^>]*>dessert<\/dd>/);
+  assert.match(page, /<dt[^>]*>Type de plat<\/dt><dd[^>]*>Dessert<\/dd>/);
   assert.match(
     page,
-    /<dt[^>]*>Qualifiers<\/dt><dd[^>]*>make-ahead, pantry<\/dd>/,
+    /<dt[^>]*>Caractéristiques<\/dt><dd[^>]*>À préparer à l&#39;avance, Du placard<\/dd>/,
   );
   for (const text of [
-    "Apple crumble",
-    "Tender apples under a buttery oat topping.",
-    "1 hr · serves 6 · dessert · make-ahead",
+    "Crumble aux pommes",
+    "Des pommes fondantes sous une croûte croustillante à l&#39;avoine.",
+    "1 h · pour 6 personnes · Dessert · À préparer à l&#39;avance",
     'aria-controls="recipe-0"',
     'aria-current="true"',
-    "Enter cook mode",
-    "Exit cook mode",
-    "Current step",
+    "Passer en mode cuisine",
+    "Quitter le mode cuisine",
+    "Étape en cours",
+    "Étape suivante",
+    "Terminer la Recette",
     "function resetCook()",
   ]) {
     assert.ok(page.includes(text), `expected ${text}`);

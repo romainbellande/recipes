@@ -1,6 +1,6 @@
 ---
-title: Crisp potatoes
-summary: Golden roast potatoes with fluffy centers.
+title: Pommes de terre croustillantes
+summary: Des pommes de terre rôties dorées, moelleuses à cœur.
 prep_time: 15 min
 cook_time: 45 min
 servings: 4
@@ -10,15 +10,15 @@ tags:
   - pantry
 ---
 
-## Ingredients
+## Ingrédients
 
-- 1 kg potatoes
-- 3 tbsp olive oil
-- Salt
-- 1 sprig rosemary
+- 1 kg de pommes de terre
+- 3 c. à soupe d'huile d'olive
+- Sel
+- 1 brin de romarin
 
-## Method
+## Préparation
 
-1. Heat the oven to 220°C and cut the potatoes into chunks.
-2. Boil for 8 minutes, drain, and shake the pan to roughen the edges.
-3. Toss with oil and rosemary, then roast until deeply golden.
+1. Préchauffez le four à 220 °C et coupez les pommes de terre en morceaux.
+2. Faites-les bouillir 8 min, égouttez-les et secouez la casserole pour les érafler.
+3. Mélangez avec l'huile et le romarin, puis faites rôtir jusqu'à ce qu'elles dorent.

@@ -1,6 +1,6 @@
 ---
-title: Crispy chickpea salad
-summary: Warm spiced chickpeas over a sharp, crunchy salad.
+title: Salade de pois chiches croustillants
+summary: Des pois chiches épicés et chauds sur une salade croquante et relevée.
 prep_time: 15 min
 cook_time: 20 min
 servings: 4
@@ -10,16 +10,16 @@ tags:
   - pantry
 ---
 
-## Ingredients
+## Ingrédients
 
-- 2 tins chickpeas
-- 1 tsp ground cumin
-- 1 cucumber
-- 200 g tomatoes
-- 1 lemon
+- 2 boîtes de pois chiches
+- 1 c. à café de cumin moulu
+- 1 concombre
+- 200 g de tomates
+- 1 citron
 
-## Method
+## Préparation
 
-1. Heat the oven to 220°C and dry the chickpeas well.
-2. Toss chickpeas with oil and cumin, then roast until crisp.
-3. Chop the vegetables, dress with lemon, and top with warm chickpeas.
+1. Préchauffez le four à 220 °C et séchez bien les pois chiches.
+2. Mélangez avec l'huile et le cumin, puis faites rôtir jusqu'à ce qu'ils soient croustillants.
+3. Coupez les légumes, assaisonnez de citron et ajoutez les pois chiches chauds.

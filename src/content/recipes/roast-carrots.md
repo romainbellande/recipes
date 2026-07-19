@@ -1,6 +1,6 @@
 ---
-title: Roast carrots
-summary: Sweet, caramelized carrots with cumin and lemon.
+title: Carottes rôties au cumin
+summary: Des carottes douces et caramélisées au cumin et au citron.
 prep_time: 10 min
 cook_time: 30 min
 servings: 4
@@ -10,16 +10,16 @@ tags:
   - weeknight
 ---
 
-## Ingredients
+## Ingrédients
 
-- 800 g carrots
-- 2 tbsp olive oil
-- 1 tsp ground cumin
-- 1 lemon
-- Salt
+- 800 g de carottes
+- 2 c. à soupe d'huile d'olive
+- 1 c. à café de cumin moulu
+- 1 citron
+- Sel
 
-## Method
+## Préparation
 
-1. Heat the oven to 220°C and cut the carrots into even pieces.
-2. Toss with oil, cumin, and salt.
-3. Roast for 25 to 30 minutes, then squeeze over lemon.
+1. Préchauffez le four à 220 °C et coupez les carottes en morceaux réguliers.
+2. Mélangez avec l'huile, le cumin et le sel.
+3. Faites rôtir 25 à 30 min, puis pressez le citron par-dessus.

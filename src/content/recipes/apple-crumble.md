@@ -1,6 +1,6 @@
 ---
-title: Apple crumble
-summary: Tender apples under a buttery oat topping.
+title: Crumble aux pommes
+summary: Des pommes fondantes sous une croûte croustillante à l'avoine.
 prep_time: 20 min
 cook_time: 40 min
 servings: 6
@@ -10,16 +10,16 @@ tags:
   - pantry
 ---
 
-## Ingredients
+## Ingrédients
 
-- 1 kg apples
-- 2 tbsp sugar
-- 150 g flour
-- 100 g butter
-- 80 g rolled oats
+- 1 kg de pommes
+- 2 c. à soupe de sucre
+- 150 g de farine
+- 100 g de beurre
+- 80 g de flocons d'avoine
 
-## Method
+## Préparation
 
-1. Heat the oven to 190°C and slice the apples into a baking dish with sugar.
-2. Rub the flour and butter together, then stir in the oats.
-3. Scatter over the apples and bake until golden and bubbling.
+1. Préchauffez le four à 190 °C et coupez les pommes dans un plat avec le sucre.
+2. Sablez la farine et le beurre, puis incorporez les flocons d'avoine.
+3. Répartissez le crumble sur les pommes et enfournez jusqu'à ce qu'il soit doré.

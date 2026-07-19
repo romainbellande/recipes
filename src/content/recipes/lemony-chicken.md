@@ -1,24 +1,25 @@
 ---
-title: Lemony chicken
-summary: Roast chicken with crisp potatoes and lemon.
+title: Poulet rôti au citron
+summary: Du poulet rôti avec des pommes de terre croustillantes et du citron.
 prep_time: 15 min
-cook_time: 1 hr
+cook_time: 1 h
 servings: 4
 tags:
   - main
   - weeknight
 ---
 
-## Ingredients
+## Ingrédients
 
-- 1 kg chicken thighs
-- 700 g potatoes
-- 1 lemon
-- 2 tbsp olive oil
-- Salt and pepper
+- 1 kg de hauts de cuisse de poulet
+- 700 g de pommes de terre
+- 1 citron
+- 2 c. à soupe d'huile d'olive
+- Sel et poivre
 
-## Method
+## Préparation
 
-1. Heat the oven to 220°C. Toss the potatoes with oil and seasoning in a roasting tin.
-2. Nestle in the chicken and lemon wedges, skin-side up.
-3. Roast for 45 to 60 minutes until the chicken is cooked through and the potatoes are crisp.
+1. Préchauffez le four à 220 °C.
+2. Mélangez les pommes de terre avec l'huile, le sel et le poivre.
+3. Ajoutez le poulet et les quartiers de citron, peau vers le haut.
+4. Faites rôtir 45 à 60 min, jusqu'à ce que le poulet soit cuit.

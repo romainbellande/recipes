@@ -1,6 +1,6 @@
 ---
-title: Tomato pasta
-summary: A bright, garlicky pasta from dependable pantry staples.
+title: Pâtes à la tomate
+summary: Des pâtes à l'ail lumineuses avec des ingrédients fiables du placard.
 prep_time: 10 min
 cook_time: 20 min
 servings: 4
@@ -11,16 +11,16 @@ tags:
   - pantry
 ---
 
-## Ingredients
+## Ingrédients
 
-- 400 g pasta
-- 2 tbsp olive oil
-- 3 garlic cloves, sliced
-- 800 g chopped tomatoes
-- 1 handful basil
+- 400 g de pâtes
+- 2 c. à soupe d'huile d'olive
+- 3 gousses d'ail émincées
+- 800 g de tomates concassées
+- 1 poignée de basilic
 
-## Method
+## Préparation
 
-1. Cook the pasta in well-salted water until almost tender.
-2. Soften the garlic in oil, add the tomatoes, and simmer for 12 minutes.
-3. Toss the pasta and basil through the sauce with a splash of pasta water.
+1. Cuisez les pâtes dans l'eau salée, presque al dente.
+2. Faites revenir l'ail dans l'huile, ajoutez les tomates et laissez mijoter 12 min.
+3. Mélangez les pâtes et le basilic à la sauce avec l'eau de cuisson.
