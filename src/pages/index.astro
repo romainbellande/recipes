@@ -91,6 +91,10 @@ const serializedRecipes = JSON.stringify(recipes).replace(/</g, '\\u003c');
 				next.textContent = step === recipe.steps.length - 1 ? 'Finish Recipe' : 'Next step';
 				stepNav.querySelectorAll('button').forEach((button, buttonIndex) => button.setAttribute('aria-current', String(buttonIndex === step)));
 			}
+			function resetCook() {
+				showStep(0);
+				ingredients.querySelectorAll('input').forEach((input) => { input.checked = false; });
+			}
 			function enterCook(index) {
 				selected = index; step = 0;
 				const recipe = recipes[selected];
@@ -102,7 +106,7 @@ const serializedRecipes = JSON.stringify(recipes).replace(/</g, '\\u003c');
 			document.querySelectorAll('[data-recipe]').forEach((button) => button.addEventListener('click', () => selectRecipe(Number(button.dataset.recipe))));
 			document.querySelectorAll('[data-cook]').forEach((button) => button.addEventListener('click', () => enterCook(Number(button.dataset.cook))));
 			next.addEventListener('click', () => step === recipes[selected].steps.length - 1 ? document.querySelector('#exit-cook').click() : showStep(step + 1));
-			document.querySelector('#exit-cook').addEventListener('click', () => { cook.hidden = true; browse.hidden = false; document.querySelector(`[data-recipe="${selected}"]`).focus(); });
+			document.querySelector('#exit-cook').addEventListener('click', () => { resetCook(); cook.hidden = true; browse.hidden = false; document.querySelector(`[data-recipe="${selected}"]`).focus(); });
 		</script>
 	</body>
 </html>
