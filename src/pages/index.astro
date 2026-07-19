@@ -144,6 +144,16 @@ const serializedRecipes = JSON.stringify(recipes).replace(/</g, "\\u003c");
               </p>
               <h2 id={`title-${index}`}>{recipe.title}</h2>
               <p class="summary">{recipe.summary}</p>
+              <label class="servings-control">
+                Nombre de personnes
+                <input
+                  type="number"
+                  min="1"
+                  step="1"
+                  value={recipe.servings}
+                  data-servings={index}
+                />
+              </label>
               {recipe.image && (
                 <img src={recipe.image} alt={`${recipe.title} terminé`} />
               )}
@@ -174,7 +184,7 @@ const serializedRecipes = JSON.stringify(recipes).replace(/</g, "\\u003c");
                   <section aria-labelledby={`ingredients-${index}`}>
                     <>
                       <h3 id={`ingredients-${index}`}>Ingrédients</h3>
-                      <ul>
+                      <ul data-ingredients={index}>
                         {recipe.ingredients.map((ingredient) => (
                           <li>{ingredient}</li>
                         ))}
@@ -204,9 +214,12 @@ const serializedRecipes = JSON.stringify(recipes).replace(/</g, "\\u003c");
       >
       <section class="cook-layout" aria-labelledby="cook-title">
         <aside>
-          <p class="eyebrow">En cuisine</p><h1 id="cook-title"></h1><nav
-            aria-label="Étapes de préparation"
-          >
+          <p class="eyebrow">En cuisine</p><h1 id="cook-title"></h1>
+          <label class="servings-control" for="cook-servings">
+            Nombre de personnes
+            <input id="cook-servings" type="number" min="1" step="1" />
+          </label>
+          <nav aria-label="Étapes de préparation">
             <ol id="step-nav"></ol>
           </nav><details>
             <summary>Ingrédients</summary><ul id="cook-ingredients"></ul>
@@ -239,6 +252,7 @@ const serializedRecipes = JSON.stringify(recipes).replace(/</g, "\\u003c");
         matchingRecipeIndices,
         nextSelection,
         resetCollection,
+        scaleIngredient,
       } from "../scripts/collection.js";
 
       const recipes = JSON.parse(
@@ -246,6 +260,7 @@ const serializedRecipes = JSON.stringify(recipes).replace(/</g, "\\u003c");
       );
       let selected = 0;
       let step = 0;
+      const selectedServings = recipes.map((recipe) => Number(recipe.servings));
       const browse = document.querySelector("#browse-view");
       const recipeDetail = document.querySelector("#recipe");
       const search = document.querySelector("#recipe-search");
@@ -280,6 +295,36 @@ const serializedRecipes = JSON.stringify(recipes).replace(/</g, "\\u003c");
       const stepTitle = document.querySelector("#step-title");
       const stepText = document.querySelector("#step-text");
       const next = document.querySelector("#next-step");
+      const cookServings = document.querySelector("#cook-servings");
+      const validServings = (value) =>
+        /^\d+$/.test(value) &&
+        Number.isSafeInteger(Number(value)) &&
+        Number(value) > 0;
+      function updateServings(index) {
+        const recipe = recipes[index];
+        const servings = selectedServings[index];
+        document.querySelector(`[data-servings="${index}"]`).value = servings;
+        document
+          .querySelectorAll(`[data-ingredients="${index}"] li`)
+          .forEach((item, itemIndex) => {
+            item.textContent = scaleIngredient(
+              recipe.ingredients[itemIndex],
+              Number(recipe.servings),
+              servings,
+            );
+          });
+        if (selected === index && !cook.hidden) {
+          cookServings.value = servings;
+          ingredients.querySelectorAll("label").forEach((label, itemIndex) => {
+            label.lastChild.textContent = ` ${scaleIngredient(recipe.ingredients[itemIndex], Number(recipe.servings), servings)}`;
+          });
+        }
+      }
+      function setServings(index, value) {
+        if (!validServings(value)) return;
+        selectedServings[index] = Number(value);
+        updateServings(index);
+      }
       function selectRecipe(index) {
         selected = index;
         document
@@ -321,6 +366,7 @@ const serializedRecipes = JSON.stringify(recipes).replace(/</g, "\\u003c");
         selected = index;
         step = 0;
         const recipe = recipes[selected];
+        cookServings.value = selectedServings[selected];
         title.textContent = recipe.title;
         stepNav.replaceChildren(
           ...recipe.steps.map((item, index) => {
@@ -339,7 +385,10 @@ const serializedRecipes = JSON.stringify(recipes).replace(/</g, "\\u003c");
             const label = document.createElement("label");
             const check = document.createElement("input");
             check.type = "checkbox";
-            label.append(check, ` ${item}`);
+            label.append(
+              check,
+              ` ${scaleIngredient(item, Number(recipe.servings), selectedServings[selected])}`,
+            );
             li.append(label);
             return li;
           }),
@@ -350,6 +399,16 @@ const serializedRecipes = JSON.stringify(recipes).replace(/</g, "\\u003c");
         window.scrollTo(0, 0);
         document.querySelector("#exit-cook").focus();
       }
+      document
+        .querySelectorAll("[data-servings]")
+        .forEach((input) =>
+          input.addEventListener("input", () =>
+            setServings(Number(input.dataset.servings), input.value),
+          ),
+        );
+      cookServings.addEventListener("input", () =>
+        setServings(selected, cookServings.value),
+      );
       search.addEventListener("input", updateCollection);
       filters.forEach((filter) =>
         filter.addEventListener("change", updateCollection),
@@ -556,6 +615,18 @@ const serializedRecipes = JSON.stringify(recipes).replace(/</g, "\\u003c");
   dd {
     margin: 0;
     font-weight: 700;
+  }
+  .servings-control {
+    display: grid;
+    gap: 0.35rem;
+    margin: 1rem 0;
+    font-family: system-ui, sans-serif;
+    font-weight: 700;
+  }
+  .servings-control input {
+    max-width: 8rem;
+    padding: 0.5rem;
+    font: inherit;
   }
   .primary {
     border: 0;

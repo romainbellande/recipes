@@ -7,6 +7,7 @@ import {
   matchingRecipeIndices,
   nextSelection,
   resetCollection,
+  scaleIngredient,
 } from "../src/scripts/collection.js";
 
 const run = promisify(execFile);
@@ -58,6 +59,13 @@ test("resets the query and every active filter", () => {
   );
 });
 
+test("scales leading ingredient quantities with concise French decimals", () => {
+  assert.equal(scaleIngredient("400 g de pâtes", 4, 6), "600 g de pâtes");
+  assert.equal(scaleIngredient("1,5 l de soupe", 4, 3), "1,13 l de soupe");
+  assert.equal(scaleIngredient("1 œuf", 3, 1), "0,33 œuf");
+  assert.equal(scaleIngredient("Sel", 4, 6), "Sel");
+});
+
 test("builds a Cookbook with French Recipes, search filters, and cook mode", async () => {
   await run("npm", ["run", "build"]);
   const page = await readFile("dist/index.html", "utf8");
@@ -87,6 +95,12 @@ test("builds a Cookbook with French Recipes, search filters, and cook mode", asy
     "Réinitialiser",
     "data-tag-filter",
     "function updateCollection()",
+    "Nombre de personnes",
+    'type="number"',
+    'min="1"',
+    'step="1"',
+    "function setServings(index, value)",
+    "scaleIngredient",
   ]) {
     assert.ok(page.includes(text) || source.includes(text), `expected ${text}`);
   }
