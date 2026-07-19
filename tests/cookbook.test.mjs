@@ -11,7 +11,10 @@ test("builds a Cookbook with its Recipes and cook mode", async () => {
 	const page = await readFile("dist/index.html", "utf8");
 	assert.equal((page.match(/data-recipe="\d+"/g) ?? []).length, 12);
 	assert.match(page, /<dt[^>]*>Course<\/dt><dd[^>]*>dessert<\/dd>/);
-	assert.match(page, /<dt[^>]*>Qualifiers<\/dt><dd[^>]*>make-ahead, pantry<\/dd>/);
+	assert.match(
+		page,
+		/<dt[^>]*>Qualifiers<\/dt><dd[^>]*>make-ahead, pantry<\/dd>/,
+	);
 	for (const text of [
 		"Apple crumble",
 		"Tender apples under a buttery oat topping.",
@@ -21,7 +24,13 @@ test("builds a Cookbook with its Recipes and cook mode", async () => {
 		"Enter cook mode",
 		"Exit cook mode",
 		"Current step",
+		"function resetCook()",
 	]) {
 		assert.ok(page.includes(text), `expected ${text}`);
 	}
+	assert.match(
+		page,
+		/exit-cook'\)\.addEventListener\('click', \(\) => \{ resetCook\(\);/,
+	);
+	assert.doesNotMatch(page, /\b(?:localStorage|sessionStorage|indexedDB)\b/);
 });
