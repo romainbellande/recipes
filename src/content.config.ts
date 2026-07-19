@@ -1,7 +1,18 @@
 import { defineCollection } from 'astro:content';
-import { docsLoader } from '@astrojs/starlight/loaders';
-import { docsSchema } from '@astrojs/starlight/schema';
+import { glob } from 'astro/loaders';
+import { z } from 'astro/zod';
 
-export const collections = {
-	docs: defineCollection({ loader: docsLoader(), schema: docsSchema() }),
-};
+const recipes = defineCollection({
+	loader: glob({ base: './src/content/recipes', pattern: '*.md' }),
+	schema: z.object({
+		title: z.string(),
+		summary: z.string(),
+		prep_time: z.string(),
+		cook_time: z.string(),
+		servings: z.coerce.string(),
+		tags: z.array(z.string()),
+		image: z.string().optional(),
+	}),
+});
+
+export const collections = { recipes };

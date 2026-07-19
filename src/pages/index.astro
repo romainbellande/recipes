@@ -1,0 +1,112 @@
+---
+import { getCollection } from 'astro:content';
+
+const durationMinutes = (value: string) => {
+	const hours = Number(value.match(/(\d+) hr/)?.[1] ?? 0);
+	const minutes = Number(value.match(/(\d+) min/)?.[1] ?? 0);
+	return hours * 60 + minutes;
+};
+const displayDuration = (minutes: number) => `${minutes >= 60 ? `${Math.floor(minutes / 60)} hr${minutes % 60 ? ` ${minutes % 60} min` : ''}` : `${minutes} min`}`;
+const recipeParts = (body: string) => {
+	const [ingredientsPart = '', methodPart = ''] = body.split(/^## Method\s*$/m);
+	return {
+		ingredients: ingredientsPart.replace(/^## Ingredients\s*$/m, '').trim().split('\n').filter((line) => line.startsWith('- ')).map((line) => line.slice(2)),
+		steps: methodPart.trim().split('\n').filter((line) => /^\d+\. /.test(line)).map((line) => line.replace(/^\d+\. /, '')),
+	};
+};
+const recipes = (await getCollection('recipes')).sort((a, b) => a.data.title.localeCompare(b.data.title)).map((recipe) => ({
+	id: recipe.id,
+	...recipe.data,
+	total_time: displayDuration(durationMinutes(recipe.data.prep_time) + durationMinutes(recipe.data.cook_time)),
+	...recipeParts(recipe.body ?? ''),
+	course: recipe.data.tags.find((tag) => ['breakfast', 'main', 'side', 'dessert'].includes(tag))!,
+	qualifiers: recipe.data.tags.filter((tag) => !['breakfast', 'main', 'side', 'dessert'].includes(tag)),
+}));
+const serializedRecipes = JSON.stringify(recipes).replace(/</g, '\\u003c');
+---
+
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width" />
+		<meta name="description" content="A small, open collection of dependable everyday Recipes." />
+		<title>Recipes</title>
+	</head>
+	<body>
+		<a class="skip-link" href="#recipe">Skip to Recipe</a>
+		<header class="site-header"><a href="/recipes/">Recipes</a><span>Everyday cooking</span></header>
+		<main class="cookbook" id="browse-view">
+			<nav class="collection" aria-labelledby="collection-title">
+				<p class="eyebrow">The Collection</p>
+				<h1 id="collection-title">Everyday Recipes</h1>
+				<ol>
+					{recipes.map((recipe, index) => <li><button type="button" class:list={{ selected: index === 0 }} data-recipe={index}><span>{String(index + 1).padStart(2, '0')}</span><strong>{recipe.title}</strong><small>{recipe.summary}</small><small>{recipe.total_time} · serves {recipe.servings} · {recipe.course}{recipe.qualifiers.length ? ` · ${recipe.qualifiers.join(', ')}` : ''}</small></button></li>)}
+				</ol>
+			</nav>
+			<section id="recipe" aria-live="polite">
+				{recipes.map((recipe, index) => <article class:list={['recipe', { hidden: index !== 0 }]} data-recipe-panel={index} aria-labelledby={`title-${index}`}>
+					<p class="eyebrow">{recipe.tags.join(' · ')}</p>
+					<h2 id={`title-${index}`}>{recipe.title}</h2>
+					<p class="summary">{recipe.summary}</p>
+					{recipe.image && <img src={recipe.image} alt={`Finished ${recipe.title}`} />}
+					<dl class="metadata"><div><dt>Prep</dt><dd>{recipe.prep_time}</dd></div><div><dt>Cook</dt><dd>{recipe.cook_time}</dd></div><div><dt>Total</dt><dd>{recipe.total_time}</dd></div><div><dt>Serves</dt><dd>{recipe.servings}</dd></div></dl>
+					<button class="primary" type="button" data-cook={index}>Enter cook mode<span class="sr-only"> for {recipe.title}</span></button>
+					<div class="recipe-body"><section aria-labelledby={`ingredients-${index}`}><h3 id={`ingredients-${index}`}>Ingredients</h3><ul>{recipe.ingredients.map((ingredient) => <li>{ingredient}</li>)}</ul></section><section aria-labelledby={`method-${index}`}><h3 id={`method-${index}`}>Method</h3><ol>{recipe.steps.map((step) => <li>{step}</li>)}</ol></section></div>
+				</article>)}
+			</section>
+		</main>
+		<main class="cook-mode" id="cook-view" hidden>
+			<button class="text-button" type="button" id="exit-cook">← Exit cook mode</button>
+			<section class="cook-layout" aria-labelledby="cook-title">
+				<aside><p class="eyebrow">Now cooking</p><h1 id="cook-title"></h1><nav aria-label="Method steps"><ol id="step-nav"></ol></nav><details><summary>Ingredients</summary><ul id="cook-ingredients"></ul></details></aside>
+				<section class="current-step" aria-live="polite"><p class="eyebrow" id="step-count"></p><h2 id="step-title"></h2><p id="step-text"></p><button class="primary" type="button" id="next-step"></button></section>
+			</section>
+		</main>
+		<footer>Recipe content © Recipes contributors, licensed under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>. Changes must be indicated. <a href="https://github.com/romainbellande/recipes">Source</a></footer>
+		<script is:inline id="recipes-json" type="application/json" set:html={serializedRecipes}></script>
+		<script is:inline>
+			const recipes = JSON.parse(document.querySelector('#recipes-json').textContent);
+			let selected = 0;
+			let step = 0;
+			const browse = document.querySelector('#browse-view');
+			const cook = document.querySelector('#cook-view');
+			const title = document.querySelector('#cook-title');
+			const stepNav = document.querySelector('#step-nav');
+			const ingredients = document.querySelector('#cook-ingredients');
+			const count = document.querySelector('#step-count');
+			const stepTitle = document.querySelector('#step-title');
+			const stepText = document.querySelector('#step-text');
+			const next = document.querySelector('#next-step');
+			function selectRecipe(index) {
+				selected = index;
+				document.querySelectorAll('[data-recipe-panel]').forEach((panel, panelIndex) => panel.classList.toggle('hidden', panelIndex !== index));
+				document.querySelectorAll('[data-recipe]').forEach((button, buttonIndex) => button.classList.toggle('selected', buttonIndex === index));
+			}
+			function showStep(index) {
+				step = index;
+				const recipe = recipes[selected];
+				count.textContent = `Step ${step + 1} of ${recipe.steps.length}`;
+				stepTitle.textContent = 'Current step';
+				stepText.textContent = recipe.steps[step];
+				next.textContent = step === recipe.steps.length - 1 ? 'Finish Recipe' : 'Next step';
+				stepNav.querySelectorAll('button').forEach((button, buttonIndex) => button.setAttribute('aria-current', String(buttonIndex === step)));
+			}
+			function enterCook(index) {
+				selected = index; step = 0;
+				const recipe = recipes[selected];
+				title.textContent = recipe.title;
+				stepNav.replaceChildren(...recipe.steps.map((item, index) => { const button = document.createElement('button'); button.type = 'button'; button.textContent = `${index + 1}. ${item}`; button.addEventListener('click', () => showStep(index)); const li = document.createElement('li'); li.append(button); return li; }));
+				ingredients.replaceChildren(...recipe.ingredients.map((item) => { const li = document.createElement('li'); const label = document.createElement('label'); const check = document.createElement('input'); check.type = 'checkbox'; label.append(check, ` ${item}`); li.append(label); return li; }));
+				browse.hidden = true; cook.hidden = false; showStep(0); document.querySelector('#exit-cook').focus();
+			}
+			document.querySelectorAll('[data-recipe]').forEach((button) => button.addEventListener('click', () => selectRecipe(Number(button.dataset.recipe))));
+			document.querySelectorAll('[data-cook]').forEach((button) => button.addEventListener('click', () => enterCook(Number(button.dataset.cook))));
+			next.addEventListener('click', () => step === recipes[selected].steps.length - 1 ? document.querySelector('#exit-cook').click() : showStep(step + 1));
+			document.querySelector('#exit-cook').addEventListener('click', () => { cook.hidden = true; browse.hidden = false; document.querySelector(`[data-recipe="${selected}"]`).focus(); });
+		</script>
+	</body>
+</html>
+
+<style>
+	:root { color: #241b16; background: #fffaf4; font-family: Georgia, serif; } * { box-sizing: border-box; } body { margin: 0; } a { color: inherit; text-underline-offset: .2em; } button { font: inherit; } button, a { cursor: pointer; } button:focus-visible, a:focus-visible, input:focus-visible, summary:focus-visible { outline: 3px solid #005fcc; outline-offset: 3px; } .skip-link { position: absolute; left: 1rem; top: -4rem; background: white; padding: .75rem; } .skip-link:focus { top: 1rem; } .site-header, footer { max-width: 76rem; margin: auto; padding: 1.25rem 2rem; display: flex; justify-content: space-between; gap: 1rem; font-family: system-ui, sans-serif; } .site-header a { font-weight: 800; text-decoration: none; } .cookbook { max-width: 76rem; margin: 2rem auto; padding: 0 2rem; display: grid; grid-template-columns: minmax(16rem, .7fr) 2fr; gap: clamp(2rem, 8vw, 7rem); } .collection ol, .collection li, .collection button, .recipe-body ul { list-style: none; padding: 0; } .collection button { width: 100%; text-align: left; border: 0; border-top: 1px solid #d9cec2; background: transparent; padding: 1rem 0; display: grid; grid-template-columns: 2.5rem 1fr; gap: .25rem; } .collection button.selected { font-weight: 800; color: #803c20; } .collection button small { grid-column: 2; color: #6b5d53; line-height: 1.35; } .eyebrow { color: #7b4b32; font: 700 .75rem system-ui, sans-serif; letter-spacing: .08em; text-transform: uppercase; } h1, h2 { line-height: 1; } .recipe h2, .cook-mode h1 { font-size: clamp(2.5rem, 6vw, 5rem); margin: .3rem 0 1rem; } .summary { font-size: 1.25rem; line-height: 1.5; max-width: 44rem; } .recipe img { max-width: 100%; height: auto; } .metadata { display: flex; flex-wrap: wrap; gap: 1rem 2rem; margin: 2rem 0; font-family: system-ui, sans-serif; } .metadata div { display: grid; gap: .25rem; } dt { color: #6b5d53; font-size: .85rem; } dd { margin: 0; font-weight: 700; } .primary { border: 0; background: #803c20; color: white; padding: .8rem 1rem; font-weight: 700; } .recipe-body { display: grid; grid-template-columns: minmax(12rem, .7fr) 1.5fr; gap: 3rem; margin-top: 3rem; } .recipe-body section { border-top: 2px solid #241b16; } .recipe-body li { margin: .75rem 0; line-height: 1.45; } .hidden { display: none; } .cook-mode { max-width: 76rem; margin: 2rem auto; padding: 0 2rem; } .text-button { border: 0; background: transparent; padding: 0; text-decoration: underline; } .cook-layout { display: grid; grid-template-columns: minmax(16rem, .7fr) 2fr; gap: clamp(2rem, 8vw, 7rem); margin-top: 2rem; } #step-nav { font-family: system-ui, sans-serif; } #step-nav ol { padding-left: 1.5rem; } #step-nav button { border: 0; background: transparent; padding: .4rem 0; text-align: left; } #step-nav button[aria-current="true"] { font-weight: 800; color: #803c20; } details { margin-top: 2rem; } .current-step { min-height: 22rem; background: #f0e5d9; padding: clamp(1.5rem, 6vw, 5rem); } .current-step h2 { font-size: clamp(2rem, 5vw, 4rem); } .current-step p:not(.eyebrow) { font-size: 1.3rem; line-height: 1.5; } footer { border-top: 1px solid #d9cec2; margin-top: 4rem; font-size: .9rem; flex-wrap: wrap; } .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; } @media (max-width: 720px) { .site-header, footer, .cookbook, .cook-mode { padding-left: 1rem; padding-right: 1rem; } .cookbook, .cook-layout, .recipe-body { grid-template-columns: 1fr; } .recipe-body { gap: 1rem; } }
+</style>
