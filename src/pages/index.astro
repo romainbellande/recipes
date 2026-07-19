@@ -74,10 +74,37 @@ const serializedRecipes = JSON.stringify(recipes).replace(/</g, "\\u003c");
       <nav class="collection" aria-labelledby="collection-title">
         <p class="eyebrow">La Collection</p>
         <h1 id="collection-title">Recettes du quotidien</h1>
+        <label class="search-label" for="recipe-search"
+          >Rechercher une Recette</label
+        >
+        <input
+          id="recipe-search"
+          type="search"
+          placeholder="Titre, résumé ou ingrédient"
+          aria-describedby="collection-results"
+        />
+        <fieldset class="tag-filters">
+          <legend>Filtrer par étiquette</legend>
+          {
+            [...new Set(recipes.flatMap((recipe) => recipe.tags))].map(
+              (tag) => (
+                <label>
+                  <input type="checkbox" value={tag} data-tag-filter />
+                  {tagLabels[tag]}
+                </label>
+              ),
+            )
+          }
+        </fieldset>
+        <p id="collection-results" aria-live="polite"></p>
+        <div id="empty-state" role="status" hidden>
+          <p>Aucune Recette ne correspond à votre recherche.</p>
+          <button type="button" id="reset-filters">Réinitialiser</button>
+        </div>
         <ol>
           {
             recipes.map((recipe, index) => (
-              <li>
+              <li data-recipe-item={index}>
                 <button
                   type="button"
                   class:list={{ selected: index === 0 }}
@@ -206,13 +233,45 @@ const serializedRecipes = JSON.stringify(recipes).replace(/</g, "\\u003c");
       type="application/json"
       set:html={serializedRecipes}
     />
-    <script is:inline>
+    <script>
+      // @ts-nocheck
+      import {
+        matchingRecipeIndices,
+        nextSelection,
+        resetCollection,
+      } from "../scripts/collection.js";
+
       const recipes = JSON.parse(
         document.querySelector("#recipes-json").textContent,
       );
       let selected = 0;
       let step = 0;
       const browse = document.querySelector("#browse-view");
+      const recipeDetail = document.querySelector("#recipe");
+      const search = document.querySelector("#recipe-search");
+      const filters = [...document.querySelectorAll("[data-tag-filter]")];
+      const results = document.querySelector("#collection-results");
+      const emptyState = document.querySelector("#empty-state");
+      function updateCollection() {
+        const selectedTags = filters
+          .filter((filter) => filter.checked)
+          .map((filter) => filter.value);
+        const matches = matchingRecipeIndices(
+          recipes,
+          search.value,
+          selectedTags,
+        );
+        document
+          .querySelectorAll("[data-recipe-item]")
+          .forEach((item, index) => {
+            item.hidden = !matches.includes(index);
+          });
+        results.textContent = `${matches.length} Recette${matches.length === 1 ? "" : "s"}`;
+        const hasMatches = matches.length > 0;
+        recipeDetail.hidden = !hasMatches;
+        emptyState.hidden = hasMatches;
+        if (hasMatches) selectRecipe(nextSelection(matches, selected));
+      }
       const cook = document.querySelector("#cook-view");
       const title = document.querySelector("#cook-title");
       const stepNav = document.querySelector("#step-nav");
@@ -291,6 +350,16 @@ const serializedRecipes = JSON.stringify(recipes).replace(/</g, "\\u003c");
         window.scrollTo(0, 0);
         document.querySelector("#exit-cook").focus();
       }
+      search.addEventListener("input", updateCollection);
+      filters.forEach((filter) =>
+        filter.addEventListener("change", updateCollection),
+      );
+      document.querySelector("#reset-filters").addEventListener("click", () => {
+        resetCollection(search, filters);
+        updateCollection();
+        search.focus();
+      });
+      updateCollection();
       document
         .querySelectorAll("[data-recipe]")
         .forEach((button) =>
@@ -391,6 +460,37 @@ const serializedRecipes = JSON.stringify(recipes).replace(/</g, "\\u003c");
   .recipe-body ul {
     list-style: none;
     padding: 0;
+  }
+  .search-label,
+  .tag-filters {
+    display: block;
+    margin: 1rem 0 0.5rem;
+    font-family: system-ui, sans-serif;
+    font-weight: 700;
+  }
+  #recipe-search {
+    width: 100%;
+    padding: 0.6rem;
+    border: 1px solid #6b5d53;
+    font: inherit;
+  }
+  .tag-filters {
+    border: 0;
+    padding: 0;
+  }
+  .tag-filters label {
+    display: block;
+    margin: 0.35rem 0;
+    font-weight: 400;
+  }
+  #empty-state {
+    margin: 1rem 0;
+  }
+  #reset-filters {
+    border: 1px solid #803c20;
+    background: transparent;
+    color: #803c20;
+    padding: 0.5rem 0.75rem;
   }
   .collection button {
     width: 100%;

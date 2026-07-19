@@ -3,12 +3,65 @@ import { execFile } from "node:child_process";
 import { readFile } from "node:fs/promises";
 import { promisify } from "node:util";
 import test from "node:test";
+import {
+  matchingRecipeIndices,
+  nextSelection,
+  resetCollection,
+} from "../src/scripts/collection.js";
 
 const run = promisify(execFile);
 
-test("builds a Cookbook with French Recipes and cook mode", async () => {
+const recipes = [
+  {
+    title: "Tarte aux pommes",
+    summary: "Un dessert simple",
+    ingredients: ["pommes", "farine"],
+    tags: ["dessert", "vegetarian"],
+  },
+  {
+    title: "Soupe du soir",
+    summary: "Un dîner avec du poivron",
+    ingredients: ["lentilles"],
+    tags: ["main", "vegetarian"],
+  },
+  {
+    title: "Poulet rôti",
+    summary: "Un plat principal",
+    ingredients: ["citron"],
+    tags: ["main"],
+  },
+];
+
+test("filters titles, summaries, ingredients, and tags", () => {
+  assert.deepEqual(matchingRecipeIndices(recipes, "PÔMME", []), [0]);
+  assert.deepEqual(matchingRecipeIndices(recipes, "poivron", []), [1]);
+  assert.deepEqual(matchingRecipeIndices(recipes, "citron", []), [2]);
+  assert.deepEqual(
+    matchingRecipeIndices(recipes, "", ["main", "vegetarian"]),
+    [1],
+  );
+});
+
+test("keeps a matching selection or uses the first result", () => {
+  assert.equal(nextSelection([1, 2], 2), 2);
+  assert.equal(nextSelection([1, 2], 0), 1);
+});
+
+test("resets the query and every active filter", () => {
+  const search = { value: "pomme" };
+  const filters = [{ checked: true }, { checked: false }];
+  resetCollection(search, filters);
+  assert.equal(search.value, "");
+  assert.deepEqual(
+    filters.map((filter) => filter.checked),
+    [false, false],
+  );
+});
+
+test("builds a Cookbook with French Recipes, search filters, and cook mode", async () => {
   await run("npm", ["run", "build"]);
   const page = await readFile("dist/index.html", "utf8");
+  const source = await readFile("src/pages/index.astro", "utf8");
   assert.equal((page.match(/data-recipe="\d+"/g) ?? []).length, 12);
   assert.match(page, /<dt[^>]*>Type de plat<\/dt><dd[^>]*>Dessert<\/dd>/);
   assert.match(
@@ -27,12 +80,25 @@ test("builds a Cookbook with French Recipes and cook mode", async () => {
     "Étape suivante",
     "Terminer la Recette",
     "function resetCook()",
+    'type="search"',
+    "Rechercher une Recette",
+    "Filtrer par étiquette",
+    "Aucune Recette ne correspond à votre recherche.",
+    "Réinitialiser",
+    "data-tag-filter",
+    "function updateCollection()",
   ]) {
-    assert.ok(page.includes(text), `expected ${text}`);
+    assert.ok(page.includes(text) || source.includes(text), `expected ${text}`);
   }
   assert.match(
-    page,
+    source,
     /exit-cook["']\)\.addEventListener\(["']click["'], \(\) => \{\s*resetCook\(\);/,
   );
+  assert.match(
+    source,
+    /matchingRecipeIndices\(\s*recipes,\s*search\.value,\s*selectedTags,\s*\)/,
+  );
+  assert.match(source, /recipeDetail\.hidden = !hasMatches/);
+  assert.match(source, /nextSelection\(matches, selected\)/);
   assert.doesNotMatch(page, /\b(?:localStorage|sessionStorage|indexedDB)\b/);
 });
