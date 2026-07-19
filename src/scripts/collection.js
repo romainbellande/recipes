@@ -28,3 +28,22 @@ export const resetCollection = (search, filters) => {
     filter.checked = false;
   });
 };
+
+export const scaleIngredient = (
+  ingredient,
+  canonicalServings,
+  selectedServings,
+) => {
+  const match = ingredient.match(/^(\d+(?:[.,]\d+)?)/);
+  if (!match) return ingredient;
+
+  const quantity = Number(match[1].replace(",", "."));
+  const scaled = (quantity * selectedServings) / canonicalServings;
+  if (!Number.isFinite(scaled)) return ingredient;
+
+  const formatted = new Intl.NumberFormat("fr-FR", {
+    maximumFractionDigits: 2,
+    useGrouping: false,
+  }).format(scaled);
+  return `${formatted}${ingredient.slice(match[1].length)}`;
+};
