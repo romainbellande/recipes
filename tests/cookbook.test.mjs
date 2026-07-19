@@ -1,0 +1,23 @@
+import assert from "node:assert/strict";
+import { execFile } from "node:child_process";
+import { readFile } from "node:fs/promises";
+import { promisify } from "node:util";
+import test from "node:test";
+
+const run = promisify(execFile);
+
+test("builds a Cookbook with its Recipes and cook mode", async () => {
+	await run("npm", ["run", "build"]);
+	const page = await readFile("dist/index.html", "utf8");
+	assert.equal((page.match(/data-recipe="\d+"/g) ?? []).length, 12);
+	for (const text of [
+		"Apple crumble",
+		"Tender apples under a buttery oat topping.",
+		"1 hr · serves 6 · dessert · make-ahead",
+		"Enter cook mode",
+		"Exit cook mode",
+		"Current step",
+	]) {
+		assert.ok(page.includes(text), `expected ${text}`);
+	}
+});
