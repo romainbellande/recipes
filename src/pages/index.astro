@@ -40,16 +40,16 @@ const serializedRecipes = JSON.stringify(recipes).replace(/</g, '\\u003c');
 				<p class="eyebrow">The Collection</p>
 				<h1 id="collection-title">Everyday Recipes</h1>
 				<ol>
-					{recipes.map((recipe, index) => <li><button type="button" class:list={{ selected: index === 0 }} data-recipe={index}><span>{String(index + 1).padStart(2, '0')}</span><strong>{recipe.title}</strong><small>{recipe.summary}</small><small>{recipe.total_time} · serves {recipe.servings} · {recipe.course}{recipe.qualifiers.length ? ` · ${recipe.qualifiers.join(', ')}` : ''}</small></button></li>)}
+					{recipes.map((recipe, index) => <li><button type="button" class:list={{ selected: index === 0 }} aria-controls={`recipe-${index}`} aria-current={index === 0 ? 'true' : undefined} data-recipe={index}><span>{String(index + 1).padStart(2, '0')}</span><strong>{recipe.title}</strong><small>{recipe.summary}</small><small>{recipe.total_time} · serves {recipe.servings} · {recipe.course}{recipe.qualifiers.length ? ` · ${recipe.qualifiers.join(', ')}` : ''}</small></button></li>)}
 				</ol>
 			</nav>
 			<section id="recipe" aria-live="polite">
-				{recipes.map((recipe, index) => <article class:list={['recipe', { hidden: index !== 0 }]} data-recipe-panel={index} aria-labelledby={`title-${index}`}>
+				{recipes.map((recipe, index) => <article id={`recipe-${index}`} class:list={['recipe', { hidden: index !== 0 }]} data-recipe-panel={index} aria-labelledby={`title-${index}`}>
 					<p class="eyebrow">{recipe.tags.join(' · ')}</p>
 					<h2 id={`title-${index}`}>{recipe.title}</h2>
 					<p class="summary">{recipe.summary}</p>
 					{recipe.image && <img src={recipe.image} alt={`Finished ${recipe.title}`} />}
-					<dl class="metadata"><div><dt>Prep</dt><dd>{recipe.prep_time}</dd></div><div><dt>Cook</dt><dd>{recipe.cook_time}</dd></div><div><dt>Total</dt><dd>{recipe.total_time}</dd></div><div><dt>Serves</dt><dd>{recipe.servings}</dd></div></dl>
+					<dl class="metadata"><div><dt>Prep</dt><dd>{recipe.prep_time}</dd></div><div><dt>Cook</dt><dd>{recipe.cook_time}</dd></div><div><dt>Total</dt><dd>{recipe.total_time}</dd></div><div><dt>Serves</dt><dd>{recipe.servings}</dd></div><div><dt>Course</dt><dd>{recipe.course}</dd></div>{recipe.qualifiers.length > 0 && <div><dt>Qualifiers</dt><dd>{recipe.qualifiers.join(', ')}</dd></div>}</dl>
 					<button class="primary" type="button" data-cook={index}>Enter cook mode<span class="sr-only"> for {recipe.title}</span></button>
 					<div class="recipe-body"><section aria-labelledby={`ingredients-${index}`}><h3 id={`ingredients-${index}`}>Ingredients</h3><ul>{recipe.ingredients.map((ingredient) => <li>{ingredient}</li>)}</ul></section><section aria-labelledby={`method-${index}`}><h3 id={`method-${index}`}>Method</h3><ol>{recipe.steps.map((step) => <li>{step}</li>)}</ol></section></div>
 				</article>)}
@@ -80,7 +80,7 @@ const serializedRecipes = JSON.stringify(recipes).replace(/</g, '\\u003c');
 			function selectRecipe(index) {
 				selected = index;
 				document.querySelectorAll('[data-recipe-panel]').forEach((panel, panelIndex) => panel.classList.toggle('hidden', panelIndex !== index));
-				document.querySelectorAll('[data-recipe]').forEach((button, buttonIndex) => button.classList.toggle('selected', buttonIndex === index));
+				document.querySelectorAll('[data-recipe]').forEach((button, buttonIndex) => { const selected = buttonIndex === index; button.classList.toggle('selected', selected); button.setAttribute('aria-current', String(selected)); });
 			}
 			function showStep(index) {
 				step = index;
