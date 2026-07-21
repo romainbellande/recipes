@@ -12,8 +12,31 @@ interface Props {
   recipe: CollectionEntry<"recipes">;
 }
 
+const recipeParts = (body: string) => {
+  const [ingredientsPart = "", methodPart = ""] =
+    body.split(/^## Préparation\s*$/m);
+  return {
+    ingredients: ingredientsPart
+      .replace(/^## Ingrédients\s*$/m, "")
+      .trim()
+      .split("\n")
+      .filter((line) => line.startsWith("- "))
+      .map((line) => line.slice(2)),
+    steps: methodPart
+      .trim()
+      .split("\n")
+      .filter((line) => /^\d+\. /.test(line))
+      .map((line) => line.replace(/^\d+\. /, "")),
+  };
+};
+
 const { recipe } = Astro.props;
 const { Content } = await render(recipe);
+const serializedRecipe = JSON.stringify({
+  title: recipe.data.title,
+  servings: Number(recipe.data.servings),
+  ...recipeParts(recipe.body ?? ""),
+}).replace(/</g, "\\u003c");
 ---
 
 <html lang="fr">
@@ -29,7 +52,7 @@ const { Content } = await render(recipe);
       <a href={import.meta.env.BASE_URL}>Recettes</a>
       <span>Cuisine du quotidien</span>
     </header>
-    <main>
+    <main id="recipe-view">
       <a
         id="return-link"
         class="return-link"
@@ -39,8 +62,47 @@ const { Content } = await render(recipe);
       <article>
         <h1 id="recipe-title" tabindex="-1">{recipe.data.title}</h1>
         <p class="summary">{recipe.data.summary}</p>
-        <Content />
+        <label class="servings-control" for="recipe-servings">
+          Nombre de personnes
+          <input
+            id="recipe-servings"
+            type="number"
+            min="1"
+            step="1"
+            value={recipe.data.servings}
+          />
+        </label>
+        <button class="primary" type="button" id="enter-cook">
+          Passer en mode cuisine
+        </button>
+        <div id="recipe-content"><Content /></div>
       </article>
+    </main>
+    <main class="cook-mode" id="cook-view" hidden>
+      <button class="text-button" type="button" id="exit-cook"
+        >← Quitter le mode cuisine</button
+      >
+      <section class="cook-layout" aria-labelledby="cook-title">
+        <aside>
+          <p class="eyebrow">En cuisine</p>
+          <h1 id="cook-title"></h1>
+          <label class="servings-control" for="cook-servings">
+            Nombre de personnes
+            <input id="cook-servings" type="number" min="1" step="1" />
+          </label>
+          <nav aria-label="Étapes de préparation"><ol id="step-nav"></ol></nav>
+          <details>
+            <summary>Ingrédients</summary>
+            <ul id="cook-ingredients"></ul>
+          </details>
+        </aside>
+        <section class="current-step" aria-live="polite">
+          <p class="eyebrow" id="step-count"></p>
+          <h2 id="step-title"></h2>
+          <p id="step-text"></p>
+          <button class="primary" type="button" id="next-step"></button>
+        </section>
+      </section>
     </main>
     <footer>
       Contenu des Recettes © contributeurs de Recettes, sous licence <a
@@ -49,12 +111,146 @@ const { Content } = await render(recipe);
         href="https://github.com/romainbellande/recipes">Source</a
       >
     </footer>
+    <script
+      is:inline
+      id="recipe-json"
+      type="application/json"
+      set:html={serializedRecipe}
+    />
     <script>
       // @ts-nocheck
       import {
         collectionFiltersFromSearch,
         collectionSearchParams,
+        scaleIngredient,
       } from "../../scripts/collection.js";
+
+      const recipe = JSON.parse(
+        document.querySelector("#recipe-json").textContent,
+      );
+      let selectedServings = recipe.servings;
+      let step = 0;
+      const recipeView = document.querySelector("#recipe-view");
+      const cook = document.querySelector("#cook-view");
+      const recipeServings = document.querySelector("#recipe-servings");
+      const cookServings = document.querySelector("#cook-servings");
+      const recipeIngredients = [
+        ...document.querySelectorAll("#recipe-content h2"),
+      ].find(
+        (heading) => heading.textContent === "Ingrédients",
+      ).nextElementSibling;
+      const title = document.querySelector("#cook-title");
+      const stepNav = document.querySelector("#step-nav");
+      const ingredients = document.querySelector("#cook-ingredients");
+      const count = document.querySelector("#step-count");
+      const stepTitle = document.querySelector("#step-title");
+      const stepText = document.querySelector("#step-text");
+      const next = document.querySelector("#next-step");
+      const exitCook = document.querySelector("#exit-cook");
+      const validServings = (value) =>
+        /^\d+$/.test(value) &&
+        Number.isSafeInteger(Number(value)) &&
+        Number(value) > 0;
+
+      function updateServings(value) {
+        if (!validServings(value)) return;
+        selectedServings = Number(value);
+        recipeServings.value = selectedServings;
+        cookServings.value = selectedServings;
+        recipeIngredients.querySelectorAll("li").forEach((item, index) => {
+          item.textContent = scaleIngredient(
+            recipe.ingredients[index],
+            recipe.servings,
+            selectedServings,
+          );
+        });
+        ingredients.querySelectorAll("label").forEach((label, index) => {
+          label.lastChild.textContent = ` ${scaleIngredient(
+            recipe.ingredients[index],
+            recipe.servings,
+            selectedServings,
+          )}`;
+        });
+      }
+
+      function showStep(index) {
+        step = index;
+        count.textContent = `Étape ${step + 1} sur ${recipe.steps.length}`;
+        stepTitle.textContent = "Étape en cours";
+        stepText.textContent = recipe.steps[step];
+        next.textContent =
+          step === recipe.steps.length - 1
+            ? "Terminer la Recette"
+            : "Étape suivante";
+        stepNav
+          .querySelectorAll("button")
+          .forEach((button, buttonIndex) =>
+            button.setAttribute("aria-current", String(buttonIndex === step)),
+          );
+      }
+
+      function resetCook() {
+        showStep(0);
+        ingredients.querySelectorAll("input").forEach((input) => {
+          input.checked = false;
+        });
+      }
+
+      function enterCook() {
+        title.textContent = recipe.title;
+        cookServings.value = selectedServings;
+        stepNav.replaceChildren(
+          ...recipe.steps.map((item, index) => {
+            const button = document.createElement("button");
+            button.type = "button";
+            button.textContent = `${index + 1}. ${item}`;
+            button.addEventListener("click", () => showStep(index));
+            const li = document.createElement("li");
+            li.append(button);
+            return li;
+          }),
+        );
+        ingredients.replaceChildren(
+          ...recipe.ingredients.map((item) => {
+            const li = document.createElement("li");
+            const label = document.createElement("label");
+            const check = document.createElement("input");
+            check.type = "checkbox";
+            label.append(
+              check,
+              ` ${scaleIngredient(item, recipe.servings, selectedServings)}`,
+            );
+            li.append(label);
+            return li;
+          }),
+        );
+        recipeView.hidden = true;
+        cook.hidden = false;
+        showStep(0);
+        window.scrollTo(0, 0);
+        exitCook.focus();
+      }
+
+      recipeServings.addEventListener("input", () =>
+        updateServings(recipeServings.value),
+      );
+      cookServings.addEventListener("input", () =>
+        updateServings(cookServings.value),
+      );
+      document
+        .querySelector("#enter-cook")
+        .addEventListener("click", enterCook);
+      next.addEventListener("click", () =>
+        step === recipe.steps.length - 1
+          ? exitCook.click()
+          : showStep(step + 1),
+      );
+      exitCook.addEventListener("click", () => {
+        resetCook();
+        cook.hidden = true;
+        recipeView.hidden = false;
+        recipeServings.focus();
+      });
 
       const returnLink = document.querySelector("#return-link");
       const controlledTags = [
@@ -88,6 +284,12 @@ const { Content } = await render(recipe);
     background: #fffaf4;
     font-family: Georgia, serif;
   }
+  * {
+    box-sizing: border-box;
+  }
+  [hidden] {
+    display: none !important;
+  }
   body {
     margin: 0;
   }
@@ -95,8 +297,19 @@ const { Content } = await render(recipe);
     color: inherit;
     text-underline-offset: 0.2em;
   }
+  button,
+  input {
+    font: inherit;
+  }
+  button,
+  a {
+    cursor: pointer;
+  }
+  button:focus-visible,
   a:focus-visible,
-  h1:focus-visible {
+  h1:focus-visible,
+  input:focus-visible,
+  summary:focus-visible {
     outline: 3px solid #005fcc;
     outline-offset: 3px;
   }
@@ -118,12 +331,19 @@ const { Content } = await render(recipe);
     font-weight: 800;
     text-decoration: none;
   }
-  main {
+  #recipe-view {
     padding-top: 2rem;
   }
-  .return-link {
+  .return-link,
+  .text-button {
     font-family: system-ui, sans-serif;
     font-weight: 700;
+  }
+  .text-button {
+    border: 0;
+    background: transparent;
+    padding: 0;
+    text-decoration: underline;
   }
   article {
     margin-top: 2rem;
@@ -137,8 +357,84 @@ const { Content } = await render(recipe);
     font-size: 1.25rem;
     line-height: 1.5;
   }
+  .servings-control {
+    display: grid;
+    gap: 0.35rem;
+    margin: 1rem 0;
+    font-family: system-ui, sans-serif;
+    font-weight: 700;
+  }
+  .servings-control input {
+    max-width: 8rem;
+    padding: 0.5rem;
+  }
+  .primary {
+    border: 0;
+    background: #803c20;
+    color: white;
+    padding: 0.8rem 1rem;
+    font-weight: 700;
+  }
   article :global(li),
   article :global(p) {
+    line-height: 1.5;
+  }
+  .cook-mode {
+    max-width: 76rem;
+    margin-top: 2rem;
+  }
+  .cook-layout {
+    display: grid;
+    grid-template-columns: minmax(16rem, 0.7fr) 2fr;
+    gap: clamp(2rem, 8vw, 7rem);
+    margin-top: 2rem;
+  }
+  .cook-mode h1 {
+    margin-top: 0.3rem;
+  }
+  #step-nav {
+    font-family: system-ui, sans-serif;
+  }
+  #step-nav ol {
+    padding-left: 1.5rem;
+  }
+  #step-nav button {
+    border: 0;
+    background: transparent;
+    padding: 0.4rem 0;
+    text-align: left;
+  }
+  #step-nav button[aria-current="true"] {
+    font-weight: 800;
+    color: #803c20;
+  }
+  details {
+    margin-top: 2rem;
+  }
+  #cook-ingredients {
+    padding-left: 1.5rem;
+  }
+  #cook-ingredients li {
+    margin: 0.5rem 0;
+  }
+  .current-step {
+    min-height: 22rem;
+    background: #f0e5d9;
+    padding: clamp(1.5rem, 6vw, 5rem);
+  }
+  .eyebrow {
+    color: #7b4b32;
+    font:
+      700 0.75rem system-ui,
+      sans-serif;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .current-step h2 {
+    font-size: clamp(2rem, 5vw, 4rem);
+  }
+  .current-step p:not(.eyebrow) {
+    font-size: 1.3rem;
     line-height: 1.5;
   }
   footer {
@@ -153,6 +449,9 @@ const { Content } = await render(recipe);
     footer {
       padding-left: 1rem;
       padding-right: 1rem;
+    }
+    .cook-layout {
+      grid-template-columns: 1fr;
     }
   }
 </style>

@@ -19,6 +19,24 @@ export const matchingRecipeIndices = (recipes, query, selectedTags) => {
     .map(({ index }) => index);
 };
 
+export const scaleIngredient = (
+  ingredient,
+  canonicalServings,
+  selectedServings,
+) => {
+  const match = ingredient.match(/^(\d+(?:[.,]\d+)?)/);
+  if (!match) return ingredient;
+
+  const quantity = Number(match[1].replace(",", "."));
+  const scaled = (quantity * selectedServings) / canonicalServings;
+  if (!Number.isFinite(scaled)) return ingredient;
+
+  return `${new Intl.NumberFormat("fr-FR", {
+    maximumFractionDigits: 2,
+    useGrouping: false,
+  }).format(scaled)}${ingredient.slice(match[1].length)}`;
+};
+
 export const collectionFiltersFromSearch = (search, controlledTags) => {
   const parameters = new URLSearchParams(search);
   const recognizedTags = new Set(controlledTags);

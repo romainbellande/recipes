@@ -7,6 +7,7 @@ import {
   collectionFiltersFromSearch,
   collectionSearchParams,
   matchingRecipeIndices,
+  scaleIngredient,
 } from "../src/scripts/collection.js";
 
 const run = promisify(execFile);
@@ -40,6 +41,13 @@ test("filters titles, summaries, ingredients, and tags", () => {
     matchingRecipeIndices(recipes, "", ["main", "vegetarian"]),
     [1],
   );
+});
+
+test("scales leading ingredient quantities with concise French decimals", () => {
+  assert.equal(scaleIngredient("400 g de pâtes", 4, 6), "600 g de pâtes");
+  assert.equal(scaleIngredient("1,5 l de soupe", 4, 3), "1,13 l de soupe");
+  assert.equal(scaleIngredient("1 œuf", 3, 1), "0,33 œuf");
+  assert.equal(scaleIngredient("Sel", 4, 6), "Sel");
 });
 
 test("restores a verbatim query and only distinct controlled URL tags", () => {
@@ -105,6 +113,35 @@ test("builds Collection-to-Recipe navigation with restored context and focus", a
   assert.match(recipeSource, /collectionFiltersFromSearch\(/);
   assert.match(recipeSource, /collectionSearchParams\(/);
   assert.match(recipeSource, /#recipe-title"\)\.focus\(\)/);
+  assert.match(
+    recipe,
+    /<input id="recipe-servings" type="number" min="1" step="1" value="6"[^>]*>/,
+  );
+  assert.match(recipe, /id="enter-cook"[^>]*>Passer en mode cuisine/);
+  assert.match(recipe, /<main class="cook-mode" id="cook-view" hidden[^>]*>/);
+  assert.match(
+    recipe,
+    /id="cook-servings" type="number" min="1" step="1"[^>]*>/,
+  );
+  assert.match(recipeSource, /function updateServings\(value\)/);
+  assert.match(recipeSource, /recipeServings\.value = selectedServings/);
+  assert.match(recipeSource, /cookServings\.value = selectedServings/);
+  assert.match(
+    recipeSource,
+    /function enterCook\(\)[\s\S]*?stepNav\.replaceChildren/,
+  );
+  assert.match(
+    recipeSource,
+    /ingredients\.replaceChildren\([\s\S]*?showStep\(0\)/,
+  );
+  assert.match(
+    recipeSource,
+    /exitCook\.addEventListener\("click", \(\) => \{\s*resetCook\(\);\s*cook\.hidden = true;\s*recipeView\.hidden = false;/,
+  );
+  assert.doesNotMatch(
+    recipeSource,
+    /(?:localStorage|sessionStorage|indexedDB|searchParams\.set\("servings")/,
+  );
   assert.equal(
     (page.match(/class="image-placeholder" aria-hidden="true"/g) ?? []).length,
     recipeFiles.length,
