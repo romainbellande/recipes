@@ -170,4 +170,35 @@ test("builds Collection-to-Recipe navigation with restored context and focus", a
   );
   assert.match(source, /background: #e9dfd3/);
   assert.ok(page.includes("Aucune Recette ne correspond à votre recherche."));
+
+  const aliasRoutes = [];
+  for (const filename of recipeFiles) {
+    const recipeSource = await readFile(
+      `src/content/recipes/${filename}`,
+      "utf8",
+    );
+    const aliases = recipeSource
+      .match(/^aliases:\n((?: {2}- .+\n?)*)/m)?.[1]
+      ?.match(/^ {2}- (.+)$/gm)
+      ?.map((alias) => alias.slice(4));
+    for (const alias of aliases ?? [])
+      aliasRoutes.push({ alias, id: filename.slice(0, -3) });
+  }
+  assert.match(recipeSource, /recipe\.data\.aliases/);
+  assert.match(recipeSource, /window\.location\.replace\(/);
+  assert.match(recipeSource, /window\.location\.search/);
+  assert.match(recipeSource, /window\.location\.hash/);
+  for (const { alias, id } of aliasRoutes) {
+    const redirect = await readFile(`dist/recipe/${alias}/index.html`, "utf8");
+    assert.match(
+      redirect,
+      new RegExp(
+        `<link rel="canonical" href="https://romainbellande\\.github\\.io/recipes/recipe/${id}/"`,
+      ),
+    );
+    assert.match(
+      redirect,
+      /window\.location\.replace\([\s\S]*?window\.location\.search[\s\S]*?window\.location\.hash/,
+    );
+  }
 });
