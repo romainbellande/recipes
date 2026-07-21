@@ -19,31 +19,24 @@ export const matchingRecipeIndices = (recipes, query, selectedTags) => {
     .map(({ index }) => index);
 };
 
-export const nextSelection = (matches, selected) =>
-  matches.includes(selected) ? selected : matches[0];
-
-export const resetCollection = (search, filters) => {
-  search.value = "";
-  filters.forEach((filter) => {
-    filter.checked = false;
-  });
+export const collectionFiltersFromSearch = (search, controlledTags) => {
+  const parameters = new URLSearchParams(search);
+  const recognizedTags = new Set(controlledTags);
+  return {
+    query: parameters.get("q") ?? "",
+    selectedTags: [
+      ...new Set(
+        parameters.getAll("tag").filter((tag) => recognizedTags.has(tag)),
+      ),
+    ],
+  };
 };
 
-export const scaleIngredient = (
-  ingredient,
-  canonicalServings,
-  selectedServings,
-) => {
-  const match = ingredient.match(/^(\d+(?:[.,]\d+)?)/);
-  if (!match) return ingredient;
-
-  const quantity = Number(match[1].replace(",", "."));
-  const scaled = (quantity * selectedServings) / canonicalServings;
-  if (!Number.isFinite(scaled)) return ingredient;
-
-  const formatted = new Intl.NumberFormat("fr-FR", {
-    maximumFractionDigits: 2,
-    useGrouping: false,
-  }).format(scaled);
-  return `${formatted}${ingredient.slice(match[1].length)}`;
+export const collectionSearchParams = (query, selectedTags, controlledTags) => {
+  const parameters = new URLSearchParams();
+  if (query) parameters.set("q", query);
+  const recognizedTags = new Set(controlledTags);
+  for (const tag of new Set(selectedTags))
+    if (recognizedTags.has(tag)) parameters.append("tag", tag);
+  return parameters;
 };
