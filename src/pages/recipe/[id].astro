@@ -1,0 +1,125 @@
+---
+import { getCollection, render, type CollectionEntry } from "astro:content";
+
+export async function getStaticPaths() {
+  return (await getCollection("recipes")).map((recipe) => ({
+    params: { id: recipe.id },
+    props: { recipe },
+  }));
+}
+
+interface Props {
+  recipe: CollectionEntry<"recipes">;
+}
+
+const { recipe } = Astro.props;
+const { Content } = await render(recipe);
+---
+
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="description" content={recipe.data.summary} />
+    <link rel="canonical" href={Astro.url.href} />
+    <title>{recipe.data.title} | Recettes</title>
+  </head>
+  <body>
+    <header>
+      <a href={import.meta.env.BASE_URL}>Recettes</a>
+      <span>Cuisine du quotidien</span>
+    </header>
+    <main>
+      <a class="return-link" href={import.meta.env.BASE_URL}
+        >← Retour à la Collection</a
+      >
+      <article>
+        <h1 id="recipe-title" tabindex="-1">{recipe.data.title}</h1>
+        <p class="summary">{recipe.data.summary}</p>
+        <Content />
+      </article>
+    </main>
+    <footer>
+      Contenu des Recettes © contributeurs de Recettes, sous licence <a
+        href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a
+      >. Les modifications doivent être indiquées. <a
+        href="https://github.com/romainbellande/recipes">Source</a
+      >
+    </footer>
+  </body>
+</html>
+
+<style>
+  :root {
+    color: #241b16;
+    background: #fffaf4;
+    font-family: Georgia, serif;
+  }
+  body {
+    margin: 0;
+  }
+  a {
+    color: inherit;
+    text-underline-offset: 0.2em;
+  }
+  a:focus-visible,
+  h1:focus-visible {
+    outline: 3px solid #005fcc;
+    outline-offset: 3px;
+  }
+  header,
+  main,
+  footer {
+    max-width: 44rem;
+    margin: auto;
+    padding: 1.25rem 2rem;
+  }
+  header,
+  footer {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    font-family: system-ui, sans-serif;
+  }
+  header a {
+    font-weight: 800;
+    text-decoration: none;
+  }
+  main {
+    padding-top: 2rem;
+  }
+  .return-link {
+    font-family: system-ui, sans-serif;
+    font-weight: 700;
+  }
+  article {
+    margin-top: 2rem;
+  }
+  h1 {
+    font-size: clamp(2.5rem, 8vw, 5rem);
+    line-height: 1;
+    margin: 0;
+  }
+  .summary {
+    font-size: 1.25rem;
+    line-height: 1.5;
+  }
+  article :global(li),
+  article :global(p) {
+    line-height: 1.5;
+  }
+  footer {
+    border-top: 1px solid #d9cec2;
+    font-size: 0.9rem;
+    flex-wrap: wrap;
+    margin-top: 4rem;
+  }
+  @media (max-width: 720px) {
+    header,
+    main,
+    footer {
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
+  }
+</style>
