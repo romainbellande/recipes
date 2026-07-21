@@ -2,14 +2,18 @@
 import { getCollection, render, type CollectionEntry } from "astro:content";
 
 export async function getStaticPaths() {
-  return (await getCollection("recipes")).map((recipe) => ({
-    params: { id: recipe.id },
-    props: { recipe },
-  }));
+  return (await getCollection("recipes")).flatMap((recipe) => [
+    { params: { id: recipe.id }, props: { recipe } },
+    ...(recipe.data.aliases ?? []).map((id) => ({
+      params: { id },
+      props: { recipe, isAlias: true },
+    })),
+  ]);
 }
 
 interface Props {
   recipe: CollectionEntry<"recipes">;
+  isAlias?: boolean;
 }
 
 const recipeParts = (body: string) => {
@@ -30,7 +34,11 @@ const recipeParts = (body: string) => {
   };
 };
 
-const { recipe } = Astro.props;
+const { recipe, isAlias = false } = Astro.props;
+const canonicalUrl = new URL(
+  `${import.meta.env.BASE_URL.replace(/\/$/, "")}/recipe/${recipe.id}/`,
+  Astro.url,
+);
 const { Content } = await render(recipe);
 const serializedRecipe = JSON.stringify({
   title: recipe.data.title,
@@ -44,7 +52,16 @@ const serializedRecipe = JSON.stringify({
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width" />
     <meta name="description" content={recipe.data.summary} />
-    <link rel="canonical" href={Astro.url.href} />
+    <link rel="canonical" href={canonicalUrl.href} />
+    {
+      isAlias && (
+        <script is:inline>
+          window.location.replace( `$
+          {document.querySelector('link[rel="canonical"]').pathname}$
+          {window.location.search}${window.location.hash}`, );
+        </script>
+      )
+    }
     <title>{recipe.data.title} | Recettes</title>
   </head>
   <body>
