@@ -164,10 +164,8 @@ test("builds Collection-to-Recipe navigation with restored context and focus", a
   assert.match(source, /collectionFiltersFromSearch\(/);
   assert.match(source, /collectionSearchParams\(/);
   assert.match(source, /a:focus-visible/);
-  assert.match(
-    source,
-    /@media \(max-width: 720px\)[\s\S]*?\.recipe-card \{\s*grid-template-columns: 1fr;/,
-  );
+  assert.match(source, /\.recipe-card \{\s*display: block;/);
+  assert.match(source, /\.image-placeholder \{[\s\S]*?aspect-ratio: 4 \/ 3;/);
   assert.match(source, /background: #e9dfd3/);
   assert.ok(page.includes("Aucune Recette ne correspond à votre recherche."));
 
