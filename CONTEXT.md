@@ -19,3 +19,10 @@ _Avoid_: portions, people count
 **Scaled ingredient quantity**:
 An ingredient quantity recalculated from a Recipe's Servings for a chosen number of Servings.
 _Avoid_: adjusted ingredient, converted amount
+
+**Recipe ID**:
+The canonical identifier derived from a Recipe filename and used in its URL.
+
+**Recipe alias**:
+A former published Recipe ID in that Recipe's front matter; its legacy URL redirects to
+its canonical Recipe URL.

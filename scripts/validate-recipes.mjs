@@ -10,7 +10,8 @@ const requiredFields = [
   "servings",
   "tags",
 ];
-const allowedFields = new Set([...requiredFields, "image"]);
+const allowedFields = new Set([...requiredFields, "aliases", "image"]);
+const recipeId = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const courses = new Set(["breakfast", "main", "side", "dessert"]);
 const qualifiers = new Set(["weeknight", "make-ahead", "vegetarian", "pantry"]);
 const duration = /^(?:(?:[1-9]\d*) h(?: [1-9]\d* min)?|[1-9]\d* min)$/;
@@ -89,6 +90,12 @@ function validateRecipe(filename, source) {
       if (!courses.has(tag) && !qualifiers.has(tag))
         fail(`controlled tag required; found "${tag}"`);
   }
+  const aliases = Array.isArray(fields.aliases) ? fields.aliases : [];
+  if ("aliases" in fields && !Array.isArray(fields.aliases))
+    fail("aliases must be a list");
+  for (const alias of aliases)
+    if (!recipeId.test(alias))
+      fail(`alias must be a Recipe ID; found "${alias}"`);
   if (
     "image" in fields &&
     (typeof fields.image !== "string" ||
@@ -119,7 +126,7 @@ function validateRecipe(filename, source) {
       fail("Préparation must contain numbered steps");
   }
   if (/^# /m.test(body)) fail("Recipe body must not contain an H1");
-  return errors;
+  return { aliases, errors };
 }
 
 export async function validateCollection(directory) {
@@ -128,12 +135,35 @@ export async function validateCollection(directory) {
     .filter((entry) => entry.isFile())
     .map((entry) => entry.name)
     .sort();
-  const errors = await Promise.all(
-    files.map(async (file) =>
-      validateRecipe(file, await readFile(join(directory, file), "utf8")),
-    ),
+  const recipes = await Promise.all(
+    files.map(async (filename) => ({
+      filename,
+      ...validateRecipe(
+        filename,
+        await readFile(join(directory, filename), "utf8"),
+      ),
+    })),
   );
-  return errors.flat();
+  const errors = recipes.flatMap((recipe) => recipe.errors);
+  const canonicalIds = new Map(
+    files.map((filename) => [basename(filename, ".md"), filename]),
+  );
+  const aliases = new Map();
+  for (const recipe of recipes)
+    for (const alias of recipe.aliases) {
+      const canonicalFilename = canonicalIds.get(alias);
+      if (canonicalFilename)
+        errors.push(
+          `${recipe.filename}: alias "${alias}" conflicts with canonical Recipe ID in ${canonicalFilename}`,
+        );
+      const firstAliasFilename = aliases.get(alias);
+      if (firstAliasFilename)
+        errors.push(
+          `${recipe.filename}: alias "${alias}" is already an alias in ${firstAliasFilename}`,
+        );
+      else aliases.set(alias, recipe.filename);
+    }
+  return errors;
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
