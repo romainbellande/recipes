@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { execFile } from "node:child_process";
-import { readFile } from "node:fs/promises";
+import { readdir, readFile } from "node:fs/promises";
 import { promisify } from "node:util";
 import test from "node:test";
 import {
@@ -66,7 +66,7 @@ test("scales leading ingredient quantities with concise French decimals", () => 
   assert.equal(scaleIngredient("Sel", 4, 6), "Sel");
 });
 
-test("builds a Cookbook with French Recipes, search filters, and cook mode", async () => {
+test("builds a Cookbook and dedicated French Recipe URLs", async () => {
   await run("npm", ["run", "build"]);
   const page = await readFile("dist/index.html", "utf8");
   const source = await readFile("src/pages/index.astro", "utf8");
@@ -115,4 +115,35 @@ test("builds a Cookbook with French Recipes, search filters, and cook mode", asy
   assert.match(source, /recipeDetail\.hidden = !hasMatches/);
   assert.match(source, /nextSelection\(matches, selected\)/);
   assert.doesNotMatch(page, /\b(?:localStorage|sessionStorage|indexedDB)\b/);
+
+  const recipeFiles = (await readdir("src/content/recipes"))
+    .filter((filename) => filename.endsWith(".md"))
+    .sort();
+  for (const filename of recipeFiles) {
+    const id = filename.slice(0, -3);
+    const recipe = await readFile(`src/content/recipes/${filename}`, "utf8");
+    const title = recipe.match(/^title: (.+)$/m)?.[1];
+    const ingredient = recipe.match(/^- (.+)$/m)?.[1];
+    const step = recipe.match(/^1\. (.+)$/m)?.[1];
+    const published = await readFile(`dist/recipe/${id}/index.html`, "utf8");
+    const renderedRecipe = published
+      .replaceAll("&#39;", "'")
+      .replaceAll("’", "'");
+    assert.ok(title, `expected title in ${filename}`);
+    assert.ok(ingredient, `expected ingredient in ${filename}`);
+    assert.ok(step, `expected preparation step in ${filename}`);
+    assert.match(published, new RegExp(`<h1[^>]*>${title}</h1>`));
+    assert.ok(renderedRecipe.includes(ingredient));
+    assert.ok(renderedRecipe.includes(step));
+    assert.match(
+      published,
+      /<a class="return-link" href="\/recipes"[^>]*>← Retour à la Collection<\/a>/,
+    );
+    assert.match(published, /<h1[^>]*tabindex="-1"/);
+    assert.ok(
+      published.includes(
+        `<link rel="canonical" href="https://romainbellande.github.io/recipes/recipe/${id}/">`,
+      ),
+    );
+  }
 });
