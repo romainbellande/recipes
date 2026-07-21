@@ -31,8 +31,70 @@ async function collection(recipe = valid, name = "quick-pasta.md") {
   return directory;
 }
 
+async function recipeCollection(recipes) {
+  const directory = await mkdtemp(join(tmpdir(), "recipes-"));
+  await Promise.all(
+    Object.entries(recipes).map(([filename, recipe]) =>
+      writeFile(join(directory, filename), recipe),
+    ),
+  );
+  return directory;
+}
+
+const withAliases = (...aliases) =>
+  valid.replace(
+    "tags:",
+    `aliases:\n${aliases.map((alias) => `  - ${alias}`).join("\n")}\ntags:`,
+  );
+
 test("accepts a valid Recipe", async () => {
   assert.deepEqual(await validateCollection(await collection()), []);
+});
+
+test("accepts former Recipe IDs as aliases", async () => {
+  assert.deepEqual(
+    await validateCollection(
+      await collection(withAliases("pasta-rapide", "pasta-du-soir")),
+    ),
+    [],
+  );
+});
+
+test("rejects an alias that matches a canonical Recipe ID", async () => {
+  assert.deepEqual(
+    await validateCollection(
+      await recipeCollection({
+        "quick-pasta.md": valid,
+        "tomato-pasta.md": withAliases("quick-pasta"),
+      }),
+    ),
+    [
+      'tomato-pasta.md: alias "quick-pasta" conflicts with canonical Recipe ID in quick-pasta.md',
+    ],
+  );
+});
+
+test("rejects an alias that matches its own canonical Recipe ID", async () => {
+  assert.deepEqual(
+    await validateCollection(await collection(withAliases("quick-pasta"))),
+    [
+      'quick-pasta.md: alias "quick-pasta" conflicts with canonical Recipe ID in quick-pasta.md',
+    ],
+  );
+});
+
+test("rejects aliases shared by two Recipes", async () => {
+  assert.deepEqual(
+    await validateCollection(
+      await recipeCollection({
+        "quick-pasta.md": withAliases("pasta-rapide"),
+        "tomato-pasta.md": withAliases("pasta-rapide"),
+      }),
+    ),
+    [
+      'tomato-pasta.md: alias "pasta-rapide" is already an alias in quick-pasta.md',
+    ],
+  );
 });
 
 for (const [name, recipe, filename, rule] of [
