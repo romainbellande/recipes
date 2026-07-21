@@ -61,10 +61,12 @@ test("restores a verbatim query and only distinct controlled URL tags", () => {
   );
 });
 
-test("builds filterable, accessible Collection cards linked to Recipe URLs", async () => {
+test("builds Collection-to-Recipe navigation with restored context and focus", async () => {
   await run("npm", ["run", "build"]);
   const page = await readFile("dist/index.html", "utf8");
   const source = await readFile("src/pages/index.astro", "utf8");
+  const recipe = await readFile("dist/recipe/apple-crumble/index.html", "utf8");
+  const recipeSource = await readFile("src/pages/recipe/[id].astro", "utf8");
   const recipeFiles = (await readdir("src/content/recipes"))
     .filter((filename) => filename.endsWith(".md"))
     .sort();
@@ -76,14 +78,33 @@ test("builds filterable, accessible Collection cards linked to Recipe URLs", asy
   );
 
   const cardLinks = [
-    ...page.matchAll(/<a class="recipe-card"[^>]*aria-label="([^"]+)"[^>]*>/g),
+    ...page.matchAll(
+      /<a[^>]*class="recipe-card"[^>]*aria-label="([^"]+)"[^>]*>/g,
+    ),
   ];
   assert.equal(cardLinks.length, recipeFiles.length);
   assert.deepEqual(cardLinks.map((link) => link[1]).sort(), [...titles].sort());
   for (const filename of recipeFiles) {
     const id = filename.slice(0, -3);
-    assert.match(page, new RegExp(`href="/recipes/recipe/${id}/"`));
+    assert.match(
+      page,
+      new RegExp(`href="/recipes/recipe/${id}/#recipe-${id}"`),
+    );
   }
+  assert.match(
+    page,
+    /<a id="recipe-apple-crumble" class="recipe-card" data-recipe-card[^>]*>/,
+  );
+  assert.match(source, /card\.dataset\.recipeUrl/);
+  assert.match(source, /#\$\{card\.id\}/);
+  assert.match(source, /originCard.*focus\(\)/);
+  assert.match(
+    recipe,
+    /<a id="return-link" class="return-link" data-origin-card="recipe-apple-crumble" href="\/recipes"/,
+  );
+  assert.match(recipeSource, /collectionFiltersFromSearch\(/);
+  assert.match(recipeSource, /collectionSearchParams\(/);
+  assert.match(recipeSource, /#recipe-title"\)\.focus\(\)/);
   assert.equal(
     (page.match(/class="image-placeholder" aria-hidden="true"/g) ?? []).length,
     recipeFiles.length,
