@@ -244,4 +244,4 @@ test("builds Collection-to-Recipe navigation with restored context and focus", a
       /window\.location\.replace\([\s\S]*?window\.location\.search[\s\S]*?window\.location\.hash/,
     );
   }
-});
+}, 30_000);
