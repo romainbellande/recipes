@@ -51,6 +51,20 @@ test("accepts a valid Recipe", async () => {
   assert.deepEqual(await validateCollection(await collection()), []);
 });
 
+test("accepts Timer definitions in front matter", async () => {
+  assert.deepEqual(
+    await validateCollection(
+      await collection(
+        valid.replace(
+          "tags:",
+          "timers:\n  - step: 1\n    title: Cuisez les pâtes\n    duration: 10 min\ntags:",
+        ),
+      ),
+    ),
+    [],
+  );
+});
+
 test("accepts former Recipe IDs as aliases", async () => {
   assert.deepEqual(
     await validateCollection(
@@ -191,6 +205,33 @@ for (const [name, recipe, filename, rule] of [
     valid.replace("## Ingrédients", "# Pâtes rapides\n\n## Ingrédients"),
     "quick-pasta.md",
     "body must not contain an H1",
+  ],
+  [
+    "inline Timer marker",
+    valid.replace(
+      "Faites cuire les pâtes.",
+      "Faites cuire les pâtes. ⏱ 10 min",
+    ),
+    "quick-pasta.md",
+    "Timer markers are not allowed",
+  ],
+  [
+    "Timer step",
+    valid.replace(
+      "tags:",
+      "timers:\n  - step: 2\n    title: Cuisez les pâtes\n    duration: 10 min\ntags:",
+    ),
+    "quick-pasta.md",
+    "Timer step must refer",
+  ],
+  [
+    "Timer duration",
+    valid.replace(
+      "tags:",
+      "timers:\n  - step: 1\n    title: Cuisez les pâtes\n    duration: bientôt\ntags:",
+    ),
+    "quick-pasta.md",
+    "Timer duration must be a duration",
   ],
 ]) {
   test(`rejects ${name}`, async () => {

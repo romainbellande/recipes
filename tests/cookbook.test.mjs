@@ -8,6 +8,7 @@ import {
   collectionSearchParams,
   matchingRecipeIndices,
   scaleIngredient,
+  durationInSeconds,
 } from "../src/scripts/collection.js";
 
 const run = promisify(execFile);
@@ -57,6 +58,11 @@ test("scales leading ingredient quantities with concise French decimals", () => 
     "1,33 sachet d'épices",
   );
   assert.equal(scaleIngredient("Sel", 4, 6), "Sel");
+});
+
+test("converts Timer definition durations to seconds", () => {
+  assert.equal(durationInSeconds("6 min"), 360);
+  assert.equal(durationInSeconds("1 h 15 min"), 4500);
 });
 
 test("restores a verbatim query and only distinct controlled URL tags", () => {
@@ -155,10 +161,20 @@ test("builds Collection-to-Recipe navigation with restored context and focus", a
   assert.match(recipeSource, /function updateServings\(value\)/);
   assert.match(recipeSource, /recipeServings\.value = selectedServings/);
   assert.match(recipeSource, /cookServings\.value = selectedServings/);
+  assert.match(recipe, /id="previous-step" hidden[^>]*>Étape précédente/);
+  assert.match(recipe, /id="step-timer"/);
+  assert.match(recipe, /id="cook-timers" aria-label="Minuteries actives"/);
+  assert.match(recipeSource, /function playAlarm\(\)/);
+  assert.match(recipeSource, /recipe\.timers/);
+  assert.match(recipeSource, /clock-button/);
+  assert.match(recipeSource, /10_000/);
+  assert.match(recipeSource, /timers = timers\.filter/);
+  assert.match(recipeSource, /previous\.hidden = step === 0/);
   assert.match(
     recipeSource,
-    /function enterCook\(\)[\s\S]*?stepNav\.replaceChildren/,
+    /previous\.addEventListener\("click", \(\) => showStep\(step - 1\)\)/,
   );
+  assert.doesNotMatch(recipeSource, /stepNav|#step-nav/);
   assert.match(
     recipeSource,
     /ingredients\.replaceChildren\([\s\S]*?showStep\(0\)/,

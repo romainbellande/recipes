@@ -4,6 +4,10 @@ summary: Des penne au bœuf haché, poivron et tomate, crémeux avec du cheddar 
 prep_time: 5 min
 cook_time: 15 min
 servings: 2
+timers:
+  - step: 2
+    title: Cuisez les penne
+    duration: 10 min
 tags:
   - main
   - weeknight

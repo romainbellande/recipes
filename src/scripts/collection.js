@@ -1,3 +1,11 @@
+export const durationInSeconds = (duration) => {
+  const [hours, minutes] = [
+    Number(duration.match(/(\d+) h/)?.[1] ?? 0),
+    Number(duration.match(/(\d+) min/)?.[1] ?? 0),
+  ];
+  return hours * 3600 + minutes * 60;
+};
+
 export const normalizeText = (value) =>
   value
     .normalize("NFD")

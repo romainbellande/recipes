@@ -4,6 +4,16 @@ summary: Des rondelles de saucisse mijotées dans une sauce tomate épicée, ser
 prep_time: 15 min
 cook_time: 20 min
 servings: 2
+timers:
+  - step: 2
+    title: Dorez les saucisses
+    duration: 5 min
+  - step: 3
+    title: Cuisez le riz
+    duration: 12 min
+  - step: 4
+    title: Préparez le rougail
+    duration: 10 min
 tags:
   - main
   - weeknight

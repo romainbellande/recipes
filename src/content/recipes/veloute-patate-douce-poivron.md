@@ -4,6 +4,13 @@ summary: Une soupe douce et crémeuse, relevée de poivron grillé et servie ave
 prep_time: 10 min
 cook_time: 25 min
 servings: 2
+timers:
+  - step: 2
+    title: Cuisez la soupe
+    duration: 15 min
+  - step: 3
+    title: Préparez l’accompagnement
+    duration: 3 min
 tags:
   - main
   - vegetarian

@@ -1,5 +1,6 @@
 ---
 import { getCollection, render, type CollectionEntry } from "astro:content";
+import { durationInSeconds } from "../../scripts/collection.js";
 
 export async function getStaticPaths() {
   return (await getCollection("recipes")).flatMap((recipe) => [
@@ -30,7 +31,7 @@ const recipeParts = (body: string) => {
       .trim()
       .split("\n")
       .filter((line) => /^\d+\. /.test(line))
-      .map((line) => line.replace(/^\d+\. /, "")),
+      .map((line) => ({ text: line.replace(/^\d+\. /, "") })),
   };
 };
 
@@ -43,6 +44,10 @@ const { Content } = await render(recipe);
 const serializedRecipe = JSON.stringify({
   title: recipe.data.title,
   servings: Number(recipe.data.servings),
+  timers: (recipe.data.timers ?? []).map((timer) => ({
+    ...timer,
+    seconds: durationInSeconds(timer.duration),
+  })),
   ...recipeParts(recipe.body ?? ""),
 }).replace(/</g, "\\u003c");
 ---
@@ -130,7 +135,6 @@ const serializedRecipe = JSON.stringify({
             Nombre de personnes
             <input id="cook-servings" type="number" min="1" step="1" />
           </label>
-          <nav aria-label="Étapes de préparation"><ol id="step-nav"></ol></nav>
           <details>
             <summary>Ingrédients</summary>
             <ul id="cook-ingredients"></ul>
@@ -140,7 +144,14 @@ const serializedRecipe = JSON.stringify({
           <p class="eyebrow" id="step-count"></p>
           <h2 id="step-title"></h2>
           <p id="step-text"></p>
-          <button class="primary" type="button" id="next-step"></button>
+          <div id="step-timer"></div>
+          <section id="cook-timers" aria-label="Minuteries actives"></section>
+          <div class="step-actions">
+            <button type="button" id="previous-step" hidden
+              >Étape précédente</button
+            >
+            <button class="primary" type="button" id="next-step"></button>
+          </div>
         </section>
       </section>
     </main>
@@ -170,6 +181,9 @@ const serializedRecipe = JSON.stringify({
       );
       let selectedServings = recipe.servings;
       let step = 0;
+      let timers = [];
+      let timerId = 0;
+      let audioContext;
       const recipeView = document.querySelector("#recipe-view");
       const shopping = document.querySelector("#shopping-view");
       const cook = document.querySelector("#cook-view");
@@ -186,11 +200,13 @@ const serializedRecipe = JSON.stringify({
         "#shopping-ingredients",
       );
       const title = document.querySelector("#cook-title");
-      const stepNav = document.querySelector("#step-nav");
       const ingredients = document.querySelector("#cook-ingredients");
       const count = document.querySelector("#step-count");
       const stepTitle = document.querySelector("#step-title");
       const stepText = document.querySelector("#step-text");
+      const stepTimer = document.querySelector("#step-timer");
+      const cookTimers = document.querySelector("#cook-timers");
+      const previous = document.querySelector("#previous-step");
       const next = document.querySelector("#next-step");
       const exitCook = document.querySelector("#exit-cook");
       const validServings = (value) =>
@@ -222,23 +238,125 @@ const serializedRecipe = JSON.stringify({
         );
       }
 
+      const formatTime = (seconds) =>
+        `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`;
+
+      function prepareAlarm() {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContext) return;
+        audioContext ??= new AudioContext();
+        audioContext.resume();
+      }
+
+      function playAlarm() {
+        if (!audioContext) return;
+        const start = audioContext.currentTime;
+        for (const [index, frequency] of [523.25, 659.25, 783.99].entries()) {
+          const oscillator = audioContext.createOscillator();
+          const gain = audioContext.createGain();
+          const when = start + index * 0.18;
+          oscillator.type = "sine";
+          oscillator.frequency.value = frequency;
+          gain.gain.setValueAtTime(0.001, when);
+          gain.gain.exponentialRampToValueAtTime(0.12, when + 0.02);
+          gain.gain.exponentialRampToValueAtTime(0.001, when + 0.16);
+          oscillator.connect(gain).connect(audioContext.destination);
+          oscillator.start(when);
+          oscillator.stop(when + 0.17);
+        }
+      }
+
+      function renderTimers() {
+        const now = Date.now();
+        for (const timer of timers) {
+          if (!timer.finished && timer.endsAt <= now) {
+            timer.finished = true;
+            timer.lastAlarmAt = now;
+            playAlarm();
+          } else if (timer.finished && now - timer.lastAlarmAt >= 10_000) {
+            timer.lastAlarmAt = now;
+            playAlarm();
+          }
+        }
+        cookTimers.replaceChildren(
+          ...timers.map((timer) => {
+            const item = document.createElement("div");
+            item.className = "cook-timer";
+            const remaining = Math.max(
+              0,
+              Math.ceil((timer.endsAt - now) / 1000),
+            );
+            item.textContent = timer.finished
+              ? `⏱ ${timer.title} — terminé`
+              : `⏱ ${timer.title} — ${formatTime(remaining)}`;
+            const stop = document.createElement("button");
+            stop.type = "button";
+            stop.textContent = timer.finished ? "Arrêter l’alarme" : "Arrêter";
+            stop.addEventListener("click", () => {
+              timers = timers.filter(({ id }) => id !== timer.id);
+              renderTimers();
+            });
+            item.append(" ", stop);
+            return item;
+          }),
+        );
+      }
+
       function showStep(index) {
         step = index;
+        const currentStep = recipe.steps[step];
         count.textContent = `Étape ${step + 1} sur ${recipe.steps.length}`;
         stepTitle.textContent = "Étape en cours";
-        stepText.textContent = recipe.steps[step];
+        stepText.textContent = currentStep.text;
+        stepTimer.replaceChildren(
+          ...recipe.timers
+            .filter((timer) => timer.step === step + 1)
+            .map((timer) => {
+              const control = document.createElement("div");
+              control.className = "timer-control";
+              const duration = document.createElement("input");
+              duration.type = "number";
+              duration.min = "1";
+              duration.step = "1";
+              duration.value = String(timer.seconds / 60);
+              duration.setAttribute(
+                "aria-label",
+                `Durée de ${timer.title} en minutes`,
+              );
+              const start = document.createElement("button");
+              start.type = "button";
+              start.className = "clock-button";
+              start.setAttribute("aria-label", `Démarrer ${timer.title}`);
+              start.innerHTML = '<span aria-hidden="true"></span>';
+              start.addEventListener("click", () => {
+                const minutes = Number(duration.value);
+                if (!Number.isInteger(minutes) || minutes < 1) return;
+                prepareAlarm();
+                timers.push({
+                  id: timerId++,
+                  title: timer.title,
+                  endsAt: Date.now() + minutes * 60_000,
+                  finished: false,
+                });
+                renderTimers();
+              });
+              const label = document.createElement("label");
+              label.textContent = `${timer.title} — `;
+              label.append(duration, " min");
+              control.append(label, start);
+              return control;
+            }),
+        );
+        previous.hidden = step === 0;
         next.textContent =
           step === recipe.steps.length - 1
             ? "Terminer la Recette"
             : "Étape suivante";
-        stepNav
-          .querySelectorAll("button")
-          .forEach((button, buttonIndex) =>
-            button.setAttribute("aria-current", String(buttonIndex === step)),
-          );
       }
 
       function resetCook() {
+        timers = [];
+        renderTimers();
         showStep(0);
         ingredients.querySelectorAll("input").forEach((input) => {
           input.checked = false;
@@ -271,17 +389,6 @@ const serializedRecipe = JSON.stringify({
       function enterCook() {
         title.textContent = recipe.title;
         cookServings.value = selectedServings;
-        stepNav.replaceChildren(
-          ...recipe.steps.map((item, index) => {
-            const button = document.createElement("button");
-            button.type = "button";
-            button.textContent = `${index + 1}. ${item}`;
-            button.addEventListener("click", () => showStep(index));
-            const li = document.createElement("li");
-            li.append(button);
-            return li;
-          }),
-        );
         ingredients.replaceChildren(
           ...recipe.ingredients.map((item) => {
             const li = document.createElement("li");
@@ -303,6 +410,8 @@ const serializedRecipe = JSON.stringify({
         exitCook.focus();
       }
 
+      setInterval(renderTimers, 250);
+
       recipeServings.addEventListener("input", () =>
         updateServings(recipeServings.value),
       );
@@ -318,6 +427,7 @@ const serializedRecipe = JSON.stringify({
       document
         .querySelector("#enter-cook")
         .addEventListener("click", enterCook);
+      previous.addEventListener("click", () => showStep(step - 1));
       next.addEventListener("click", () =>
         step === recipe.steps.length - 1
           ? exitCook.click()
@@ -483,21 +593,71 @@ const serializedRecipe = JSON.stringify({
   .cook-mode h1 {
     margin-top: 0.3rem;
   }
-  #step-nav {
+  .step-actions {
+    display: flex;
+    gap: 0.75rem;
+  }
+  #step-timer {
+    display: grid;
+    gap: 0.75rem;
+    margin: 1.5rem 0;
+  }
+  .timer-control {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
     font-family: system-ui, sans-serif;
+    font-weight: 700;
   }
-  #step-nav ol {
-    padding-left: 1.5rem;
+  .timer-control input {
+    width: 4rem;
+    padding: 0.4rem;
   }
-  #step-nav button {
-    border: 0;
-    background: transparent;
-    padding: 0.4rem 0;
-    text-align: left;
+  .clock-button {
+    position: relative;
+    width: 3.5rem;
+    height: 3.5rem;
+    border: 3px solid #803c20;
+    border-radius: 50%;
+    background: #fffaf4;
   }
-  #step-nav button[aria-current="true"] {
-    font-weight: 800;
-    color: #803c20;
+  .clock-button::before,
+  .clock-button::after {
+    position: absolute;
+    left: 50%;
+    bottom: 50%;
+    width: 2px;
+    content: "";
+    background: #803c20;
+    transform-origin: bottom;
+  }
+  .clock-button::before {
+    height: 0.9rem;
+    transform: rotate(35deg);
+  }
+  .clock-button::after {
+    height: 1.25rem;
+    transform: rotate(125deg);
+  }
+  .clock-button span {
+    position: absolute;
+    inset: 0.4rem;
+    border: 1px dotted #803c20;
+    border-radius: 50%;
+  }
+  #cook-timers {
+    display: grid;
+    gap: 0.5rem;
+    margin: 1.5rem 0;
+  }
+  .cook-timer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    border-top: 1px solid var(--line);
+    padding-top: 0.5rem;
+    font-family: system-ui, sans-serif;
   }
   details {
     margin-top: 2rem;
@@ -731,17 +891,6 @@ const serializedRecipe = JSON.stringify({
   }
   .cook-layout aside {
     color: var(--muted);
-  }
-  #step-nav {
-    font-family: "DM Sans", sans-serif;
-  }
-  #step-nav button {
-    color: inherit;
-    font-size: 0.86rem;
-    line-height: 1.35;
-  }
-  #step-nav button[aria-current="true"] {
-    color: var(--accent);
   }
   details {
     border-top: 1px solid var(--line);

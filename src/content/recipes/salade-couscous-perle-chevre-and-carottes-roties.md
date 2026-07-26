@@ -4,6 +4,13 @@ summary: Une salade de couscous perlé aux carottes rôties au miel, sauce yaour
 prep_time: 40 min
 cook_time: 20 min
 servings: 2
+timers:
+  - step: 2
+    title: Rôtissez les légumes
+    duration: 20 min
+  - step: 3
+    title: Cuisez le couscous
+    duration: 12 min
 tags:
   - main
   - vegetarian

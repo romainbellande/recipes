@@ -4,6 +4,13 @@ summary: Une paëlla au poulet, chorizo et crevettes, accompagnée d'une salade 
 prep_time: 15 min
 cook_time: 25 min
 servings: 2
+timers:
+  - step: 3
+    title: Cuisez le riz
+    duration: 20 min
+  - step: 4
+    title: Préparez la garniture et la salade
+    duration: 3 min
 tags:
   - main
 ---
