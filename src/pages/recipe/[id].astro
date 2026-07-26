@@ -273,7 +273,7 @@ const serializedRecipe = JSON.stringify({
             timer.finished = true;
             timer.lastAlarmAt = now;
             playAlarm();
-          } else if (timer.finished && now - timer.lastAlarmAt >= 10_000) {
+          } else if (timer.finished && now - timer.lastAlarmAt >= 1_000) {
             timer.lastAlarmAt = now;
             playAlarm();
           }
