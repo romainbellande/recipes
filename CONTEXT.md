@@ -34,3 +34,15 @@ _Avoid_: basket, cart
 **Acquired ingredient**:
 An ingredient marked as obtained on a Shopping List.
 _Avoid_: completed ingredient, used ingredient
+
+**Timer**:
+A manually started countdown associated with a Recipe preparation step and shown in cooking mode. Multiple active Timers may run concurrently, finish with an alarm and visual notice, and are discarded when cooking mode is exited.
+_Avoid_: duration, alarm
+
+**Timer definition**:
+Recipe front-matter metadata that associates a 1-based preparation step with a Timer title and default duration.
+_Avoid_: timer marker, countdown tag
+
+**Timer run**:
+An independently active instance created when a cook starts a Timer definition; any number of runs of the same definition may overlap.
+_Avoid_: timer instance, timer copy

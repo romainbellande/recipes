@@ -4,6 +4,13 @@ summary: Des œufs mollets marinés dans une sauce soja sucrée et parfumée. Pr
 prep_time: 9 min
 cook_time: 6 min
 servings: 6
+timers:
+  - step: 1
+    title: Cuisez les œufs
+    duration: 6 min
+  - step: 4
+    title: Faites mariner
+    duration: 6 h
 tags:
   - side
   - make-ahead

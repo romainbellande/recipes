@@ -4,6 +4,13 @@ summary: Des cuisses de poulet rôties aux épices mexicaines, avec patate douce
 prep_time: 10 min
 cook_time: 40 min
 servings: 2
+timers:
+  - step: 2
+    title: Enfournez le poulet et les légumes
+    duration: 25 min
+  - step: 5
+    title: Terminez la cuisson
+    duration: 8 min
 tags:
   - main
   - weeknight

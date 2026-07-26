@@ -10,7 +10,12 @@ const requiredFields = [
   "servings",
   "tags",
 ];
-const allowedFields = new Set([...requiredFields, "aliases", "image"]);
+const allowedFields = new Set([
+  ...requiredFields,
+  "aliases",
+  "image",
+  "timers",
+]);
 const recipeId = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const courses = new Set(["breakfast", "main", "side", "dessert"]);
 const qualifiers = new Set(["weeknight", "make-ahead", "vegetarian", "pantry"]);
@@ -28,16 +33,30 @@ function parseRecipe(source) {
     };
   const fields = {};
   let currentList;
+  let currentTimer;
   for (const line of match[1].split(/\r?\n/)) {
     if (!line.trim()) continue;
     const field = line.match(/^([A-Za-z_]+):(?:\s*(.*))?$/);
     if (field) {
       currentList = field[1];
+      currentTimer = undefined;
       fields[currentList] = field[2] ?? "";
       if (/^(?:\[|\{|[|>])/.test(fields[currentList]))
         errors.push(
           `front-matter field ${currentList} must be a scalar or block list`,
         );
+      continue;
+    }
+    const timerItem = line.match(/^ {2}- step:\s*(.+)$/);
+    if (currentList === "timers" && timerItem) {
+      if (!Array.isArray(fields.timers)) fields.timers = [];
+      currentTimer = { step: timerItem[1] };
+      fields.timers.push(currentTimer);
+      continue;
+    }
+    const timerField = line.match(/^ {4}(title|duration):\s*(.+)$/);
+    if (currentList === "timers" && currentTimer && timerField) {
+      currentTimer[timerField[1]] = timerField[2];
       continue;
     }
     const item = line.match(/^\s+-\s+(.+)$/);
@@ -129,6 +148,24 @@ function validateRecipe(filename, source) {
       fail("Ingrédients must contain bullet items");
     if (!/^\s*1\.\s+.+/m.test(method) || !/^\s*\d+\.\s+.+/m.test(method))
       fail("Préparation must contain numbered steps");
+    const steps = method.match(/^\s*\d+\.\s+.+$/gm) ?? [];
+    if (/⏱/.test(method))
+      fail("Timer markers are not allowed; use timers front-matter metadata");
+    if ("timers" in fields && !Array.isArray(fields.timers))
+      fail("timers must be a list");
+    for (const timer of fields.timers ?? []) {
+      if (!/^[1-9]\d*$/.test(timer.step ?? ""))
+        fail("Timer step must be a positive integer");
+      else if (Number(timer.step) > steps.length)
+        fail(
+          `Timer step must refer to one of the ${steps.length} preparation steps`,
+        );
+      if (!timer.title?.trim()) fail("Timer title must be a non-empty string");
+      if (!duration.test(timer.duration ?? ""))
+        fail(
+          'Timer duration must be a duration such as "20 min" or "1 h 15 min"',
+        );
+    }
   }
   if (/^# /m.test(body)) fail("Recipe body must not contain an H1");
   return { aliases, errors };

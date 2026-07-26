@@ -4,6 +4,13 @@ summary: Des pâtes express aux sardines à la tomate, savoureuses et prêtes en
 prep_time: 5 min
 cook_time: 10 min
 servings: 2
+timers:
+  - step: 3
+    title: La sauce
+    duration: 5 min
+  - step: 5
+    title: Le mélange
+    duration: 1 min
 tags:
   - main
   - weeknight
