@@ -39,14 +39,73 @@ const vulgarFractions = {
   "⅞": 7 / 8,
 };
 
+export const parseInlineRecipeMarkup = (value) => {
+  if (/!?(?:\[[^\]]*\]\([^)]*\))|`|~~|<[^>]*>|(?<!\*)\*(?!\*)/.test(value))
+    throw new Error("unsupported Markdown");
+
+  const parse = (index, closing) => {
+    const nodes = [];
+    let text = "";
+    const flush = () => {
+      if (text) nodes.push(text);
+      text = "";
+    };
+    while (index < value.length) {
+      if (closing && value.startsWith(closing, index)) {
+        if (!nodes.length && !text) throw new Error("empty emphasis");
+        flush();
+        return [nodes, index + closing.length];
+      }
+      const delimiter = value.startsWith("**", index)
+        ? "**"
+        : value[index] === "_"
+          ? "_"
+          : undefined;
+      if (!delimiter) {
+        text += value[index++];
+        continue;
+      }
+      flush();
+      const [children, nextIndex] = parse(index + delimiter.length, delimiter);
+      nodes.push({ tag: delimiter === "**" ? "strong" : "em", children });
+      index = nextIndex;
+    }
+    if (closing) throw new Error("unmatched emphasis delimiter");
+    flush();
+    return [nodes, index];
+  };
+
+  return parse(0)[0];
+};
+
+export const appendInlineRecipeMarkup = (parent, value) => {
+  const append = (nodes, target) => {
+    for (const node of nodes) {
+      if (typeof node === "string") target.append(node);
+      else {
+        const element = globalThis.document.createElement(node.tag);
+        append(node.children, element);
+        target.append(element);
+      }
+    }
+  };
+  append(parseInlineRecipeMarkup(value), parent);
+};
+
+export const setInlineRecipeMarkup = (element, value) => {
+  element.replaceChildren();
+  appendInlineRecipeMarkup(element, value);
+};
+
 export const scaleIngredient = (
   ingredient,
   canonicalServings,
   selectedServings,
 ) => {
-  const match = ingredient.match(
-    /^(?:(\d+(?:[.,]\d+)?)?([¼½¾⅓⅔⅛⅜⅝⅞])|(\d+(?:[.,]\d+)?))/,
-  );
+  const prefix = ingredient.match(/^(?:(?:\*\*)|_)*/)?.[0] ?? "";
+  const match = ingredient
+    .slice(prefix.length)
+    .match(/^(?:(\d+(?:[.,]\d+)?)?([¼½¾⅓⅔⅛⅜⅝⅞])|(\d+(?:[.,]\d+)?))/);
   if (!match) return ingredient;
 
   const quantity = match[3]
@@ -55,10 +114,13 @@ export const scaleIngredient = (
   const scaled = (quantity * selectedServings) / canonicalServings;
   if (!Number.isFinite(scaled)) return ingredient;
 
-  return `${new Intl.NumberFormat("fr-FR", {
-    maximumFractionDigits: 2,
-    useGrouping: false,
-  }).format(scaled)}${ingredient.slice(match[0].length)}`;
+  return `${ingredient.slice(0, prefix.length)}${new Intl.NumberFormat(
+    "fr-FR",
+    {
+      maximumFractionDigits: 2,
+      useGrouping: false,
+    },
+  ).format(scaled)}${ingredient.slice(prefix.length + match[0].length)}`;
 };
 
 export const collectionFiltersFromSearch = (search, controlledTags) => {

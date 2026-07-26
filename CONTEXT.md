@@ -50,3 +50,7 @@ _Avoid_: timer marker, countdown tag
 **Timer run**:
 An independently active instance created when a cook starts a Timer definition; any number of runs of the same definition may overlap.
 _Avoid_: timer instance, timer copy
+
+**Inline Recipe markup**:
+Markdown bold, italic, and combined emphasis in Recipe body ingredients and preparation steps that remains formatted in every Recipe view.
+_Avoid_: plain text, display markup

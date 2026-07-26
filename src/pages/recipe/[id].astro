@@ -182,8 +182,10 @@ const serializedRecipe = JSON.stringify({
       // @ts-nocheck
       import {
         collectionFiltersFromSearch,
+        appendInlineRecipeMarkup,
         collectionSearchParams,
         scaleIngredient,
+        setInlineRecipeMarkup,
       } from "../../scripts/collection.js";
 
       const recipe = JSON.parse(
@@ -230,20 +232,30 @@ const serializedRecipe = JSON.stringify({
         recipeServings.value = selectedServings;
         shoppingServings.value = selectedServings;
         cookServings.value = selectedServings;
-        recipeIngredients.querySelectorAll("li").forEach((item, index) => {
-          item.textContent = scaleIngredient(
-            recipe.ingredients[index],
-            recipe.servings,
-            selectedServings,
+        recipeIngredients
+          .querySelectorAll("li")
+          .forEach((item, index) =>
+            setInlineRecipeMarkup(
+              item,
+              scaleIngredient(
+                recipe.ingredients[index],
+                recipe.servings,
+                selectedServings,
+              ),
+            ),
           );
-        });
         [shoppingIngredients, ingredients].forEach((list) =>
           list.querySelectorAll("label").forEach((label, index) => {
-            label.lastChild.textContent = ` ${scaleIngredient(
-              recipe.ingredients[index],
-              recipe.servings,
-              selectedServings,
-            )}`;
+            const check = label.querySelector("input");
+            label.replaceChildren(check, " ");
+            appendInlineRecipeMarkup(
+              label,
+              scaleIngredient(
+                recipe.ingredients[index],
+                recipe.servings,
+                selectedServings,
+              ),
+            );
           }),
         );
       }
@@ -317,7 +329,7 @@ const serializedRecipe = JSON.stringify({
         const currentStep = recipe.steps[step];
         count.textContent = `Étape ${step + 1} sur ${recipe.steps.length}`;
         stepTitle.textContent = "Étape en cours";
-        stepText.textContent = currentStep.text;
+        setInlineRecipeMarkup(stepText, currentStep.text);
         stepTimer.replaceChildren(
           ...recipe.timers
             .filter((timer) => timer.step === step + 1)
@@ -382,9 +394,10 @@ const serializedRecipe = JSON.stringify({
             const label = document.createElement("label");
             const check = document.createElement("input");
             check.type = "checkbox";
-            label.append(
-              check,
-              ` ${scaleIngredient(item, recipe.servings, selectedServings)}`,
+            label.append(check, " ");
+            appendInlineRecipeMarkup(
+              label,
+              scaleIngredient(item, recipe.servings, selectedServings),
             );
             li.append(label);
             return li;
@@ -405,9 +418,10 @@ const serializedRecipe = JSON.stringify({
             const label = document.createElement("label");
             const check = document.createElement("input");
             check.type = "checkbox";
-            label.append(
-              check,
-              ` ${scaleIngredient(item, recipe.servings, selectedServings)}`,
+            label.append(check, " ");
+            appendInlineRecipeMarkup(
+              label,
+              scaleIngredient(item, recipe.servings, selectedServings),
             );
             li.append(label);
             return li;
