@@ -73,6 +73,11 @@ function validateRecipe(filename, source) {
     if (typeof fields[field] !== "string" || !fields[field].trim())
       fail(`${field} must be a non-empty string`);
   }
+  if (
+    typeof fields.title === "string" &&
+    !/^\p{Extended_Pictographic}/u.test(fields.title)
+  )
+    fail("title must begin with an icon");
   for (const field of ["prep_time", "cook_time"])
     if (typeof fields[field] === "string" && !duration.test(fields[field]))
       fail(`${field} must be a duration such as "20 min" or "1 h 15 min"`);

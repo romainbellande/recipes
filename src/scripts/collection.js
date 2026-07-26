@@ -19,22 +19,38 @@ export const matchingRecipeIndices = (recipes, query, selectedTags) => {
     .map(({ index }) => index);
 };
 
+const vulgarFractions = {
+  "¼": 1 / 4,
+  "½": 1 / 2,
+  "¾": 3 / 4,
+  "⅓": 1 / 3,
+  "⅔": 2 / 3,
+  "⅛": 1 / 8,
+  "⅜": 3 / 8,
+  "⅝": 5 / 8,
+  "⅞": 7 / 8,
+};
+
 export const scaleIngredient = (
   ingredient,
   canonicalServings,
   selectedServings,
 ) => {
-  const match = ingredient.match(/^(\d+(?:[.,]\d+)?)/);
+  const match = ingredient.match(
+    /^(?:(\d+(?:[.,]\d+)?)?([¼½¾⅓⅔⅛⅜⅝⅞])|(\d+(?:[.,]\d+)?))/,
+  );
   if (!match) return ingredient;
 
-  const quantity = Number(match[1].replace(",", "."));
+  const quantity = match[3]
+    ? Number(match[3].replace(",", "."))
+    : Number(match[1]?.replace(",", ".") ?? 0) + vulgarFractions[match[2]];
   const scaled = (quantity * selectedServings) / canonicalServings;
   if (!Number.isFinite(scaled)) return ingredient;
 
   return `${new Intl.NumberFormat("fr-FR", {
     maximumFractionDigits: 2,
     useGrouping: false,
-  }).format(scaled)}${ingredient.slice(match[1].length)}`;
+  }).format(scaled)}${ingredient.slice(match[0].length)}`;
 };
 
 export const collectionFiltersFromSearch = (search, controlledTags) => {

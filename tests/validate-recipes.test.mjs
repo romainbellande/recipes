@@ -6,7 +6,7 @@ import test from "node:test";
 import { validateCollection } from "../scripts/validate-recipes.mjs";
 
 const valid = `---
-title: Pâtes rapides
+title: 🍝 Pâtes rapides
 summary: Un dîner fiable.
 prep_time: 10 min
 cook_time: 20 min
@@ -113,7 +113,7 @@ for (const [name, recipe, filename, rule] of [
   ],
   [
     "array field",
-    valid.replace("title: Pâtes rapides", "title: [Pâtes rapides]"),
+    valid.replace("title: 🍝 Pâtes rapides", "title: [Pâtes rapides]"),
     "quick-pasta.md",
     "title must be a scalar or block list",
   ],
@@ -125,9 +125,15 @@ for (const [name, recipe, filename, rule] of [
   ],
   [
     "empty title",
-    valid.replace("title: Pâtes rapides", "title:"),
+    valid.replace("title: 🍝 Pâtes rapides", "title:"),
     "quick-pasta.md",
     "title must be a non-empty string",
+  ],
+  [
+    "title icon",
+    valid.replace("title: 🍝 Pâtes rapides", "title: Pâtes rapides"),
+    "quick-pasta.md",
+    "title must begin with an icon",
   ],
   [
     "duration",

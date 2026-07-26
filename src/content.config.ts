@@ -5,7 +5,9 @@ import { z } from "astro/zod";
 const recipes = defineCollection({
   loader: glob({ base: "./src/content/recipes", pattern: "*.md" }),
   schema: z.object({
-    title: z.string(),
+    title: z
+      .string()
+      .regex(/^\p{Extended_Pictographic}/u, "title must begin with an icon"),
     summary: z.string(),
     prep_time: z.string(),
     cook_time: z.string(),
