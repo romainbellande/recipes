@@ -5,6 +5,12 @@ prep_time: 5 min
 cook_time: 10 min
 servings: 2
 timers:
+  - step: 2
+    title: Oignon et ail
+    duration: 3 min
+  - step: 2
+    title: Les champignons
+    duration: 5 min
   - step: 3
     title: La sauce
     duration: 5 min
@@ -27,14 +33,15 @@ tags:
 - 1 petit oignon(s) ou une échalote ciselée
 - 200g de champignons de Paris émincés
 - 1 cuillère à soupe d'huile d'olive (vous pouvez aussi utiliser l'huile de la boîte de sardines si elle est parfumée)
-- Sel, poivre et herbes de Provence (ou basilic frais)
+- Sel, poivre et herbes de Provence
+- Quelques feuilles de basilic frais, ciselées
 - Optionnel pour pimper le plat : quelques câpres, des olives noires, ou une pincée de piment
 
 ## Préparation
 
 1. **Les pâtes :** Lancez la cuisson de vos pâtes dans une grande casserole d'eau bouillante salée, en suivant le temps indiqué sur le paquet pour une cuisson _al dente_.
 2. **La base aromatique :** Pendant ce temps, faites chauffer l'huile d'olive dans une poêle. Faites-y revenir l'oignon et l'ail pendant 2 à 3 minutes à feu moyen jusqu'à ce qu'ils soient translucides. Ajoutez les champignons et faites-les cuire 5 minutes, jusqu'à ce qu'ils soient dorés.
-3. **La sauce :** Ajoutez le coulis de tomate (ou les tomates concassées) dans la poêle. Assaisonnez avec le sel, le poivre et les herbes. Laissez mijoter à feu doux pendant 5 minutes, puis incorporez la feta émiettée à la sauce.
+3. **La sauce :** Ajoutez le coulis de tomate (ou les tomates concassées) dans la poêle. Assaisonnez avec le sel, le poivre et les herbes. Laissez mijoter à feu doux pendant 5 minutes, puis incorporez la feta et le basilic ciselé à la sauce.
 4. **Les sardines :** Ouvrez vos boîtes de sardines. Vous pouvez les intégrer de deux façons :
    - _Option « sauce riche » :_ Écrasez-les grossièrement à la fourchette directement dans la sauce pour qu'elles se mélangent bien.
    - _Option « beaux morceaux » :_ Retirez l'arête centrale si vous préférez, et déposez délicatement les filets dans la sauce en fin de cuisson pour ne pas trop les briser.
