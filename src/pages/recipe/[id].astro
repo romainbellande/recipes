@@ -51,6 +51,12 @@ const serializedRecipe = JSON.stringify({
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap"
+      rel="stylesheet"
+    />
     <meta name="description" content={recipe.data.summary} />
     <link rel="canonical" href={canonicalUrl.href} />
     {
@@ -92,8 +98,25 @@ const serializedRecipe = JSON.stringify({
         <button class="primary" type="button" id="enter-cook">
           Passer en mode cuisine
         </button>
+        <button class="text-button" type="button" id="enter-shopping">
+          Voir la liste de courses
+        </button>
         <div id="recipe-content"><Content /></div>
       </article>
+    </main>
+    <main class="shopping-mode" id="shopping-view" hidden>
+      <button class="text-button" type="button" id="exit-shopping"
+        >← Retour à la Recette</button
+      >
+      <section aria-labelledby="shopping-title">
+        <p class="eyebrow">Liste de courses</p>
+        <h1 id="shopping-title"></h1>
+        <label class="servings-control" for="shopping-servings">
+          Nombre de personnes
+          <input id="shopping-servings" type="number" min="1" step="1" />
+        </label>
+        <ul id="shopping-ingredients"></ul>
+      </section>
     </main>
     <main class="cook-mode" id="cook-view" hidden>
       <button class="text-button" type="button" id="exit-cook"
@@ -148,14 +171,20 @@ const serializedRecipe = JSON.stringify({
       let selectedServings = recipe.servings;
       let step = 0;
       const recipeView = document.querySelector("#recipe-view");
+      const shopping = document.querySelector("#shopping-view");
       const cook = document.querySelector("#cook-view");
       const recipeServings = document.querySelector("#recipe-servings");
+      const shoppingServings = document.querySelector("#shopping-servings");
       const cookServings = document.querySelector("#cook-servings");
       const recipeIngredients = [
         ...document.querySelectorAll("#recipe-content h2"),
       ].find(
         (heading) => heading.textContent === "Ingrédients",
       ).nextElementSibling;
+      const shoppingTitle = document.querySelector("#shopping-title");
+      const shoppingIngredients = document.querySelector(
+        "#shopping-ingredients",
+      );
       const title = document.querySelector("#cook-title");
       const stepNav = document.querySelector("#step-nav");
       const ingredients = document.querySelector("#cook-ingredients");
@@ -173,6 +202,7 @@ const serializedRecipe = JSON.stringify({
         if (!validServings(value)) return;
         selectedServings = Number(value);
         recipeServings.value = selectedServings;
+        shoppingServings.value = selectedServings;
         cookServings.value = selectedServings;
         recipeIngredients.querySelectorAll("li").forEach((item, index) => {
           item.textContent = scaleIngredient(
@@ -181,13 +211,15 @@ const serializedRecipe = JSON.stringify({
             selectedServings,
           );
         });
-        ingredients.querySelectorAll("label").forEach((label, index) => {
-          label.lastChild.textContent = ` ${scaleIngredient(
-            recipe.ingredients[index],
-            recipe.servings,
-            selectedServings,
-          )}`;
-        });
+        [shoppingIngredients, ingredients].forEach((list) =>
+          list.querySelectorAll("label").forEach((label, index) => {
+            label.lastChild.textContent = ` ${scaleIngredient(
+              recipe.ingredients[index],
+              recipe.servings,
+              selectedServings,
+            )}`;
+          }),
+        );
       }
 
       function showStep(index) {
@@ -211,6 +243,29 @@ const serializedRecipe = JSON.stringify({
         ingredients.querySelectorAll("input").forEach((input) => {
           input.checked = false;
         });
+      }
+
+      function enterShopping() {
+        shoppingTitle.textContent = recipe.title;
+        shoppingServings.value = selectedServings;
+        shoppingIngredients.replaceChildren(
+          ...recipe.ingredients.map((item) => {
+            const li = document.createElement("li");
+            const label = document.createElement("label");
+            const check = document.createElement("input");
+            check.type = "checkbox";
+            label.append(
+              check,
+              ` ${scaleIngredient(item, recipe.servings, selectedServings)}`,
+            );
+            li.append(label);
+            return li;
+          }),
+        );
+        recipeView.hidden = true;
+        shopping.hidden = false;
+        window.scrollTo(0, 0);
+        document.querySelector("#exit-shopping").focus();
       }
 
       function enterCook() {
@@ -251,9 +306,15 @@ const serializedRecipe = JSON.stringify({
       recipeServings.addEventListener("input", () =>
         updateServings(recipeServings.value),
       );
+      shoppingServings.addEventListener("input", () =>
+        updateServings(shoppingServings.value),
+      );
       cookServings.addEventListener("input", () =>
         updateServings(cookServings.value),
       );
+      document
+        .querySelector("#enter-shopping")
+        .addEventListener("click", enterShopping);
       document
         .querySelector("#enter-cook")
         .addEventListener("click", enterCook);
@@ -262,6 +323,11 @@ const serializedRecipe = JSON.stringify({
           ? exitCook.click()
           : showStep(step + 1),
       );
+      document.querySelector("#exit-shopping").addEventListener("click", () => {
+        shopping.hidden = true;
+        recipeView.hidden = false;
+        document.querySelector("#enter-shopping").focus();
+      });
       exitCook.addEventListener("click", () => {
         resetCook();
         cook.hidden = true;
@@ -295,7 +361,7 @@ const serializedRecipe = JSON.stringify({
   </body>
 </html>
 
-<style>
+<style is:global>
   :root {
     color: #241b16;
     background: #fffaf4;
@@ -392,13 +458,21 @@ const serializedRecipe = JSON.stringify({
     padding: 0.8rem 1rem;
     font-weight: 700;
   }
-  article :global(li),
-  article :global(p) {
+  article li,
+  article p {
     line-height: 1.5;
   }
+  .shopping-mode,
   .cook-mode {
     max-width: 76rem;
     margin-top: 2rem;
+  }
+  #shopping-ingredients {
+    padding-left: 1.5rem;
+    font-size: 1.25rem;
+  }
+  #shopping-ingredients li {
+    margin: 0.75rem 0;
   }
   .cook-layout {
     display: grid;
@@ -469,6 +543,262 @@ const serializedRecipe = JSON.stringify({
     }
     .cook-layout {
       grid-template-columns: 1fr;
+    }
+  }
+  /* Editorial recipe layer */
+  :root {
+    --paper: #f8f3ea;
+    --paper-deep: #eee4d5;
+    --ink: #29231d;
+    --muted: #71675c;
+    --line: #d9cdbc;
+    --accent: #9e4229;
+    --leaf: #5b6c51;
+    color: var(--ink);
+    background: var(--paper);
+    font-family: "Newsreader", Georgia, serif;
+  }
+  body {
+    background:
+      radial-gradient(
+        circle at 90% 0%,
+        rgb(214 190 150 / 35%),
+        transparent 24rem
+      ),
+      var(--paper);
+  }
+  header,
+  main,
+  footer {
+    max-width: 48rem;
+  }
+  header {
+    align-items: baseline;
+    border-bottom: 1px solid var(--line);
+    padding-top: 1.75rem;
+    padding-bottom: 1rem;
+  }
+  header a {
+    font:
+      600 clamp(1.5rem, 3vw, 2rem) / 1 "Newsreader",
+      Georgia,
+      serif;
+  }
+  header span,
+  footer {
+    color: var(--muted);
+    font:
+      500 0.78rem / 1.4 "DM Sans",
+      sans-serif;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  #recipe-view {
+    padding-top: clamp(2.5rem, 6vw, 5.5rem);
+  }
+  .return-link,
+  .text-button {
+    color: var(--muted);
+    font:
+      700 0.72rem "DM Sans",
+      sans-serif;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  article {
+    margin-top: clamp(2rem, 7vw, 5rem);
+  }
+  h1 {
+    max-width: 10ch;
+    font-family: "Newsreader", Georgia, serif;
+    font-size: clamp(3.5rem, 11vw, 7rem);
+    font-weight: 500;
+    letter-spacing: -0.06em;
+    line-height: 0.87;
+  }
+  .summary {
+    max-width: 36rem;
+    margin: 1.5rem 0 2rem;
+    color: #4b433a;
+    font-size: clamp(1.2rem, 2.5vw, 1.55rem);
+    line-height: 1.35;
+  }
+  .servings-control {
+    max-width: 13rem;
+    margin: 1.5rem 0;
+    color: var(--ink);
+    font:
+      700 0.72rem "DM Sans",
+      sans-serif;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .servings-control input {
+    border: 0;
+    border-bottom: 1px solid var(--ink);
+    border-radius: 0;
+    background: transparent;
+    font:
+      500 1.4rem "Newsreader",
+      Georgia,
+      serif;
+  }
+  .primary {
+    background: var(--accent);
+    padding: 0.9rem 1.2rem;
+    font:
+      700 0.75rem "DM Sans",
+      sans-serif;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    transition:
+      background 160ms ease,
+      transform 160ms ease;
+  }
+  .primary:hover {
+    background: #7e301d;
+    transform: translateY(-2px);
+  }
+  .text-button {
+    margin-left: 1rem;
+  }
+  #recipe-content {
+    margin-top: clamp(3rem, 8vw, 6rem);
+    border-top: 1px solid var(--line);
+  }
+  #recipe-content :is(h2, h3) {
+    margin: 2.75rem 0 1rem;
+    font:
+      500 clamp(2rem, 5vw, 3.5rem) / 0.95 "Newsreader",
+      Georgia,
+      serif;
+    letter-spacing: -0.045em;
+  }
+  #recipe-content ul {
+    padding: 0;
+    list-style: none;
+  }
+  #recipe-content ul li {
+    border-top: 1px solid var(--line);
+    padding: 0.8rem 0;
+    font-size: 1.15rem;
+  }
+  #recipe-content ol {
+    padding-left: 1.5rem;
+  }
+  #recipe-content ol li {
+    margin: 1.25rem 0;
+    padding-left: 0.5rem;
+    font-size: 1.18rem;
+  }
+  #recipe-content ol li::marker {
+    color: var(--accent);
+    font:
+      700 0.8rem "DM Sans",
+      sans-serif;
+  }
+  .shopping-mode,
+  .cook-mode {
+    max-width: 78rem;
+    margin-top: clamp(2rem, 6vw, 5rem);
+  }
+  .shopping-mode section {
+    max-width: 48rem;
+    margin-top: 3rem;
+  }
+  .eyebrow {
+    color: var(--accent);
+    font-family: "DM Sans", sans-serif;
+    letter-spacing: 0.14em;
+  }
+  .shopping-mode h1 {
+    font-size: clamp(3rem, 8vw, 6rem);
+  }
+  .cook-mode h1 {
+    font-size: clamp(2.25rem, 4.4vw, 3.75rem);
+    overflow-wrap: anywhere;
+  }
+  #shopping-ingredients {
+    padding: 0;
+    list-style: none;
+  }
+  #shopping-ingredients li {
+    border-top: 1px solid var(--line);
+    padding: 0.9rem 0;
+  }
+  .cook-layout {
+    gap: clamp(2rem, 7vw, 7rem);
+  }
+  .cook-layout aside {
+    color: var(--muted);
+  }
+  #step-nav {
+    font-family: "DM Sans", sans-serif;
+  }
+  #step-nav button {
+    color: inherit;
+    font-size: 0.86rem;
+    line-height: 1.35;
+  }
+  #step-nav button[aria-current="true"] {
+    color: var(--accent);
+  }
+  details {
+    border-top: 1px solid var(--line);
+    padding-top: 1rem;
+  }
+  details summary {
+    color: var(--ink);
+    font:
+      700 0.72rem "DM Sans",
+      sans-serif;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .current-step {
+    background: #e9ddcb;
+    box-shadow: inset 0 0 0 1px rgb(128 91 51 / 8%);
+  }
+  .current-step h2 {
+    margin: 0.6rem 0 1rem;
+    font-family: "Newsreader", Georgia, serif;
+    font-weight: 500;
+    letter-spacing: -0.05em;
+  }
+  .current-step p:not(.eyebrow) {
+    max-width: 30rem;
+    font-size: clamp(1.35rem, 3vw, 1.75rem);
+    line-height: 1.35;
+  }
+  footer {
+    margin-top: 5rem;
+    padding-top: 1.5rem;
+    padding-bottom: 2rem;
+  }
+  @media (max-width: 720px) {
+    header,
+    main,
+    footer {
+      padding-left: 1.25rem;
+      padding-right: 1.25rem;
+    }
+    header span {
+      display: none;
+    }
+    h1 {
+      font-size: clamp(3.2rem, 17vw, 5.5rem);
+    }
+    .text-button {
+      display: block;
+      margin: 1rem 0 0;
+    }
+    .shopping-mode,
+    .cook-mode {
+      margin-top: 2rem;
+    }
+    .current-step {
+      min-height: 18rem;
+      padding: 1.75rem;
     }
   }
 </style>

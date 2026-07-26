@@ -118,6 +118,23 @@ test("builds Collection-to-Recipe navigation with restored context and focus", a
     /<input id="recipe-servings" type="number" min="1" step="1" value="6"[^>]*>/,
   );
   assert.match(recipe, /id="enter-cook"[^>]*>Passer en mode cuisine/);
+  assert.match(recipe, /id="enter-shopping"[^>]*>Voir la liste de courses/);
+  assert.match(
+    recipe,
+    /<main class="shopping-mode" id="shopping-view" hidden[^>]*>/,
+  );
+  assert.match(recipe, /id="shopping-servings" type="number" min="1" step="1"/);
+  assert.match(recipe, /<ul id="shopping-ingredients"[^>]*><\/ul>/);
+  assert.match(
+    recipeSource,
+    /function enterShopping\(\)[\s\S]*?shoppingIngredients\.replaceChildren/,
+  );
+  assert.match(recipeSource, /shoppingServings\.addEventListener\("input"/);
+  assert.match(
+    recipeSource,
+    /shopping\.hidden = true;\s*recipeView\.hidden = false;/,
+  );
+  assert.match(recipeSource, /\[shoppingIngredients, ingredients\]\.forEach/);
   assert.match(recipe, /<main class="cook-mode" id="cook-view" hidden[^>]*>/);
   assert.match(
     recipe,
@@ -155,7 +172,7 @@ test("builds Collection-to-Recipe navigation with restored context and focus", a
     firstCard.indexOf("image-placeholder") < firstCard.indexOf("card-content"),
   );
   assert.ok(firstCard.indexOf("card-meta") < firstCard.indexOf("<h2"));
-  assert.ok(firstCard.indexOf("<h2") < firstCard.indexOf("card-servings"));
+  assert.doesNotMatch(firstCard, /card-servings/);
   assert.match(source, /history\.replaceState\(/);
   assert.doesNotMatch(
     source,
