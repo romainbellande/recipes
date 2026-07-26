@@ -48,6 +48,12 @@ const serializedRecipes = JSON.stringify(recipes).replace(/</g, "\\u003c");
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap"
+      rel="stylesheet"
+    />
     <meta
       name="description"
       content="Une petite Collection ouverte de Recettes fiables pour tous les jours."
@@ -115,10 +121,6 @@ const serializedRecipes = JSON.stringify(recipes).replace(/</g, "\\u003c");
                     </p>
                     <h2>{recipe.title}</h2>
                     <p>{recipe.summary}</p>
-                    <p class="card-servings">
-                      Pour {recipe.servings} personne
-                      {recipe.servings === "1" ? "" : "s"}
-                    </p>
                   </div>
                 </a>
               </li>
@@ -220,7 +222,7 @@ const serializedRecipes = JSON.stringify(recipes).replace(/</g, "\\u003c");
   </body>
 </html>
 
-<style>
+<style is:global>
   :root {
     color: #241b16;
     background: #fffaf4;
@@ -363,8 +365,7 @@ const serializedRecipes = JSON.stringify(recipes).replace(/</g, "\\u003c");
   .card-content p {
     line-height: 1.45;
   }
-  .card-meta,
-  .card-servings {
+  .card-meta {
     margin: 0;
     color: #6b5d53;
     font-family: system-ui, sans-serif;
@@ -377,9 +378,6 @@ const serializedRecipes = JSON.stringify(recipes).replace(/</g, "\\u003c");
     margin: 0.5rem 0;
     font-size: clamp(1.5rem, 3vw, 2.25rem);
     line-height: 1.05;
-  }
-  .card-servings {
-    font-weight: 700;
   }
   footer {
     border-top: 1px solid #d9cec2;
@@ -406,6 +404,240 @@ const serializedRecipes = JSON.stringify(recipes).replace(/</g, "\\u003c");
     .card-image,
     .image-placeholder {
       min-height: 0;
+    }
+  }
+  /* Editorial collection layer */
+  :root {
+    --paper: #f8f3ea;
+    --paper-deep: #eee4d5;
+    --ink: #29231d;
+    --muted: #71675c;
+    --line: #d9cdbc;
+    --accent: #9e4229;
+    --leaf: #5b6c51;
+    color: var(--ink);
+    background: var(--paper);
+    font-family: "Newsreader", Georgia, serif;
+  }
+  body {
+    background:
+      radial-gradient(
+        circle at 90% 0%,
+        rgb(214 190 150 / 35%),
+        transparent 24rem
+      ),
+      var(--paper);
+  }
+  .site-header,
+  main,
+  footer {
+    max-width: 78rem;
+  }
+  .site-header {
+    align-items: baseline;
+    border-bottom: 1px solid var(--line);
+    padding-top: 1.75rem;
+    padding-bottom: 1rem;
+  }
+  .site-header a {
+    font:
+      600 clamp(1.5rem, 3vw, 2rem) / 1 "Newsreader",
+      Georgia,
+      serif;
+  }
+  .site-header span,
+  footer {
+    color: var(--muted);
+    font:
+      500 0.78rem / 1.4 "DM Sans",
+      sans-serif;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  main {
+    padding-top: clamp(2.5rem, 6vw, 5.5rem);
+  }
+  .collection {
+    gap: 1.5rem;
+  }
+  .collection > * {
+    min-width: 0;
+  }
+  .eyebrow {
+    color: var(--accent);
+    font-family: "DM Sans", sans-serif;
+    letter-spacing: 0.14em;
+  }
+  .collection h1 {
+    max-width: 11ch;
+    margin: 0;
+    font-size: clamp(3.5rem, 8vw, 7rem);
+    font-weight: 500;
+    letter-spacing: -0.055em;
+    line-height: 0.87;
+  }
+  .filters {
+    display: grid;
+    gap: 0.65rem;
+    max-width: 52rem;
+    margin-top: 1.5rem;
+    padding: clamp(1.25rem, 3vw, 2rem);
+    border: 1px solid var(--line);
+    background: rgb(255 253 248 / 65%);
+  }
+  .search-label,
+  .tag-filters {
+    margin: 0;
+    color: var(--ink);
+    font:
+      700 0.72rem / 1.2 "DM Sans",
+      sans-serif;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  #recipe-search {
+    border: 0;
+    border-bottom: 1px solid var(--ink);
+    border-radius: 0;
+    background: transparent;
+    padding: 0.85rem 0 0.65rem;
+    font:
+      400 clamp(1.05rem, 2vw, 1.3rem) "Newsreader",
+      Georgia,
+      serif;
+  }
+  #recipe-search::placeholder {
+    color: #978b7c;
+  }
+  .tag-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding-top: 0.5rem;
+  }
+  .tag-filters legend {
+    width: 100%;
+    margin-bottom: 0.1rem;
+  }
+  .tag-filters label {
+    margin: 0;
+    border: 1px solid var(--line);
+    padding: 0.45rem 0.65rem;
+    color: var(--muted);
+    font:
+      500 0.78rem / 1 "DM Sans",
+      sans-serif;
+    transition:
+      background 160ms ease,
+      color 160ms ease;
+  }
+  .tag-filters input {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    opacity: 0;
+  }
+  .tag-filters label:has(input:checked) {
+    border-color: var(--leaf);
+    background: var(--leaf);
+    color: white;
+  }
+  #collection-results {
+    color: var(--muted);
+    font:
+      500 0.78rem "DM Sans",
+      sans-serif;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .recipe-cards {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+    gap: 1rem;
+    border: 1px solid var(--line);
+    background: var(--line);
+  }
+  .recipe-cards > li {
+    min-width: 0;
+  }
+  .recipe-card {
+    height: 100%;
+    background: #fcfaf5;
+    transition:
+      transform 180ms ease,
+      background 180ms ease;
+  }
+  .recipe-card:hover {
+    background: white;
+    transform: translateY(-0.35rem);
+  }
+  .image-placeholder {
+    min-height: 10rem;
+    background: linear-gradient(135deg, #d7c3a3, #f0e5d4 55%, #c4d0bb);
+    color: var(--accent);
+    font:
+      700 0.7rem "DM Sans",
+      sans-serif;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+  }
+  .card-content {
+    display: grid;
+    align-content: start;
+    min-height: 15rem;
+    padding: 1.5rem;
+  }
+  .card-meta {
+    color: var(--muted);
+    font:
+      500 0.72rem "DM Sans",
+      sans-serif;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .card-content h2 {
+    margin: 0.8rem 0 0.55rem;
+    font-size: clamp(1.85rem, 3vw, 2.8rem);
+    font-weight: 500;
+    letter-spacing: -0.04em;
+    line-height: 0.95;
+  }
+  .card-content p:not(.card-meta) {
+    margin: 0;
+    font-size: 1.08rem;
+  }
+  #reset-filters {
+    border-color: var(--accent);
+    color: var(--accent);
+    font:
+      700 0.75rem "DM Sans",
+      sans-serif;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  footer {
+    margin-top: 5rem;
+    padding-top: 1.5rem;
+    padding-bottom: 2rem;
+  }
+  @media (max-width: 720px) {
+    .site-header,
+    main,
+    footer {
+      padding-left: 1.25rem;
+      padding-right: 1.25rem;
+    }
+    .site-header span {
+      display: none;
+    }
+    .collection h1 {
+      font-size: clamp(3.2rem, 16vw, 5rem);
+      overflow-wrap: anywhere;
+    }
+    .recipe-cards {
+      grid-template-columns: 1fr;
+    }
+    .image-placeholder {
+      aspect-ratio: 16 / 7;
     }
   }
 </style>

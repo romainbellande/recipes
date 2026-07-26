@@ -26,3 +26,11 @@ The canonical identifier derived from a Recipe filename and used in its URL.
 **Recipe alias**:
 A former published Recipe ID in that Recipe's front matter; its legacy URL redirects to
 its canonical Recipe URL.
+
+**Shopping List**:
+A Recipe-scoped checklist of the ingredients needed to make that Recipe.
+_Avoid_: basket, cart
+
+**Acquired ingredient**:
+An ingredient marked as obtained on a Shopping List.
+_Avoid_: completed ingredient, used ingredient
