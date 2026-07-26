@@ -47,6 +47,15 @@ test("scales leading ingredient quantities with concise French decimals", () => 
   assert.equal(scaleIngredient("400 g de pâtes", 4, 6), "600 g de pâtes");
   assert.equal(scaleIngredient("1,5 l de soupe", 4, 3), "1,13 l de soupe");
   assert.equal(scaleIngredient("1 œuf", 3, 1), "0,33 œuf");
+  assert.equal(scaleIngredient("½ citron", 2, 4), "1 citron");
+  assert.equal(
+    scaleIngredient("1½ c. à soupe d'huile", 2, 4),
+    "3 c. à soupe d'huile",
+  );
+  assert.equal(
+    scaleIngredient("⅔ sachet d'épices", 3, 6),
+    "1,33 sachet d'épices",
+  );
   assert.equal(scaleIngredient("Sel", 4, 6), "Sel");
 });
 
@@ -73,7 +82,10 @@ test("builds Collection-to-Recipe navigation with restored context and focus", a
   await run("npm", ["run", "build"]);
   const page = await readFile("dist/index.html", "utf8");
   const source = await readFile("src/pages/index.astro", "utf8");
-  const recipe = await readFile("dist/recipe/apple-crumble/index.html", "utf8");
+  const recipe = await readFile(
+    "dist/recipe/pates-aux-sardines-et-a-la-tomate/index.html",
+    "utf8",
+  );
   const recipeSource = await readFile("src/pages/recipe/[id].astro", "utf8");
   const recipeFiles = (await readdir("src/content/recipes"))
     .filter((filename) => filename.endsWith(".md"))
@@ -101,21 +113,21 @@ test("builds Collection-to-Recipe navigation with restored context and focus", a
   }
   assert.match(
     page,
-    /<a id="recipe-apple-crumble" class="recipe-card" data-recipe-card[^>]*>/,
+    /<a id="recipe-pates-aux-sardines-et-a-la-tomate" class="recipe-card" data-recipe-card[^>]*>/,
   );
   assert.match(source, /card\.dataset\.recipeUrl/);
   assert.match(source, /#\$\{card\.id\}/);
   assert.match(source, /originCard.*focus\(\)/);
   assert.match(
     recipe,
-    /<a id="return-link" class="return-link" data-origin-card="recipe-apple-crumble" href="\/recipes"/,
+    /<a id="return-link" class="return-link" data-origin-card="recipe-pates-aux-sardines-et-a-la-tomate" href="\/recipes"/,
   );
   assert.match(recipeSource, /collectionFiltersFromSearch\(/);
   assert.match(recipeSource, /collectionSearchParams\(/);
   assert.match(recipeSource, /#recipe-title"\)\.focus\(\)/);
   assert.match(
     recipe,
-    /<input id="recipe-servings" type="number" min="1" step="1" value="6"[^>]*>/,
+    /<input id="recipe-servings" type="number" min="1" step="1" value="2"[^>]*>/,
   );
   assert.match(recipe, /id="enter-cook"[^>]*>Passer en mode cuisine/);
   assert.match(recipe, /id="enter-shopping"[^>]*>Voir la liste de courses/);
