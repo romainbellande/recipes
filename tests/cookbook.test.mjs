@@ -167,7 +167,7 @@ test("builds Collection-to-Recipe navigation with restored context and focus", a
   assert.match(recipeSource, /function playAlarm\(\)/);
   assert.match(recipeSource, /recipe\.timers/);
   assert.match(recipeSource, /clock-button/);
-  assert.match(recipeSource, /10_000/);
+  assert.match(recipeSource, /1_000/);
   assert.match(recipeSource, /timers = timers\.filter/);
   assert.match(recipeSource, /previous\.hidden = step === 0/);
   assert.match(
