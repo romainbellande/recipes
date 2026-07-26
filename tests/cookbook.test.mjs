@@ -104,164 +104,182 @@ test("restores a verbatim query and only distinct controlled URL tags", () => {
   );
 });
 
-test("builds Collection-to-Recipe navigation with restored context and focus", async () => {
-  await run("npm", ["run", "build"]);
-  const page = await readFile("dist/index.html", "utf8");
-  const source = await readFile("src/pages/index.astro", "utf8");
-  const recipe = await readFile(
-    "dist/recipe/pates-aux-sardines-et-a-la-tomate/index.html",
-    "utf8",
-  );
-  const recipeSource = await readFile("src/pages/recipe/[id].astro", "utf8");
-  const recipeFiles = (await readdir("src/content/recipes"))
-    .filter((filename) => filename.endsWith(".md"))
-    .sort();
-  const titles = await Promise.all(
-    recipeFiles.map(async (filename) => {
-      const recipe = await readFile(`src/content/recipes/${filename}`, "utf8");
-      return recipe.match(/^title: (.+)$/m)?.[1];
-    }),
-  );
-
-  const cardLinks = [
-    ...page.matchAll(
-      /<a[^>]*class="recipe-card"[^>]*aria-label="([^"]+)"[^>]*>/g,
-    ),
-  ];
-  assert.equal(cardLinks.length, recipeFiles.length);
-  assert.deepEqual(cardLinks.map((link) => link[1]).sort(), [...titles].sort());
-  for (const filename of recipeFiles) {
-    const id = filename.slice(0, -3);
-    assert.match(
-      page,
-      new RegExp(`href="/recipes/recipe/${id}/#recipe-${id}"`),
-    );
-  }
-  assert.match(
-    page,
-    /<a id="recipe-pates-aux-sardines-et-a-la-tomate" class="recipe-card" data-recipe-card[^>]*>/,
-  );
-  assert.match(source, /card\.dataset\.recipeUrl/);
-  assert.match(source, /#\$\{card\.id\}/);
-  assert.match(source, /originCard.*focus\(\)/);
-  assert.match(
-    recipe,
-    /<a id="return-link" class="return-link" data-origin-card="recipe-pates-aux-sardines-et-a-la-tomate" href="\/recipes"/,
-  );
-  assert.match(recipeSource, /collectionFiltersFromSearch\(/);
-  assert.match(recipeSource, /collectionSearchParams\(/);
-  assert.match(recipeSource, /#recipe-title"\)\.focus\(\)/);
-  assert.match(
-    recipe,
-    /<input id="recipe-servings" type="number" min="1" step="1" value="2"[^>]*>/,
-  );
-  assert.match(recipe, /id="enter-cook"[^>]*>Passer en mode cuisine/);
-  assert.match(recipe, /id="enter-shopping"[^>]*>Voir la liste de courses/);
-  assert.match(
-    recipe,
-    /<main class="shopping-mode" id="shopping-view" hidden[^>]*>/,
-  );
-  assert.match(recipe, /id="shopping-servings" type="number" min="1" step="1"/);
-  assert.match(recipe, /<ul id="shopping-ingredients"[^>]*><\/ul>/);
-  assert.match(
-    recipeSource,
-    /function enterShopping\(\)[\s\S]*?shoppingIngredients\.replaceChildren/,
-  );
-  assert.match(recipeSource, /shoppingServings\.addEventListener\("input"/);
-  assert.match(
-    recipeSource,
-    /shopping\.hidden = true;\s*recipeView\.hidden = false;/,
-  );
-  assert.match(recipeSource, /\[shoppingIngredients, ingredients\]\.forEach/);
-  assert.match(recipe, /<main class="cook-mode" id="cook-view" hidden[^>]*>/);
-  assert.match(
-    recipe,
-    /id="cook-servings" type="number" min="1" step="1"[^>]*>/,
-  );
-  assert.match(recipeSource, /function updateServings\(value\)/);
-  assert.match(recipeSource, /recipeServings\.value = selectedServings/);
-  assert.match(recipeSource, /cookServings\.value = selectedServings/);
-  assert.match(recipe, /id="previous-step" hidden[^>]*>Étape précédente/);
-  assert.match(recipe, /id="step-timer"/);
-  assert.match(recipe, /id="cook-timers" aria-label="Minuteries actives"/);
-  assert.match(recipeSource, /function playAlarm\(\)/);
-  assert.match(recipeSource, /recipe\.timers/);
-  assert.match(recipeSource, /clock-button/);
-  assert.match(recipeSource, /1_000/);
-  assert.match(recipeSource, /timers = timers\.filter/);
-  assert.match(recipeSource, /previous\.hidden = step === 0/);
-  assert.match(
-    recipeSource,
-    /previous\.addEventListener\("click", \(\) => showStep\(step - 1\)\)/,
-  );
-  assert.doesNotMatch(recipeSource, /stepNav|#step-nav/);
-  assert.match(
-    recipeSource,
-    /ingredients\.replaceChildren\([\s\S]*?showStep\(0\)/,
-  );
-  assert.match(
-    recipeSource,
-    /exitCook\.addEventListener\("click", \(\) => \{\s*resetCook\(\);\s*cook\.hidden = true;\s*recipeView\.hidden = false;/,
-  );
-  assert.doesNotMatch(
-    recipeSource,
-    /(?:localStorage|sessionStorage|indexedDB|searchParams\.set\("servings")/,
-  );
-  assert.equal(
-    (page.match(/class="image-placeholder" aria-hidden="true"/g) ?? []).length,
-    recipeFiles.length,
-  );
-  const firstCard = page.slice(
-    cardLinks[0].index,
-    page.indexOf("</a>", cardLinks[0].index),
-  );
-  assert.ok(firstCard.includes("Photo à venir"));
-  assert.ok(
-    firstCard.indexOf("image-placeholder") < firstCard.indexOf("card-content"),
-  );
-  assert.ok(firstCard.indexOf("card-meta") < firstCard.indexOf("<h2"));
-  assert.doesNotMatch(firstCard, /card-servings/);
-  assert.match(source, /history\.replaceState\(/);
-  assert.doesNotMatch(
-    source,
-    /(?:pushState|localStorage|sessionStorage|indexedDB)/,
-  );
-  assert.match(source, /collectionFiltersFromSearch\(/);
-  assert.match(source, /collectionSearchParams\(/);
-  assert.match(source, /a:focus-visible/);
-  assert.match(source, /\.recipe-card \{\s*display: block;/);
-  assert.match(source, /\.image-placeholder \{[\s\S]*?aspect-ratio: 4 \/ 3;/);
-  assert.match(source, /background: #e9dfd3/);
-  assert.ok(page.includes("Aucune Recette ne correspond à votre recherche."));
-
-  const aliasRoutes = [];
-  for (const filename of recipeFiles) {
-    const recipeSource = await readFile(
-      `src/content/recipes/${filename}`,
+test(
+  "builds Collection-to-Recipe navigation with restored context and focus",
+  async () => {
+    await run("npm", ["run", "build"]);
+    const page = await readFile("dist/index.html", "utf8");
+    const source = await readFile("src/pages/index.astro", "utf8");
+    const recipe = await readFile(
+      "dist/recipe/pates-aux-sardines-et-a-la-tomate/index.html",
       "utf8",
     );
-    const aliases = recipeSource
-      .match(/^aliases:\n((?: {2}- .+\n?)*)/m)?.[1]
-      ?.match(/^ {2}- (.+)$/gm)
-      ?.map((alias) => alias.slice(4));
-    for (const alias of aliases ?? [])
-      aliasRoutes.push({ alias, id: filename.slice(0, -3) });
-  }
-  assert.match(recipeSource, /recipe\.data\.aliases/);
-  assert.match(recipeSource, /window\.location\.replace\(/);
-  assert.match(recipeSource, /window\.location\.search/);
-  assert.match(recipeSource, /window\.location\.hash/);
-  for (const { alias, id } of aliasRoutes) {
-    const redirect = await readFile(`dist/recipe/${alias}/index.html`, "utf8");
-    assert.match(
-      redirect,
-      new RegExp(
-        `<link rel="canonical" href="https://romainbellande\\.github\\.io/recipes/recipe/${id}/"`,
+    const recipeSource = await readFile("src/pages/recipe/[id].astro", "utf8");
+    const recipeFiles = (await readdir("src/content/recipes"))
+      .filter((filename) => filename.endsWith(".md"))
+      .sort();
+    const titles = await Promise.all(
+      recipeFiles.map(async (filename) => {
+        const recipe = await readFile(
+          `src/content/recipes/${filename}`,
+          "utf8",
+        );
+        return recipe.match(/^title: (.+)$/m)?.[1];
+      }),
+    );
+
+    const cardLinks = [
+      ...page.matchAll(
+        /<a[^>]*class="recipe-card"[^>]*aria-label="([^"]+)"[^>]*>/g,
       ),
+    ];
+    assert.equal(cardLinks.length, recipeFiles.length);
+    assert.deepEqual(
+      cardLinks.map((link) => link[1]).sort(),
+      [...titles].sort(),
+    );
+    for (const filename of recipeFiles) {
+      const id = filename.slice(0, -3);
+      assert.match(
+        page,
+        new RegExp(`href="/recipes/recipe/${id}/#recipe-${id}"`),
+      );
+    }
+    assert.match(
+      page,
+      /<a id="recipe-pates-aux-sardines-et-a-la-tomate" class="recipe-card" data-recipe-card[^>]*>/,
+    );
+    assert.match(source, /card\.dataset\.recipeUrl/);
+    assert.match(source, /#\$\{card\.id\}/);
+    assert.match(source, /originCard.*focus\(\)/);
+    assert.match(
+      recipe,
+      /<a id="return-link" class="return-link" data-origin-card="recipe-pates-aux-sardines-et-a-la-tomate" href="\/recipes"/,
+    );
+    assert.match(recipeSource, /collectionFiltersFromSearch\(/);
+    assert.match(recipeSource, /collectionSearchParams\(/);
+    assert.match(recipeSource, /#recipe-title"\)\.focus\(\)/);
+    assert.match(
+      recipe,
+      /<input id="recipe-servings" type="number" min="1" step="1" value="2"[^>]*>/,
+    );
+    assert.match(recipe, /id="enter-cook"[^>]*>Passer en mode cuisine/);
+    assert.match(recipe, /id="enter-shopping"[^>]*>Voir la liste de courses/);
+    assert.match(
+      recipe,
+      /<main class="shopping-mode" id="shopping-view" hidden[^>]*>/,
     );
     assert.match(
-      redirect,
-      /window\.location\.replace\([\s\S]*?window\.location\.search[\s\S]*?window\.location\.hash/,
+      recipe,
+      /id="shopping-servings" type="number" min="1" step="1"/,
     );
-  }
-}, 30_000);
+    assert.match(recipe, /<ul id="shopping-ingredients"[^>]*><\/ul>/);
+    assert.match(
+      recipeSource,
+      /function enterShopping\(\)[\s\S]*?shoppingIngredients\.replaceChildren/,
+    );
+    assert.match(recipeSource, /shoppingServings\.addEventListener\("input"/);
+    assert.match(
+      recipeSource,
+      /shopping\.hidden = true;\s*recipeView\.hidden = false;/,
+    );
+    assert.match(recipeSource, /\[shoppingIngredients, ingredients\]\.forEach/);
+    assert.match(recipe, /<main class="cook-mode" id="cook-view" hidden[^>]*>/);
+    assert.match(
+      recipe,
+      /id="cook-servings" type="number" min="1" step="1"[^>]*>/,
+    );
+    assert.match(recipeSource, /function updateServings\(value\)/);
+    assert.match(recipeSource, /recipeServings\.value = selectedServings/);
+    assert.match(recipeSource, /cookServings\.value = selectedServings/);
+    assert.match(recipe, /id="previous-step" hidden[^>]*>Étape précédente/);
+    assert.match(recipe, /id="step-timer"/);
+    assert.match(recipe, /id="cook-timers" aria-label="Minuteries actives"/);
+    assert.match(recipeSource, /function playAlarm\(\)/);
+    assert.match(recipeSource, /recipe\.timers/);
+    assert.match(recipeSource, /clock-button/);
+    assert.match(recipeSource, /1_000/);
+    assert.match(recipeSource, /timers = timers\.filter/);
+    assert.match(recipeSource, /previous\.hidden = step === 0/);
+    assert.match(
+      recipeSource,
+      /previous\.addEventListener\("click", \(\) => showStep\(step - 1\)\)/,
+    );
+    assert.doesNotMatch(recipeSource, /stepNav|#step-nav/);
+    assert.match(
+      recipeSource,
+      /ingredients\.replaceChildren\([\s\S]*?showStep\(0\)/,
+    );
+    assert.match(
+      recipeSource,
+      /exitCook\.addEventListener\("click", \(\) => \{\s*resetCook\(\);\s*cook\.hidden = true;\s*recipeView\.hidden = false;/,
+    );
+    assert.doesNotMatch(
+      recipeSource,
+      /(?:localStorage|sessionStorage|indexedDB|searchParams\.set\("servings")/,
+    );
+    assert.equal(
+      (page.match(/class="image-placeholder" aria-hidden="true"/g) ?? [])
+        .length,
+      recipeFiles.length,
+    );
+    const firstCard = page.slice(
+      cardLinks[0].index,
+      page.indexOf("</a>", cardLinks[0].index),
+    );
+    assert.ok(firstCard.includes("Photo à venir"));
+    assert.ok(
+      firstCard.indexOf("image-placeholder") <
+        firstCard.indexOf("card-content"),
+    );
+    assert.ok(firstCard.indexOf("card-meta") < firstCard.indexOf("<h2"));
+    assert.doesNotMatch(firstCard, /card-servings/);
+    assert.match(source, /history\.replaceState\(/);
+    assert.doesNotMatch(
+      source,
+      /(?:pushState|localStorage|sessionStorage|indexedDB)/,
+    );
+    assert.match(source, /collectionFiltersFromSearch\(/);
+    assert.match(source, /collectionSearchParams\(/);
+    assert.match(source, /a:focus-visible/);
+    assert.match(source, /\.recipe-card \{\s*display: block;/);
+    assert.match(source, /\.image-placeholder \{[\s\S]*?aspect-ratio: 4 \/ 3;/);
+    assert.match(source, /background: #e9dfd3/);
+    assert.ok(page.includes("Aucune Recette ne correspond à votre recherche."));
+
+    const aliasRoutes = [];
+    for (const filename of recipeFiles) {
+      const recipeSource = await readFile(
+        `src/content/recipes/${filename}`,
+        "utf8",
+      );
+      const aliases = recipeSource
+        .match(/^aliases:\n((?: {2}- .+\n?)*)/m)?.[1]
+        ?.match(/^ {2}- (.+)$/gm)
+        ?.map((alias) => alias.slice(4));
+      for (const alias of aliases ?? [])
+        aliasRoutes.push({ alias, id: filename.slice(0, -3) });
+    }
+    assert.match(recipeSource, /recipe\.data\.aliases/);
+    assert.match(recipeSource, /window\.location\.replace\(/);
+    assert.match(recipeSource, /window\.location\.search/);
+    assert.match(recipeSource, /window\.location\.hash/);
+    for (const { alias, id } of aliasRoutes) {
+      const redirect = await readFile(
+        `dist/recipe/${alias}/index.html`,
+        "utf8",
+      );
+      assert.match(
+        redirect,
+        new RegExp(
+          `<link rel="canonical" href="https://romainbellande\\.github\\.io/recipes/recipe/${id}/"`,
+        ),
+      );
+      assert.match(
+        redirect,
+        /window\.location\.replace\([\s\S]*?window\.location\.search[\s\S]*?window\.location\.hash/,
+      );
+    }
+  },
+  { timeout: 30_000 },
+);
