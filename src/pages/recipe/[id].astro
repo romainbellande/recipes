@@ -56,6 +56,15 @@ const serializedRecipe = JSON.stringify({
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width" />
+    <meta name="theme-color" content="#9e4229" />
+    <link
+      rel="manifest"
+      href={`${import.meta.env.BASE_URL}/manifest.webmanifest`}
+    />
+    <link
+      rel="apple-touch-icon"
+      href={`${import.meta.env.BASE_URL}/icons/pwa-192.png`}
+    />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -162,6 +171,7 @@ const serializedRecipe = JSON.stringify({
         href="https://github.com/romainbellande/recipes">Source</a
       >
     </footer>
+    <script is:inline src={`${import.meta.env.BASE_URL}/pwa.js`}></script>
     <script
       is:inline
       id="recipe-json"

@@ -9,5 +9,11 @@ export default [
     files: ["**/*.{cjs,js,mjs}"],
     languageOptions: { globals: globals.node },
   },
+  {
+    files: ["public/pwa.js", "public/sw.js"],
+    languageOptions: {
+      globals: { ...globals.browser, ...globals.serviceworker },
+    },
+  },
   ...astro.configs["flat/recommended"],
 ];

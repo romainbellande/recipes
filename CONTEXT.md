@@ -12,6 +12,10 @@ _Avoid_: recipe page, recipe data
 A curated group of Recipes published together for home cooks.
 _Avoid_: catalog, dataset
 
+**Installed Collection**:
+The Collection installed through a supporting browser as a standalone, online-first web application. It does not retain Recipes for offline use.
+_Avoid_: native app, offline app, PWA
+
 **Servings**:
 The number of people for whom a Recipe's ingredient quantities are calculated.
 _Avoid_: portions, people count
