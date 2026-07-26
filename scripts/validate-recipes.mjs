@@ -1,6 +1,7 @@
 import { readdir, readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { basename, join } from "node:path";
+import { parseInlineRecipeMarkup } from "../src/scripts/collection.js";
 
 const requiredFields = [
   "title",
@@ -144,11 +145,16 @@ function validateRecipe(filename, source) {
     const method = body
       .slice(methodSections[0].index + methodSections[0][0].length)
       .trim();
-    if (!/^\s*-\s+.+/m.test(ingredients))
-      fail("Ingrédients must contain bullet items");
-    if (!/^\s*1\.\s+.+/m.test(method) || !/^\s*\d+\.\s+.+/m.test(method))
+    const ingredientItems = ingredients.match(/^\s*-\s+(.+)$/gm) ?? [];
+    const steps = method.match(/^\s*\d+\.\s+(.+)$/gm) ?? [];
+    if (!ingredientItems.length) fail("Ingrédients must contain bullet items");
+    if (!steps.some((step) => /^\s*1\.\s+/.test(step)))
       fail("Préparation must contain numbered steps");
-    const steps = method.match(/^\s*\d+\.\s+.+$/gm) ?? [];
+    try {
+      parseInlineRecipeMarkup(body);
+    } catch ({ message }) {
+      fail(`invalid Inline Recipe markup: ${message}`);
+    }
     if (/⏱/.test(method))
       fail("Timer markers are not allowed; use timers front-matter metadata");
     if ("timers" in fields && !Array.isArray(fields.timers))

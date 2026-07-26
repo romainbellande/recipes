@@ -216,6 +216,21 @@ for (const [name, recipe, filename, rule] of [
     "Timer markers are not allowed",
   ],
   [
+    "unsupported Markdown",
+    valid.replace(
+      "Faites cuire les pâtes.",
+      "[Voir la source](https://example.com)",
+    ),
+    "quick-pasta.md",
+    "invalid Inline Recipe markup: unsupported Markdown",
+  ],
+  [
+    "malformed Inline Recipe markup",
+    valid.replace("Faites cuire les pâtes.", "**Faites cuire les pâtes."),
+    "quick-pasta.md",
+    "invalid Inline Recipe markup: unmatched emphasis delimiter",
+  ],
+  [
     "Timer step",
     valid.replace(
       "tags:",

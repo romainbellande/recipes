@@ -7,6 +7,7 @@ import {
   collectionFiltersFromSearch,
   collectionSearchParams,
   matchingRecipeIndices,
+  parseInlineRecipeMarkup,
   scaleIngredient,
   durationInSeconds,
 } from "../src/scripts/collection.js";
@@ -41,6 +42,25 @@ test("filters titles, summaries, ingredients, and tags", () => {
   assert.deepEqual(
     matchingRecipeIndices(recipes, "", ["main", "vegetarian"]),
     [1],
+  );
+});
+
+test("parses nested Inline Recipe markup and preserves it when scaling", () => {
+  assert.deepEqual(
+    parseInlineRecipeMarkup("**Faites _très_ vite** maintenant"),
+    [
+      {
+        tag: "strong",
+        children: ["Faites ", { tag: "em", children: ["très"] }, " vite"],
+      },
+      " maintenant",
+    ],
+  );
+  assert.throws(() => parseInlineRecipeMarkup("**incomplet"));
+  assert.throws(() => parseInlineRecipeMarkup("[un lien](/)"));
+  assert.equal(
+    scaleIngredient("**400 g** de pâtes", 4, 6),
+    "**600 g** de pâtes",
   );
 });
 
