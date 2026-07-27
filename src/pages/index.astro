@@ -121,7 +121,7 @@ const serializedRecipes = JSON.stringify(recipes).replace(/</g, "\\u003c");
                     <img class="card-image" src={recipe.image} alt="" />
                   ) : (
                     <div class="image-placeholder" aria-hidden="true">
-                      Photo à venir
+                      {recipe.icon}
                     </div>
                   )}
                   <div class="card-content">
@@ -583,12 +583,7 @@ const serializedRecipes = JSON.stringify(recipes).replace(/</g, "\\u003c");
   .image-placeholder {
     min-height: 10rem;
     background: linear-gradient(135deg, #d7c3a3, #f0e5d4 55%, #c4d0bb);
-    color: var(--accent);
-    font:
-      700 0.7rem "DM Sans",
-      sans-serif;
-    letter-spacing: 0.13em;
-    text-transform: uppercase;
+    font-size: clamp(4rem, 12vw, 7rem);
   }
   .card-content {
     display: grid;

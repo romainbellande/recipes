@@ -5,6 +5,7 @@ import { parseInlineRecipeMarkup } from "../src/scripts/collection.js";
 
 const requiredFields = [
   "title",
+  "icon",
   "summary",
   "prep_time",
   "cook_time",
@@ -85,6 +86,7 @@ function validateRecipe(filename, source) {
       fail(`missing required front-matter field: ${field}`);
   for (const field of [
     "title",
+    "icon",
     "summary",
     "prep_time",
     "cook_time",
@@ -94,10 +96,10 @@ function validateRecipe(filename, source) {
       fail(`${field} must be a non-empty string`);
   }
   if (
-    typeof fields.title === "string" &&
-    !/^\p{Extended_Pictographic}/u.test(fields.title)
+    typeof fields.icon === "string" &&
+    !/^\p{Extended_Pictographic}$/u.test(fields.icon)
   )
-    fail("title must begin with an icon");
+    fail("icon must be a single icon");
   for (const field of ["prep_time", "cook_time"])
     if (typeof fields[field] === "string" && !duration.test(fields[field]))
       fail(`${field} must be a duration such as "20 min" or "1 h 15 min"`);

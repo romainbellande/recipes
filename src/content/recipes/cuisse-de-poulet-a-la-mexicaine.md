@@ -1,5 +1,6 @@
 ---
-title: 🍗 Cuisse de poulet à la mexicaine
+title: Cuisse de poulet à la mexicaine
+icon: 🍗
 summary: Des cuisses de poulet rôties aux épices mexicaines, avec patate douce, haricots rouges, cheddar et crema au citron vert.
 prep_time: 10 min
 cook_time: 40 min

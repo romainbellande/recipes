@@ -1,5 +1,6 @@
 ---
-title: 🥗 Salade de couscous perlé, chèvre et carottes rôties
+title: Salade de couscous perlé, chèvre et carottes rôties
+icon: 🥗
 summary: Une salade de couscous perlé aux carottes rôties au miel, sauce yaourt-tahini, noisettes et chèvre frais.
 prep_time: 40 min
 cook_time: 20 min
