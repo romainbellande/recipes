@@ -54,3 +54,11 @@ _Avoid_: timer instance, timer copy
 **Inline Recipe markup**:
 Markdown bold, italic, and combined emphasis in Recipe body ingredients and preparation steps that remains formatted in every Recipe view.
 _Avoid_: plain text, display markup
+
+**Recipe print export**:
+A browser print flow, started from a Recipe-view button, for a Recipe using the cook’s selected Servings and Scaled ingredient quantities; the cook may save the rendered Recipe as a PDF.
+_Avoid_: PDF download, generated PDF
+
+**Printable Recipe**:
+The title, summary, selected Servings, ingredients, and preparation steps from a Recipe, without Collection navigation or interactive controls.
+_Avoid_: page printout, full-page export

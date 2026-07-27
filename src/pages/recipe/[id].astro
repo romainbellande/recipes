@@ -109,11 +109,15 @@ const serializedRecipe = JSON.stringify({
             value={recipe.data.servings}
           />
         </label>
+        <p id="print-servings">Pour {recipe.data.servings} personnes</p>
         <button class="primary" type="button" id="enter-cook">
           Passer en mode cuisine
         </button>
         <button class="text-button" type="button" id="enter-shopping">
           Voir la liste de courses
+        </button>
+        <button class="text-button" type="button" id="print-recipe">
+          Imprimer / Enregistrer en PDF
         </button>
         <div id="recipe-content"><Content /></div>
       </article>
@@ -202,6 +206,7 @@ const serializedRecipe = JSON.stringify({
       const recipeServings = document.querySelector("#recipe-servings");
       const shoppingServings = document.querySelector("#shopping-servings");
       const cookServings = document.querySelector("#cook-servings");
+      const printServings = document.querySelector("#print-servings");
       const recipeIngredients = [
         ...document.querySelectorAll("#recipe-content h2"),
       ].find(
@@ -232,6 +237,7 @@ const serializedRecipe = JSON.stringify({
         recipeServings.value = selectedServings;
         shoppingServings.value = selectedServings;
         cookServings.value = selectedServings;
+        printServings.textContent = `Pour ${selectedServings} personne${selectedServings > 1 ? "s" : ""}`;
         recipeIngredients
           .querySelectorAll("li")
           .forEach((item, index) =>
@@ -448,6 +454,9 @@ const serializedRecipe = JSON.stringify({
       document
         .querySelector("#enter-shopping")
         .addEventListener("click", enterShopping);
+      document
+        .querySelector("#print-recipe")
+        .addEventListener("click", () => window.print());
       document
         .querySelector("#enter-cook")
         .addEventListener("click", enterCook);
@@ -972,6 +981,31 @@ const serializedRecipe = JSON.stringify({
     .current-step {
       min-height: 18rem;
       padding: 1.75rem;
+    }
+  }
+  #print-servings {
+    display: none;
+  }
+  @media print {
+    @page {
+      margin: 1.5cm;
+    }
+    header,
+    footer,
+    .return-link,
+    .servings-control,
+    button {
+      display: none !important;
+    }
+    #recipe-view {
+      max-width: none;
+      padding: 0;
+    }
+    article {
+      margin-top: 0;
+    }
+    #print-servings {
+      display: block;
     }
   }
 </style>
