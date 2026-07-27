@@ -35,6 +35,10 @@ its canonical Recipe URL.
 An icon in a Recipe's front matter that represents the Recipe when it has no image.
 _Avoid_: title icon, emoji title
 
+**Healthy tag**:
+A controlled Recipe qualifier for a balanced, plant-rich meal with a protein source. It is editorial guidance, not a medical or nutritional claim.
+_Avoid_: health claim, diet label
+
 **Shopping List**:
 A Recipe-scoped checklist of the ingredients needed to make that Recipe.
 _Avoid_: basket, cart

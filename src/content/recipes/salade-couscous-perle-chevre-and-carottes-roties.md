@@ -15,6 +15,7 @@ timers:
 tags:
   - main
   - vegetarian
+  - healthy
 ---
 
 ## Ingrédients

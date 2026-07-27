@@ -20,7 +20,13 @@ const allowedFields = new Set([
 ]);
 const recipeId = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const courses = new Set(["breakfast", "main", "side", "dessert"]);
-const qualifiers = new Set(["weeknight", "make-ahead", "vegetarian", "pantry"]);
+const qualifiers = new Set([
+  "weeknight",
+  "make-ahead",
+  "vegetarian",
+  "pantry",
+  "healthy",
+]);
 const duration = /^(?:(?:[1-9]\d*) h(?: [1-9]\d* min)?|[1-9]\d* min)$/;
 const servings = /^[1-9]\d*(?:\s*[–-]\s*[1-9]\d*)?$/;
 

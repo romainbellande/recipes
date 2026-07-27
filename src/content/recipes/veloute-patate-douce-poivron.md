@@ -16,6 +16,7 @@ tags:
   - main
   - vegetarian
   - weeknight
+  - healthy
 ---
 
 ## Ingrédients
