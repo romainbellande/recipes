@@ -188,6 +188,13 @@ test(
       recipeSource,
       /#print-recipe"\)\s*\.addEventListener\("click", \(\) => window\.print\(\)\)/,
     );
+    assert.match(recipe, /id="copy-recipe-link"[^>]*>Copier le lien/);
+    assert.match(recipe, /id="copy-status" class="sr-only" aria-live="polite"/);
+    assert.match(recipeSource, /navigator\.clipboard\.writeText\(/);
+    assert.match(recipeSource, /link\[rel="canonical"\]/);
+    assert.match(recipeSource, /Lien copié/);
+    assert.match(recipeSource, /Impossible de copier le lien/);
+    assert.match(recipeSource, /3_000/);
     assert.match(recipeSource, /@media print \{[\s\S]*?#print-servings/);
     assert.match(
       recipe,

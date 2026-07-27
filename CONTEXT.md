@@ -31,6 +31,10 @@ The canonical identifier derived from a Recipe filename and used in its URL.
 A former published Recipe ID in that Recipe's front matter; its legacy URL redirects to
 its canonical Recipe URL.
 
+**Recipe share link**:
+The canonical Recipe URL copied for sharing; it identifies the Recipe by its Recipe ID and excludes Collection state.
+_Avoid_: deep link, filtered URL
+
 **Recipe icon**:
 An icon in a Recipe's front matter that represents the Recipe when it has no image.
 _Avoid_: title icon, emoji title
