@@ -1,5 +1,6 @@
 ---
-title: 🍠 Velouté de patate douce et poivron
+title: Velouté de patate douce et poivron
+icon: 🍠
 summary: Une soupe douce et crémeuse, relevée de poivron grillé et servie avec des graines de courge.
 prep_time: 10 min
 cook_time: 25 min

@@ -1,5 +1,6 @@
 ---
-title: 🍝 Pâtes aux sardines et à la tomate
+title: Pâtes aux sardines et à la tomate
+icon: 🍝
 summary: Des pâtes express aux sardines à la tomate, savoureuses et prêtes en 16 minutes.
 prep_time: 5 min
 cook_time: 11 min

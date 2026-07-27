@@ -1,5 +1,6 @@
 ---
-title: 🥘 Paëlla au chorizo et crevettes
+title: Paëlla au chorizo et crevettes
+icon: 🥘
 summary: Une paëlla au poulet, chorizo et crevettes, accompagnée d'une salade citronnée.
 prep_time: 15 min
 cook_time: 25 min

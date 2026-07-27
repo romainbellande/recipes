@@ -1,5 +1,6 @@
 ---
-title: 🍝 Penne et bœuf haché aux saveurs mexicaines
+title: Penne et bœuf haché aux saveurs mexicaines
+icon: 🍝
 summary: Des penne au bœuf haché, poivron et tomate, crémeux avec du cheddar et de la crème fraîche.
 prep_time: 5 min
 cook_time: 15 min

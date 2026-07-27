@@ -191,6 +191,10 @@ test(
     assert.match(recipeSource, /@media print \{[\s\S]*?#print-servings/);
     assert.match(
       recipe,
+      /class="recipe-visual" aria-hidden="true">\s*🍝\s*<\/div>/,
+    );
+    assert.match(
+      recipe,
       /<main class="shopping-mode" id="shopping-view" hidden[^>]*>/,
     );
     assert.match(
@@ -251,7 +255,10 @@ test(
       cardLinks[0].index,
       page.indexOf("</a>", cardLinks[0].index),
     );
-    assert.ok(firstCard.includes("Photo à venir"));
+    assert.match(
+      firstCard,
+      /class="image-placeholder" aria-hidden="true">\s*🍗\s*<\/div>/,
+    );
     assert.ok(
       firstCard.indexOf("image-placeholder") <
         firstCard.indexOf("card-content"),
@@ -268,7 +275,7 @@ test(
     assert.match(source, /a:focus-visible/);
     assert.match(source, /\.recipe-card \{\s*display: block;/);
     assert.match(source, /\.image-placeholder \{[\s\S]*?aspect-ratio: 4 \/ 3;/);
-    assert.match(source, /background: #e9dfd3/);
+    assert.match(source, /font-size: clamp\(4rem, 12vw, 7rem\)/);
     assert.ok(page.includes("Aucune Recette ne correspond à votre recherche."));
 
     const aliasRoutes = [];
