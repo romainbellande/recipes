@@ -6,16 +6,16 @@ prep_time: 40 min
 cook_time: 20 min
 servings: 2
 nutrition:
-  weight_g: 881
-  energy_kj: 1160
-  energy_kcal: 161
-  fat_g: 8.8
-  saturates_g: 2.3
-  carbohydrates_g: 14.5
+  weight_g: 850
+  energy_kj: 682
+  energy_kcal: 163
+  fat_g: 8.2
+  saturates_g: 2.6
+  carbohydrates_g: 17.8
   sugars_g: 3.4
   fibre_g: 2.3
-  protein_g: 5.1
-  salt_g: 0.1
+  protein_g: 5.3
+  salt_g: 0.2
 timers:
   - step: 2
     title: Rôtissez les légumes

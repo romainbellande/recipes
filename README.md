@@ -14,6 +14,8 @@ A static, open Collection of everyday Recipes for home cooks.
 
 ## Develop
 
+Use [direnv](https://direnv.net/) to load `FDC_API_KEY` from `.envrc` before starting the site.
+
 ```sh
 bun install
 bun run dev

@@ -6,15 +6,15 @@ prep_time: 10 min
 cook_time: 40 min
 servings: 2
 nutrition:
-  weight_g: 1549
-  energy_kj: 479
-  energy_kcal: 115
-  fat_g: 5.7
-  saturates_g: 1.8
-  carbohydrates_g: 8.4
-  sugars_g: 2.5
-  fibre_g: 2.4
-  protein_g: 6.3
+  weight_g: 1285
+  energy_kj: 565
+  energy_kcal: 135
+  fat_g: 6.8
+  saturates_g: 2.0
+  carbohydrates_g: 11.7
+  sugars_g: 3.2
+  fibre_g: 2.2
+  protein_g: 6.9
   salt_g: 0.2
 timers:
   - step: 2

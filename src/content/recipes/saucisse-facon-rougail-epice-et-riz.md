@@ -6,16 +6,16 @@ prep_time: 15 min
 cook_time: 20 min
 servings: 2
 nutrition:
-  weight_g: 1562
-  energy_kj: 576
-  energy_kcal: 138
-  fat_g: 8.0
-  saturates_g: 3.1
-  carbohydrates_g: 12.5
-  sugars_g: 2.3
+  weight_g: 1200
+  energy_kj: 812
+  energy_kcal: 194
+  fat_g: 12.1
+  saturates_g: 5.2
+  carbohydrates_g: 16.8
+  sugars_g: 3.2
   fibre_g: 1.2
-  protein_g: 4.1
-  salt_g: 0.4
+  protein_g: 4.6
+  salt_g: 0.5
 timers:
   - step: 2
     title: Dorez les saucisses

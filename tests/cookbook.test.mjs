@@ -191,7 +191,10 @@ test(
       recipe,
       /<h2 id="nutrition-title">Valeurs nutritionnelles<\/h2>/,
     );
-    assert.match(recipe, /Estimation générée par IA — valeurs indicatives/);
+    assert.match(
+      recipe,
+      /données de <a href="https:\/\/fdc\.nal\.usda\.gov\/">USDA FoodData Central<\/a> — valeurs indicatives/,
+    );
     assert.match(recipe, /aria-pressed="true"[\s\S]*?Par portion/);
     assert.match(recipe, /aria-pressed="false"[\s\S]*?Pour 100 g/);
     assert.match(recipeSource, /function renderNutrition\(\)/);
