@@ -167,6 +167,20 @@ test(
     assert.match(recipe, /id="enter-shopping"[^>]*>Voir la liste de courses/);
     assert.match(
       recipe,
+      /id="print-recipe"[^>]*>Imprimer \/ Enregistrer en PDF/,
+    );
+    assert.match(recipe, /<p id="print-servings">Pour 2 personnes<\/p>/);
+    assert.match(
+      recipeSource,
+      /printServings\.textContent = `Pour \$\{selectedServings\} personne/,
+    );
+    assert.match(
+      recipeSource,
+      /#print-recipe"\)\s*\.addEventListener\("click", \(\) => window\.print\(\)\)/,
+    );
+    assert.match(recipeSource, /@media print \{[\s\S]*?#print-servings/);
+    assert.match(
+      recipe,
       /<main class="shopping-mode" id="shopping-view" hidden[^>]*>/,
     );
     assert.match(
