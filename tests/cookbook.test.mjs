@@ -163,6 +163,16 @@ test(
       recipe,
       /<input id="recipe-servings" type="number" min="1" step="1" value="2"[^>]*>/,
     );
+    assert.equal((recipe.match(/data-servings-change="-1"/g) ?? []).length, 3);
+    assert.equal((recipe.match(/data-servings-change="1"/g) ?? []).length, 3);
+    assert.match(recipe, /aria-label="Diminuer le nombre de personnes"/);
+    assert.match(recipe, /aria-label="Augmenter le nombre de personnes"/);
+    assert.match(recipeSource, /button\.disabled = selectedServings === 1/);
+    assert.match(
+      recipeSource,
+      /updateServings\(\s*String\(selectedServings \+ Number\(button\.dataset\.servingsChange\)\)/,
+    );
+    assert.match(recipeSource, /appearance: textfield/);
     assert.match(recipe, /id="enter-cook"[^>]*>Passer en mode cuisine/);
     assert.match(recipe, /id="enter-shopping"[^>]*>Voir la liste de courses/);
     assert.match(
