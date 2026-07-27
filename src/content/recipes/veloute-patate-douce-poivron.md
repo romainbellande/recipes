@@ -5,6 +5,17 @@ summary: Une soupe douce et crémeuse, relevée de poivron grillé et servie ave
 prep_time: 10 min
 cook_time: 25 min
 servings: 2
+nutrition:
+  weight_g: 954
+  energy_kj: 301
+  energy_kcal: 72
+  fat_g: 2.9
+  saturates_g: 1.5
+  carbohydrates_g: 9.3
+  sugars_g: 2.8
+  fibre_g: 1.7
+  protein_g: 1.8
+  salt_g: 0.5
 timers:
   - step: 2
     title: Cuisez la soupe

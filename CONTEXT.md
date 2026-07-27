@@ -43,6 +43,10 @@ _Avoid_: title icon, emoji title
 A controlled Recipe qualifier for a balanced, plant-rich meal with a protein source. It is editorial guidance, not a medical or nutritional claim.
 _Avoid_: health claim, diet label
 
+**Nutrition estimate**:
+An AI-generated, Recipe-specific approximation stored with a Recipe and expressed per Serving and per 100 g. It is not a medical or nutritional claim.
+_Avoid_: nutrition facts, nutritional claim
+
 **Shopping List**:
 A Recipe-scoped checklist of the ingredients needed to make that Recipe.
 _Avoid_: basket, cart

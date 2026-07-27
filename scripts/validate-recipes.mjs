@@ -10,6 +10,7 @@ const requiredFields = [
   "prep_time",
   "cook_time",
   "servings",
+  "nutrition",
   "tags",
 ];
 const allowedFields = new Set([
@@ -67,6 +68,16 @@ function parseRecipe(source) {
       currentTimer[timerField[1]] = timerField[2];
       continue;
     }
+    const nutritionField = line.match(/^ {2}([a-z_]+):\s*(.+)$/);
+    if (currentList === "nutrition" && nutritionField) {
+      if (
+        typeof fields.nutrition !== "object" ||
+        Array.isArray(fields.nutrition)
+      )
+        fields.nutrition = {};
+      fields.nutrition[nutritionField[1]] = nutritionField[2];
+      continue;
+    }
     const item = line.match(/^\s+-\s+(.+)$/);
     if (item && currentList) {
       if (!Array.isArray(fields[currentList])) fields[currentList] = [];
@@ -111,6 +122,28 @@ function validateRecipe(filename, source) {
       fail(`${field} must be a duration such as "20 min" or "1 h 15 min"`);
   if (typeof fields.servings === "string" && !servings.test(fields.servings))
     fail('servings must be a number or range such as "4" or "2-4"');
+  const nutritionFields = [
+    "weight_g",
+    "energy_kj",
+    "energy_kcal",
+    "fat_g",
+    "saturates_g",
+    "carbohydrates_g",
+    "sugars_g",
+    "fibre_g",
+    "protein_g",
+    "salt_g",
+  ];
+  if (typeof fields.nutrition !== "object" || Array.isArray(fields.nutrition))
+    fail("nutrition must be a block of numeric estimates");
+  else
+    for (const field of nutritionFields) {
+      const value = fields.nutrition[field] ?? "";
+      if (!/^\d+(?:\.\d+)?$/.test(value))
+        fail(`nutrition ${field} must be a non-negative number`);
+      else if (field === "weight_g" && Number(value) === 0)
+        fail("nutrition weight_g must be greater than zero");
+    }
   if (!Array.isArray(fields.tags) || !fields.tags.length)
     fail("tags must be a non-empty list");
   else {

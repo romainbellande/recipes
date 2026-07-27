@@ -185,6 +185,15 @@ test(
       /printServings\.textContent = `Pour \$\{selectedServings\} personne/,
     );
     assert.match(
+      recipe,
+      /<h2 id="nutrition-title">Valeurs nutritionnelles<\/h2>/,
+    );
+    assert.match(recipe, /Estimation générée par IA — valeurs indicatives/);
+    assert.match(recipe, /aria-pressed="true"[\s\S]*?Par portion/);
+    assert.match(recipe, /aria-pressed="false"[\s\S]*?Pour 100 g/);
+    assert.match(recipeSource, /function renderNutrition\(\)/);
+    assert.match(recipeSource, /nutritionView === "100g"/);
+    assert.match(
       recipeSource,
       /#print-recipe"\)\s*\.addEventListener\("click", \(\) => window\.print\(\)\)/,
     );

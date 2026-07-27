@@ -5,6 +5,17 @@ summary: Des rondelles de saucisse mijotées dans une sauce tomate épicée, ser
 prep_time: 15 min
 cook_time: 20 min
 servings: 2
+nutrition:
+  weight_g: 1562
+  energy_kj: 576
+  energy_kcal: 138
+  fat_g: 8.0
+  saturates_g: 3.1
+  carbohydrates_g: 12.5
+  sugars_g: 2.3
+  fibre_g: 1.2
+  protein_g: 4.1
+  salt_g: 0.4
 timers:
   - step: 2
     title: Dorez les saucisses
