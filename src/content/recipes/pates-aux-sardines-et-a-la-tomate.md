@@ -22,6 +22,7 @@ tags:
   - main
   - weeknight
   - pantry
+  - healthy
 ---
 
 ## Ingrédients

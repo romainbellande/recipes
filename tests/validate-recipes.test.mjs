@@ -52,6 +52,17 @@ test("accepts a valid Recipe", async () => {
   assert.deepEqual(await validateCollection(await collection()), []);
 });
 
+test("accepts the healthy qualifier", async () => {
+  assert.deepEqual(
+    await validateCollection(
+      await collection(
+        valid.replace("  - weeknight", "  - weeknight\n  - healthy"),
+      ),
+    ),
+    [],
+  );
+});
+
 test("accepts Timer definitions in front matter", async () => {
   assert.deepEqual(
     await validateCollection(
