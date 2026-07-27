@@ -174,10 +174,13 @@ test(
     );
     assert.match(recipeSource, /appearance: textfield/);
     assert.match(recipe, /id="enter-cook"[^>]*>Passer en mode cuisine/);
-    assert.match(recipe, /id="enter-shopping"[^>]*>Voir la liste de courses/);
     assert.match(
       recipe,
-      /id="print-recipe"[^>]*>Imprimer \/ Enregistrer en PDF/,
+      /id="enter-shopping"[^>]*aria-label="Voir la liste de courses"[^>]*>[\s\S]*?<svg/,
+    );
+    assert.match(
+      recipe,
+      /id="print-recipe"[^>]*aria-label="Imprimer ou enregistrer en PDF"[^>]*>[\s\S]*?<svg/,
     );
     assert.match(recipe, /<p id="print-servings">Pour 2 personnes<\/p>/);
     assert.match(
@@ -197,13 +200,23 @@ test(
       recipeSource,
       /#print-recipe"\)\s*\.addEventListener\("click", \(\) => window\.print\(\)\)/,
     );
-    assert.match(recipe, /id="copy-recipe-link"[^>]*>Copier le lien/);
-    assert.match(recipe, /id="copy-status" class="sr-only" aria-live="polite"/);
+    assert.match(
+      recipe,
+      /id="copy-recipe-link"[^>]*aria-label="Copier le lien"[^>]*>[\s\S]*?<svg/,
+    );
+    assert.match(
+      recipe,
+      /id="copy-status" class="copy-status" aria-live="polite"/,
+    );
     assert.match(recipeSource, /navigator\.clipboard\.writeText\(/);
     assert.match(recipeSource, /link\[rel="canonical"\]/);
     assert.match(recipeSource, /Lien copié/);
     assert.match(recipeSource, /Impossible de copier le lien/);
     assert.match(recipeSource, /3_000/);
+    assert.match(
+      recipeSource,
+      /\.icon-button:is\(:hover, :focus-visible\)::after/,
+    );
     assert.match(recipeSource, /@media print \{[\s\S]*?#print-servings/);
     assert.match(
       recipe,
