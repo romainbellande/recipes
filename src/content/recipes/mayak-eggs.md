@@ -5,6 +5,17 @@ summary: Des œufs mollets marinés dans une sauce soja sucrée et parfumée. Pr
 prep_time: 9 min
 cook_time: 6 min
 servings: 6
+nutrition:
+  weight_g: 758
+  energy_kj: 570
+  energy_kcal: 136
+  fat_g: 5.3
+  saturates_g: 1.5
+  carbohydrates_g: 13.8
+  sugars_g: 12.3
+  fibre_g: 0.4
+  protein_g: 8.1
+  salt_g: 1.8
 timers:
   - step: 1
     title: Cuisez les œufs

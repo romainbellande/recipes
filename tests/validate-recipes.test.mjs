@@ -12,6 +12,17 @@ summary: Un dîner fiable.
 prep_time: 10 min
 cook_time: 20 min
 servings: 4
+nutrition:
+  weight_g: 1000
+  energy_kj: 500
+  energy_kcal: 120
+  fat_g: 2
+  saturates_g: 0.5
+  carbohydrates_g: 20
+  sugars_g: 3
+  fibre_g: 2
+  protein_g: 4
+  salt_g: 0.5
 tags:
   - main
   - weeknight
@@ -178,6 +189,12 @@ for (const [name, recipe, filename, rule] of [
     valid.replace("servings: 4", "servings: beaucoup"),
     "quick-pasta.md",
     "servings must be a number or range",
+  ],
+  [
+    "nutrition",
+    valid.replace("  protein_g: 4\n", ""),
+    "quick-pasta.md",
+    "nutrition protein_g must be a non-negative number",
   ],
   [
     "tags",

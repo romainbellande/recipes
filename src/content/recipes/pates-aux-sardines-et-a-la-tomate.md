@@ -5,6 +5,17 @@ summary: Des pâtes express aux sardines à la tomate, savoureuses et prêtes en
 prep_time: 5 min
 cook_time: 11 min
 servings: 2
+nutrition:
+  weight_g: 1214
+  energy_kj: 525
+  energy_kcal: 125
+  fat_g: 4.2
+  saturates_g: 1.7
+  carbohydrates_g: 15.5
+  sugars_g: 2.3
+  fibre_g: 1.1
+  protein_g: 6.0
+  salt_g: 0.3
 timers:
   - step: 2
     title: Oignon et ail

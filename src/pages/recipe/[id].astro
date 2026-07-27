@@ -44,6 +44,7 @@ const { Content } = await render(recipe);
 const serializedRecipe = JSON.stringify({
   title: recipe.data.title,
   servings: Number(recipe.data.servings),
+  nutrition: recipe.data.nutrition,
   timers: (recipe.data.timers ?? []).map((timer) => ({
     ...timer,
     seconds: durationInSeconds(timer.duration),
@@ -149,6 +150,29 @@ const serializedRecipe = JSON.stringify({
         </div>
         <p id="copy-status" class="sr-only" aria-live="polite"></p>
         <div id="recipe-content"><Content /></div>
+        <section class="nutrition" aria-labelledby="nutrition-title">
+          <h2 id="nutrition-title">Valeurs nutritionnelles</h2>
+          <p class="nutrition-note">
+            Estimation générée par IA — valeurs indicatives.
+          </p>
+          <div
+            class="nutrition-tabs"
+            role="group"
+            aria-label="Unité des valeurs nutritionnelles"
+          >
+            <button
+              type="button"
+              aria-pressed="true"
+              data-nutrition-view="serving">Par portion</button
+            >
+            <button
+              type="button"
+              aria-pressed="false"
+              data-nutrition-view="100g">Pour 100 g</button
+            >
+          </div>
+          <dl id="nutrition-values" aria-live="polite"></dl>
+        </section>
       </article>
     </main>
     <main class="shopping-mode" id="shopping-view" hidden>
@@ -313,6 +337,7 @@ const serializedRecipe = JSON.stringify({
               ),
             ),
           );
+        renderNutrition();
         [shoppingIngredients, ingredients].forEach((list) =>
           list.querySelectorAll("label").forEach((label, index) => {
             const check = label.querySelector("input");
@@ -325,6 +350,42 @@ const serializedRecipe = JSON.stringify({
                 selectedServings,
               ),
             );
+          }),
+        );
+      }
+
+      const nutritionValues = document.querySelector("#nutrition-values");
+      let nutritionView = "serving";
+      const nutritionFields = [
+        ["Énergie (kJ)", "energy_kj", "kJ"],
+        ["Énergie (kcal)", "energy_kcal", "kcal"],
+        ["Matières grasses", "fat_g", "g"],
+        ["dont acides gras saturés", "saturates_g", "g"],
+        ["Glucides", "carbohydrates_g", "g"],
+        ["dont sucres", "sugars_g", "g"],
+        ["Fibres alimentaires", "fibre_g", "g"],
+        ["Protéines", "protein_g", "g"],
+        ["Sel", "salt_g", "g"],
+      ];
+      const formatNutrition = (value, unit) =>
+        `${new Intl.NumberFormat("fr-FR", {
+          maximumFractionDigits: unit === "g" ? 1 : 0,
+        }).format(value)} ${unit}`;
+      function renderNutrition() {
+        const multiplier =
+          nutritionView === "100g"
+            ? 1
+            : recipe.nutrition.weight_g / 100 / selectedServings;
+        nutritionValues.replaceChildren(
+          ...nutritionFields.flatMap(([label, field, unit]) => {
+            const term = document.createElement("dt");
+            term.textContent = label;
+            const value = document.createElement("dd");
+            value.textContent = formatNutrition(
+              recipe.nutrition[field] * multiplier,
+              unit,
+            );
+            return [term, value];
           }),
         );
       }
@@ -506,6 +567,18 @@ const serializedRecipe = JSON.stringify({
       setInterval(renderTimers, 250);
 
       updateDecrementButtons();
+      renderNutrition();
+      document.querySelectorAll("[data-nutrition-view]").forEach((tab) =>
+        tab.addEventListener("click", () => {
+          nutritionView = tab.dataset.nutritionView;
+          document
+            .querySelectorAll("[data-nutrition-view]")
+            .forEach((other) =>
+              other.setAttribute("aria-pressed", String(other === tab)),
+            );
+          renderNutrition();
+        }),
+      );
       document
         .querySelectorAll("[data-servings-change]")
         .forEach((button) =>
@@ -1033,6 +1106,63 @@ const serializedRecipe = JSON.stringify({
     font:
       700 0.8rem "DM Sans",
       sans-serif;
+  }
+  .nutrition {
+    margin-top: clamp(3rem, 8vw, 6rem);
+    border-top: 1px solid var(--line);
+    padding-top: 2.75rem;
+  }
+  .nutrition h2 {
+    margin: 0;
+    font:
+      500 clamp(2rem, 5vw, 3.5rem) / 0.95 "Newsreader",
+      Georgia,
+      serif;
+    letter-spacing: -0.045em;
+  }
+  .nutrition-note {
+    color: var(--muted);
+    font:
+      500 0.75rem "DM Sans",
+      sans-serif;
+    letter-spacing: 0.04em;
+  }
+  .nutrition-tabs {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    max-width: 18rem;
+    overflow: hidden;
+    border: 1px solid var(--ink);
+    border-radius: 0.4rem;
+  }
+  .nutrition-tabs button {
+    border: 0;
+    background: transparent;
+    padding: 0.7rem;
+    color: var(--ink);
+    font:
+      700 0.7rem "DM Sans",
+      sans-serif;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .nutrition-tabs button[aria-pressed="true"] {
+    background: var(--ink);
+    color: var(--paper);
+  }
+  #nutrition-values {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    margin: 1.5rem 0 0;
+    font-family: "DM Sans", sans-serif;
+  }
+  #nutrition-values :is(dt, dd) {
+    margin: 0;
+    border-top: 1px solid var(--line);
+    padding: 0.75rem 0;
+  }
+  #nutrition-values dd {
+    text-align: right;
   }
   .shopping-mode,
   .cook-mode {

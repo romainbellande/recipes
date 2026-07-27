@@ -5,6 +5,17 @@ summary: Une poêlée rapide de poulet, courgette, poivron et lentilles, riche e
 prep_time: 5 min
 cook_time: 15 min
 servings: 1
+nutrition:
+  weight_g: 612
+  energy_kj: 271
+  energy_kcal: 64
+  fat_g: 1.5
+  saturates_g: 0.3
+  carbohydrates_g: 4.3
+  sugars_g: 1.6
+  fibre_g: 2.1
+  protein_g: 7.7
+  salt_g: 0.1
 timers:
   - step: 2
     title: Cuisez le poulet et les légumes

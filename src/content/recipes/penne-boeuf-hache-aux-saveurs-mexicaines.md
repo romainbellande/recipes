@@ -5,6 +5,17 @@ summary: Des penne au bœuf haché, poivron et tomate, crémeux avec du cheddar 
 prep_time: 5 min
 cook_time: 15 min
 servings: 2
+nutrition:
+  weight_g: 1254
+  energy_kj: 759
+  energy_kcal: 181
+  fat_g: 10.5
+  saturates_g: 5.4
+  carbohydrates_g: 14.2
+  sugars_g: 2.4
+  fibre_g: 1.2
+  protein_g: 7.5
+  salt_g: 0.1
 timers:
   - step: 2
     title: Cuisez les penne

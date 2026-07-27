@@ -13,6 +13,18 @@ const recipes = defineCollection({
     prep_time: z.string(),
     cook_time: z.string(),
     servings: z.coerce.string(),
+    nutrition: z.object({
+      weight_g: z.coerce.number().positive(),
+      energy_kj: z.coerce.number().nonnegative(),
+      energy_kcal: z.coerce.number().nonnegative(),
+      fat_g: z.coerce.number().nonnegative(),
+      saturates_g: z.coerce.number().nonnegative(),
+      carbohydrates_g: z.coerce.number().nonnegative(),
+      sugars_g: z.coerce.number().nonnegative(),
+      fibre_g: z.coerce.number().nonnegative(),
+      protein_g: z.coerce.number().nonnegative(),
+      salt_g: z.coerce.number().nonnegative(),
+    }),
     tags: z.array(z.string()),
     timers: z
       .array(

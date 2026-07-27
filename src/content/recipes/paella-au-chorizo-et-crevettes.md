@@ -5,6 +5,17 @@ summary: Une paëlla au poulet, chorizo et crevettes, accompagnée d'une salade 
 prep_time: 15 min
 cook_time: 25 min
 servings: 2
+nutrition:
+  weight_g: 1350
+  energy_kj: 561
+  energy_kcal: 134
+  fat_g: 6.4
+  saturates_g: 1.5
+  carbohydrates_g: 11.7
+  sugars_g: 1.6
+  fibre_g: 1.0
+  protein_g: 6.7
+  salt_g: 0.7
 timers:
   - step: 3
     title: Cuisez le riz

@@ -5,6 +5,17 @@ summary: Des cuisses de poulet rôties aux épices mexicaines, avec patate douce
 prep_time: 10 min
 cook_time: 40 min
 servings: 2
+nutrition:
+  weight_g: 1549
+  energy_kj: 479
+  energy_kcal: 115
+  fat_g: 5.7
+  saturates_g: 1.8
+  carbohydrates_g: 8.4
+  sugars_g: 2.5
+  fibre_g: 2.4
+  protein_g: 6.3
+  salt_g: 0.2
 timers:
   - step: 2
     title: Enfournez le poulet et les légumes
