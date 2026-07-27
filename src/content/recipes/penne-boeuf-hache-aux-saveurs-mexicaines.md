@@ -6,16 +6,16 @@ prep_time: 5 min
 cook_time: 15 min
 servings: 2
 nutrition:
-  weight_g: 1254
-  energy_kj: 759
-  energy_kcal: 181
-  fat_g: 10.5
-  saturates_g: 5.4
-  carbohydrates_g: 14.2
-  sugars_g: 2.4
+  weight_g: 1140
+  energy_kj: 862
+  energy_kcal: 206
+  fat_g: 12.5
+  saturates_g: 6.3
+  carbohydrates_g: 15.1
+  sugars_g: 2.5
   fibre_g: 1.2
-  protein_g: 7.5
-  salt_g: 0.1
+  protein_g: 7.6
+  salt_g: 0.2
 timers:
   - step: 2
     title: Cuisez les penne

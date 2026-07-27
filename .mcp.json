@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "usda-fooddata-central": {
+      "command": "bun",
+      "args": ["run", "mcp/usda-fooddata-central/server.ts"],
+      "cwd": ".",
+      "env": {
+        "FDC_API_KEY": "${FDC_API_KEY}"
+      },
+      "directTools": ["get_ingredient_nutrition"]
+    }
+  }
+}
