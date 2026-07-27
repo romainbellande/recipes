@@ -99,16 +99,28 @@ const serializedRecipe = JSON.stringify({
       <article>
         <h1 id="recipe-title" tabindex="-1">{recipe.data.title}</h1>
         <p class="summary">{recipe.data.summary}</p>
-        <label class="servings-control" for="recipe-servings">
-          Nombre de personnes
-          <input
-            id="recipe-servings"
-            type="number"
-            min="1"
-            step="1"
-            value={recipe.data.servings}
-          />
-        </label>
+        <div class="servings-control">
+          <label for="recipe-servings">Nombre de personnes</label>
+          <span class="servings-stepper">
+            <button
+              type="button"
+              data-servings-change="-1"
+              aria-label="Diminuer le nombre de personnes">−</button
+            >
+            <input
+              id="recipe-servings"
+              type="number"
+              min="1"
+              step="1"
+              value={recipe.data.servings}
+            />
+            <button
+              type="button"
+              data-servings-change="1"
+              aria-label="Augmenter le nombre de personnes">+</button
+            >
+          </span>
+        </div>
         <p id="print-servings">Pour {recipe.data.servings} personnes</p>
         <button class="primary" type="button" id="enter-cook">
           Passer en mode cuisine
@@ -129,10 +141,22 @@ const serializedRecipe = JSON.stringify({
       <section aria-labelledby="shopping-title">
         <p class="eyebrow">Liste de courses</p>
         <h1 id="shopping-title"></h1>
-        <label class="servings-control" for="shopping-servings">
-          Nombre de personnes
-          <input id="shopping-servings" type="number" min="1" step="1" />
-        </label>
+        <div class="servings-control">
+          <label for="shopping-servings">Nombre de personnes</label>
+          <span class="servings-stepper">
+            <button
+              type="button"
+              data-servings-change="-1"
+              aria-label="Diminuer le nombre de personnes">−</button
+            >
+            <input id="shopping-servings" type="number" min="1" step="1" />
+            <button
+              type="button"
+              data-servings-change="1"
+              aria-label="Augmenter le nombre de personnes">+</button
+            >
+          </span>
+        </div>
         <ul id="shopping-ingredients"></ul>
       </section>
     </main>
@@ -144,10 +168,22 @@ const serializedRecipe = JSON.stringify({
         <aside>
           <p class="eyebrow">En cuisine</p>
           <h1 id="cook-title"></h1>
-          <label class="servings-control" for="cook-servings">
-            Nombre de personnes
-            <input id="cook-servings" type="number" min="1" step="1" />
-          </label>
+          <div class="servings-control">
+            <label for="cook-servings">Nombre de personnes</label>
+            <span class="servings-stepper">
+              <button
+                type="button"
+                data-servings-change="-1"
+                aria-label="Diminuer le nombre de personnes">−</button
+              >
+              <input id="cook-servings" type="number" min="1" step="1" />
+              <button
+                type="button"
+                data-servings-change="1"
+                aria-label="Augmenter le nombre de personnes">+</button
+              >
+            </span>
+          </div>
           <details>
             <summary>Ingrédients</summary>
             <ul id="cook-ingredients"></ul>
@@ -207,6 +243,9 @@ const serializedRecipe = JSON.stringify({
       const shoppingServings = document.querySelector("#shopping-servings");
       const cookServings = document.querySelector("#cook-servings");
       const printServings = document.querySelector("#print-servings");
+      const decrementButtons = document.querySelectorAll(
+        '[data-servings-change="-1"]',
+      );
       const recipeIngredients = [
         ...document.querySelectorAll("#recipe-content h2"),
       ].find(
@@ -231,9 +270,15 @@ const serializedRecipe = JSON.stringify({
         Number.isSafeInteger(Number(value)) &&
         Number(value) > 0;
 
+      const updateDecrementButtons = () =>
+        decrementButtons.forEach((button) => {
+          button.disabled = selectedServings === 1;
+        });
+
       function updateServings(value) {
         if (!validServings(value)) return;
         selectedServings = Number(value);
+        updateDecrementButtons();
         recipeServings.value = selectedServings;
         shoppingServings.value = selectedServings;
         cookServings.value = selectedServings;
@@ -442,6 +487,16 @@ const serializedRecipe = JSON.stringify({
 
       setInterval(renderTimers, 250);
 
+      updateDecrementButtons();
+      document
+        .querySelectorAll("[data-servings-change]")
+        .forEach((button) =>
+          button.addEventListener("click", () =>
+            updateServings(
+              String(selectedServings + Number(button.dataset.servingsChange)),
+            ),
+          ),
+        );
       recipeServings.addEventListener("input", () =>
         updateServings(recipeServings.value),
       );
@@ -589,6 +644,15 @@ const serializedRecipe = JSON.stringify({
     margin: 1rem 0;
     font-family: system-ui, sans-serif;
     font-weight: 700;
+  }
+  .servings-stepper {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .servings-stepper button {
+    min-width: 44px;
+    min-height: 44px;
   }
   .servings-control input {
     max-width: 8rem;
@@ -827,14 +891,21 @@ const serializedRecipe = JSON.stringify({
     text-transform: uppercase;
   }
   .servings-control input {
+    width: 3rem;
     border: 0;
     border-bottom: 1px solid var(--ink);
     border-radius: 0;
+    appearance: textfield;
     background: transparent;
     font:
       500 1.4rem "Newsreader",
       Georgia,
       serif;
+  }
+  .servings-control input::-webkit-inner-spin-button,
+  .servings-control input::-webkit-outer-spin-button {
+    appearance: none;
+    margin: 0;
   }
   .primary {
     background: var(--accent);

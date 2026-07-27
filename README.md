@@ -2,6 +2,16 @@
 
 A static, open Collection of everyday Recipes for home cooks.
 
+## Features
+
+- Browse Recipes with text search and tag filters; filter state is shareable in the URL.
+- Read focused Recipe pages with adjustable servings and automatically scaled Ingredients.
+- Switch to a checkable shopping list or step-by-step cooking mode with editable timers and audio alerts.
+- Print Recipes or save them as PDFs.
+- Install the site as a lightweight PWA.
+- Use accessible controls, live search results, visible keyboard focus, and skip links.
+- Keep Recipe content consistent with schema-backed collections and a validator for metadata, tags, images, Ingredients, steps, aliases, and timers.
+
 ## Develop
 
 ```sh
