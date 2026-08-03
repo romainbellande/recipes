@@ -1,6 +1,7 @@
 ---
 title: Mayak eggs (œufs marinés coréens)
-icon: 🥚
+icon: /icons/recipes/mayak-eggs.svg
+protein: vegetarian
 summary: Des œufs mollets marinés dans une sauce soja sucrée et parfumée. Préparez-les la veille pour un accompagnement addictif.
 prep_time: 9 min
 cook_time: 6 min
@@ -26,7 +27,6 @@ timers:
 tags:
   - side
   - make-ahead
-  - vegetarian
 ---
 
 ## Ingrédients

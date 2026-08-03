@@ -1,6 +1,7 @@
 import { defineCollection } from "astro:content";
 import { glob } from "astro/loaders";
 import { z } from "astro/zod";
+import { METHOD_VALUES, PROTEIN_VALUES } from "./scripts/taxonomy.js";
 
 const recipes = defineCollection({
   loader: glob({ base: "./src/content/recipes", pattern: "*.md" }),
@@ -8,11 +9,21 @@ const recipes = defineCollection({
     title: z.string(),
     icon: z
       .string()
-      .regex(/^\p{Extended_Pictographic}$/u, "icon must be a single icon"),
+      .regex(/^\/[^\s].*\/[^\s]+$/, "icon must be a repository-local path"),
     summary: z.string(),
     prep_time: z.string(),
     cook_time: z.string(),
     servings: z.coerce.string(),
+    protein: z.enum([...PROTEIN_VALUES]),
+    method: z
+      .enum([...METHOD_VALUES])
+      .array()
+      .min(1)
+      .refine(
+        (values) => new Set(values).size === values.length,
+        "method must be distinct",
+      )
+      .optional(),
     nutrition: z.object({
       weight_g: z.coerce.number().positive(),
       energy_kj: z.coerce.number().nonnegative(),
@@ -38,7 +49,6 @@ const recipes = defineCollection({
       )
       .optional(),
     aliases: z.array(z.string()).optional(),
-    image: z.string().optional(),
   }),
 });
 

@@ -1,6 +1,9 @@
 ---
 title: Calamars à la tomate
-icon: 🦑
+icon: /icons/recipes/calamars-a-la-tomate.svg
+protein: fish
+method:
+  - one-pot
 summary: Des calamars tendres mijotés une heure dans une sauce tomate relevée d'une pincée de piment, servis avec du riz.
 prep_time: 25 min
 cook_time: 1 h 25 min

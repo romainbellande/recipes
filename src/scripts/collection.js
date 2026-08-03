@@ -1,3 +1,5 @@
+import { METHOD_VALUES, PROTEIN_VALUES, TAG_VALUES } from "./taxonomy.js";
+
 export const durationInSeconds = (duration) => {
   const [hours, minutes] = [
     Number(duration.match(/(\d+) h/)?.[1] ?? 0),
@@ -41,8 +43,9 @@ const includesIngredient = (ingredient, term) => {
   );
 };
 
-export const matchingRecipes = (recipes, query, selectedTags) => {
+export const matchingRecipes = (recipes, query, filters = {}) => {
   const terms = ingredientTerms(query);
+  const { tags = [], protein = "", method = [] } = filters;
   return recipes
     .map((recipe, index) => ({
       recipe,
@@ -59,7 +62,9 @@ export const matchingRecipes = (recipes, query, selectedTags) => {
               includesIngredient(ingredient, term),
             ),
           )) &&
-        selectedTags.every((tag) => recipe.tags.includes(tag)),
+        tags.every((tag) => recipe.tags.includes(tag)) &&
+        (!protein || recipe.protein === protein) &&
+        method.every((value) => (recipe.method ?? []).includes(value)),
     );
 };
 
@@ -159,24 +164,31 @@ export const scaleIngredient = (
   ).format(scaled)}${ingredient.slice(prefix.length + match[0].length)}`;
 };
 
-export const collectionFiltersFromSearch = (search, controlledTags) => {
+export const collectionFiltersFromSearch = (search) => {
   const parameters = new URLSearchParams(search);
-  const recognizedTags = new Set(controlledTags);
+  const protein = parameters.get("protein") ?? "";
+  const tags = [];
+  const method = [];
+  for (const value of parameters.getAll("tag")) {
+    if (TAG_VALUES.has(value) && !tags.includes(value)) tags.push(value);
+    if (METHOD_VALUES.has(value) && !method.includes(value)) method.push(value);
+  }
   return {
     query: parameters.get("q") ?? "",
-    selectedTags: [
-      ...new Set(
-        parameters.getAll("tag").filter((tag) => recognizedTags.has(tag)),
-      ),
-    ],
+    protein: PROTEIN_VALUES.has(protein) ? protein : "",
+    tags,
+    method,
   };
 };
 
-export const collectionSearchParams = (query, selectedTags, controlledTags) => {
+export const collectionSearchParams = (filters) => {
   const parameters = new URLSearchParams();
-  if (query) parameters.set("q", query);
-  const recognizedTags = new Set(controlledTags);
-  for (const tag of new Set(selectedTags))
-    if (recognizedTags.has(tag)) parameters.append("tag", tag);
+  if (filters.query) parameters.set("q", filters.query);
+  if (PROTEIN_VALUES.has(filters.protein))
+    parameters.set("protein", filters.protein);
+  for (const tag of new Set(filters.tags ?? []))
+    if (TAG_VALUES.has(tag)) parameters.append("tag", tag);
+  for (const value of new Set(filters.method ?? []))
+    if (METHOD_VALUES.has(value)) parameters.append("tag", value);
   return parameters;
 };

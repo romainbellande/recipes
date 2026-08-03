@@ -1,6 +1,9 @@
 ---
 title: Poêlée de poulet, courgette, poivron et lentilles
-icon: 🍗
+icon: /icons/recipes/poelee-poulet-courgette-poivron-lentilles.svg
+protein: meat
+method:
+  - one-pot
 summary: Une poêlée rapide de poulet, courgette, poivron et lentilles, riche en protéines et en fibres.
 prep_time: 5 min
 cook_time: 15 min

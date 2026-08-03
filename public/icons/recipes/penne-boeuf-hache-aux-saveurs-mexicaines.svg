@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+  <!-- three penne tubes -->
+  <rect x="26" y="30" width="18" height="34" rx="9"/>
+  <rect x="46" y="22" width="18" height="34" rx="9"/>
+  <rect x="66" y="40" width="18" height="26" rx="9"/>
+  <path d="M26 47l18 0M46 39l18 0M66 53l18 0"/>
+  <!-- cheese drip + ground meat -->
+  <path d="M34 68q-4 6 0 10M56 60q3 4 1 8M76 70q-3 5 0 8"/>
+  <circle cx="50" cy="88" r="3"/>
+</svg>

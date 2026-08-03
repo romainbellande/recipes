@@ -1,5 +1,6 @@
 ---
 import { getCollection, render, type CollectionEntry } from "astro:content";
+import { readFileSync } from "node:fs";
 import { durationInSeconds } from "../../scripts/collection.js";
 
 export async function getStaticPaths() {
@@ -41,6 +42,10 @@ const canonicalUrl = new URL(
   Astro.url,
 );
 const { Content } = await render(recipe);
+const recipeIcon = readFileSync(
+  `public/icons/recipes/${recipe.id}.svg`,
+  "utf8",
+);
 const serializedRecipe = JSON.stringify({
   title: recipe.data.title,
   servings: Number(recipe.data.servings),
@@ -97,15 +102,7 @@ const serializedRecipe = JSON.stringify({
         data-origin-card={`recipe-${recipe.id}`}
         href={import.meta.env.BASE_URL}>← Retour à la Collection</a
       >
-      <div class="recipe-visual" aria-hidden="true">
-        {
-          recipe.data.image ? (
-            <img src={recipe.data.image} alt="" />
-          ) : (
-            recipe.data.icon
-          )
-        }
-      </div>
+      <div class="recipe-visual" aria-hidden="true" set:html={recipeIcon} />
       <article>
         <h1 id="recipe-title" tabindex="-1">{recipe.data.title}</h1>
         <p class="summary">{recipe.data.summary}</p>
@@ -265,7 +262,6 @@ const serializedRecipe = JSON.stringify({
           <h2 id="step-title"></h2>
           <p id="step-text"></p>
           <div id="step-timer"></div>
-          <section id="cook-timers" aria-label="Minuteries actives"></section>
           <div class="step-actions">
             <button type="button" id="previous-step" hidden
               >Étape précédente</button
@@ -273,6 +269,12 @@ const serializedRecipe = JSON.stringify({
             <button class="primary" type="button" id="next-step"></button>
           </div>
         </section>
+        <aside class="timers-rail">
+          <details class="cook-timers-panel" open>
+            <summary>Minuteries</summary>
+            <section id="cook-timers" aria-label="Minuteries actives"></section>
+          </details>
+        </aside>
       </section>
     </main>
     <footer>
@@ -674,25 +676,8 @@ const serializedRecipe = JSON.stringify({
       });
 
       const returnLink = document.querySelector("#return-link");
-      const controlledTags = [
-        "breakfast",
-        "main",
-        "side",
-        "dessert",
-        "weeknight",
-        "make-ahead",
-        "vegetarian",
-        "pantry",
-      ];
-      const filters = collectionFiltersFromSearch(
-        window.location.search,
-        controlledTags,
-      );
-      const query = collectionSearchParams(
-        filters.query,
-        filters.selectedTags,
-        controlledTags,
-      ).toString();
+      const filters = collectionFiltersFromSearch(window.location.search);
+      const query = collectionSearchParams(filters).toString();
       returnLink.href = `${import.meta.env.BASE_URL}${query ? `?${query}` : ""}#${returnLink.dataset.originCard}`;
       document.querySelector("#recipe-title").focus();
     </script>
@@ -831,9 +816,14 @@ const serializedRecipe = JSON.stringify({
   }
   .cook-layout {
     display: grid;
-    grid-template-columns: minmax(16rem, 0.7fr) 2fr;
+    grid-template-columns: minmax(16rem, 0.7fr) 2fr minmax(14rem, 0.8fr);
     gap: clamp(2rem, 8vw, 7rem);
     margin-top: 2rem;
+  }
+  .timers-rail {
+    align-self: start;
+    position: sticky;
+    top: 1rem;
   }
   .cook-mode h1 {
     margin-top: 0.3rem;
@@ -1018,12 +1008,11 @@ const serializedRecipe = JSON.stringify({
     place-items: center;
     overflow: hidden;
     background: linear-gradient(135deg, #d7c3a3, #f0e5d4 55%, #c4d0bb);
-    font-size: clamp(5rem, 18vw, 10rem);
+    color: #8a5a34;
   }
-  .recipe-visual img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+  .recipe-visual svg {
+    width: clamp(8rem, 26vw, 16rem);
+    height: clamp(8rem, 26vw, 16rem);
   }
   article {
     margin-top: clamp(2rem, 5vw, 4rem);
@@ -1272,22 +1261,37 @@ const serializedRecipe = JSON.stringify({
     padding: 0.9rem 0;
   }
   .cook-layout {
-    gap: clamp(2rem, 7vw, 7rem);
+    gap: clamp(2rem, 8vw, 4rem);
   }
   .cook-layout aside {
     color: var(--muted);
   }
-  details {
-    border-top: 1px solid var(--line);
-    padding-top: 1rem;
+  .cook-layout aside.timers-rail {
+    color: var(--ink);
   }
-  details summary {
+  .cook-layout details > summary {
     color: var(--ink);
     font:
       700 0.72rem "DM Sans",
       sans-serif;
     letter-spacing: 0.1em;
     text-transform: uppercase;
+  }
+  .cook-layout aside:not(.timers-rail) details {
+    border-top: 1px solid var(--line);
+    padding-top: 1rem;
+  }
+  .cook-timers-panel {
+    border: 1px solid var(--line);
+    background: rgb(255 253 248 / 70%);
+    padding: 0 1rem 1rem;
+  }
+  .cook-timers-panel summary {
+    padding: 1rem 0 0.5rem;
+    cursor: pointer;
+  }
+  .cook-timers-panel #cook-timers {
+    margin: 0;
   }
   .current-step {
     background: #e9ddcb;
@@ -1333,6 +1337,9 @@ const serializedRecipe = JSON.stringify({
     .current-step {
       min-height: 18rem;
       padding: 1.75rem;
+    }
+    .timers-rail {
+      position: static;
     }
   }
   #print-servings {

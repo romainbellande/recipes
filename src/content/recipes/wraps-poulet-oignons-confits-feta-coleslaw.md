@@ -1,6 +1,7 @@
 ---
 title: Wraps au poulet, oignons confits, feta et coleslaw
-icon: 🌯
+icon: /icons/recipes/wraps-poulet-oignons-confits-feta-coleslaw.svg
+protein: meat
 summary: Des wraps généreux au poulet doré, oignons confits au miel, feta, tomates cerises, coleslaw croquant et sauce yaourt-moutarde.
 prep_time: 13 min
 cook_time: 22 min

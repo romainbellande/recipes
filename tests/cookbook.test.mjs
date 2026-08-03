@@ -20,36 +20,49 @@ const recipes = [
     title: "Tarte aux pommes",
     summary: "Un dessert simple",
     ingredients: ["pommes", "farine"],
-    tags: ["dessert", "vegetarian"],
+    tags: ["dessert"],
+    protein: "vegetarian",
   },
   {
     title: "Soupe du soir",
     summary: "Un dîner avec du poivron",
     ingredients: ["lentilles"],
-    tags: ["main", "vegetarian"],
+    tags: ["main"],
+    protein: "vegetarian",
   },
   {
     title: "Poulet rôti",
     summary: "Un plat principal",
     ingredients: ["citron"],
     tags: ["main"],
+    protein: "meat",
   },
 ];
 
-test("filters complete ingredient entries and selected tags", () => {
+test("filters complete ingredient entries and selected facets", () => {
   const ingredientRecipes = [
     ...recipes,
     {
       title: "Salade croquante",
       summary: "Un accompagnement frais",
       ingredients: ["tomates concassées", "oignons", "pois", "noix"],
-      tags: ["main", "vegetarian"],
+      tags: ["main"],
+      protein: "vegetarian",
     },
     {
       title: "Omelette",
       summary: "Un repas simple",
       ingredients: ["œufs"],
-      tags: ["main", "vegetarian"],
+      tags: ["main"],
+      protein: "vegetarian",
+    },
+    {
+      title: "Paëlla",
+      summary: "Un plat de fête",
+      ingredients: ["riz", "chorizo"],
+      tags: ["main"],
+      protein: "meat",
+      method: ["one-pot"],
     },
   ];
   assert.deepEqual(ingredientTerms(" tomate, , TOMATES, oignon "), [
@@ -57,33 +70,62 @@ test("filters complete ingredient entries and selected tags", () => {
     "oignon",
   ]);
   assert.deepEqual(
-    matchingRecipes(ingredientRecipes, "tomate, oignon", [
-      "main",
-      "vegetarian",
-    ]).map(({ index, matchedIngredients }) => ({ index, matchedIngredients })),
+    matchingRecipes(ingredientRecipes, "tomate, oignon", {
+      tags: ["main"],
+      protein: "vegetarian",
+    }).map(({ index, matchedIngredients }) => ({ index, matchedIngredients })),
     [{ index: 3, matchedIngredients: ["tomates concassées", "oignons"] }],
   );
   assert.deepEqual(
-    matchingRecipes(ingredientRecipes, "PÔMME", []).map(({ index }) => index),
+    matchingRecipes(ingredientRecipes, "PÔMME", {}).map(({ index }) => index),
     [0],
   );
   assert.deepEqual(
-    matchingRecipes(ingredientRecipes, "poivron", []).map(({ index }) => index),
+    matchingRecipes(ingredientRecipes, "poivron", {}).map(({ index }) => index),
     [],
   );
   assert.deepEqual(
-    matchingRecipes(ingredientRecipes, "pois, noix", []).map(
+    matchingRecipes(ingredientRecipes, "pois, noix", {}).map(
       ({ index }) => index,
     ),
     [3],
   );
   assert.deepEqual(
-    matchingRecipes(ingredientRecipes, "poi", []).map(({ index }) => index),
+    matchingRecipes(ingredientRecipes, "poi", {}).map(({ index }) => index),
     [],
   );
   assert.deepEqual(
-    matchingRecipes(ingredientRecipes, "oeuf", []).map(({ index }) => index),
+    matchingRecipes(ingredientRecipes, "oeuf", {}).map(({ index }) => index),
     [4],
+  );
+  // protein single-select
+  assert.deepEqual(
+    matchingRecipes(ingredientRecipes, "", {
+      protein: "fish",
+    }).map(({ index }) => index),
+    [],
+  );
+  assert.deepEqual(
+    matchingRecipes(ingredientRecipes, "", {
+      protein: "vegetarian",
+    }).map(({ index }) => index),
+    [0, 1, 3, 4],
+  );
+  // method multi-select
+  assert.deepEqual(
+    matchingRecipes(ingredientRecipes, "", {
+      method: ["one-pot"],
+    }).map(({ index }) => index),
+    [5],
+  );
+  // combined facets
+  assert.deepEqual(
+    matchingRecipes(ingredientRecipes, "", {
+      tags: ["main"],
+      protein: "meat",
+      method: ["one-pot"],
+    }).map(({ index }) => index),
+    [5],
   );
 });
 
@@ -127,22 +169,34 @@ test("converts Timer definition durations to seconds", () => {
   assert.equal(durationInSeconds("1 h 15 min"), 4500);
 });
 
-test("restores a verbatim query and only distinct controlled URL tags", () => {
-  const controlledTags = ["main", "vegetarian", "dessert"];
+test("restores verbatim query, facets, and only distinct controlled values", () => {
   assert.deepEqual(
     collectionFiltersFromSearch(
-      "?q=P%C3%94MME+%26+citron&tag=main&tag=main&tag=&tag=unknown&tag=main%25",
-      controlledTags,
+      "?q=P%C3%94MME+%26+citron&protein=meat&tag=main&tag=main&tag=&tag=oven&tag=unknown&tag=main%25&tag=one-pot&protein=fish",
     ),
-    { query: "PÔMME & citron", selectedTags: ["main"] },
+    {
+      query: "PÔMME & citron",
+      protein: "meat",
+      tags: ["main"],
+      method: ["oven", "one-pot"],
+    },
   );
   assert.equal(
-    collectionSearchParams(
-      "PÔMME & citron",
-      ["main", "main", "unknown", "", "vegetarian"],
-      controlledTags,
-    ).toString(),
-    "q=P%C3%94MME+%26+citron&tag=main&tag=vegetarian",
+    collectionSearchParams({
+      query: "PÔMME & citron",
+      protein: "vegetarian",
+      tags: ["main", "main", "unknown", "", "dessert"],
+      method: ["oven", "oven", "bogus", "one-pot"],
+    }).toString(),
+    "q=P%C3%94MME+%26+citron&protein=vegetarian&tag=main&tag=dessert&tag=oven&tag=one-pot",
+  );
+  // an unrecognized protein is dropped from the URL
+  assert.equal(
+    collectionSearchParams({
+      protein: "dog",
+      tags: ["main"],
+    }).toString(),
+    "tag=main",
   );
 });
 
@@ -265,7 +319,7 @@ test(
     assert.match(recipeSource, /@media print \{[\s\S]*?#print-servings/);
     assert.match(
       recipe,
-      /class="recipe-visual" aria-hidden="true">\s*🍝\s*<\/div>/,
+      /class="recipe-visual" aria-hidden="true"><svg[\s\S]*?<\/svg>/,
     );
     assert.match(
       recipe,
@@ -297,6 +351,10 @@ test(
     assert.match(recipe, /id="previous-step" hidden[^>]*>Étape précédente/);
     assert.match(recipe, /id="step-timer"/);
     assert.match(recipe, /id="cook-timers" aria-label="Minuteries actives"/);
+    assert.match(
+      recipe,
+      /<aside class="timers-rail">[\s\S]*?<details class="cook-timers-panel" open>[\s\S]*?<summary>Minuteries/,
+    );
     assert.match(recipeSource, /function playAlarm\(\)/);
     assert.match(recipeSource, /recipe\.timers/);
     assert.match(recipeSource, /clock-button/);
@@ -331,8 +389,9 @@ test(
     );
     assert.match(
       firstCard,
-      /class="image-placeholder" aria-hidden="true">\s*\p{Extended_Pictographic}\s*<\/div>/u,
+      /class="image-placeholder" aria-hidden="true"><svg[\s\S]*?<\/svg>/,
     );
+    assert.ok(firstCard.indexOf("<svg") >= 0);
     assert.ok(
       firstCard.indexOf("image-placeholder") <
         firstCard.indexOf("card-content"),
@@ -349,7 +408,7 @@ test(
     assert.match(source, /a:focus-visible/);
     assert.match(source, /\.recipe-card \{\s*display: block;/);
     assert.match(source, /\.image-placeholder \{[\s\S]*?aspect-ratio: 4 \/ 3;/);
-    assert.match(source, /font-size: clamp\(4rem, 12vw, 7rem\)/);
+    assert.match(source, /\.image-placeholder svg \{[\s\S]*?width:/);
     assert.ok(page.includes("Aucune Recette ne correspond à votre recherche."));
 
     const aliasRoutes = [];

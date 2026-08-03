@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+  <!-- paella pan -->
+  <path d="M14 62h72"/>
+  <path d="M14 62a36 18 0 0 0 72 0"/>
+  <path d="M22 62v-8M78 62v-8"/>
+  <!-- shrimp -->
+  <path d="M56 26c-6 2-8 8-6 12s6 6 8 12 1 11-2 14"/>
+  <path d="M54 38c3-3 7-3 8 0M58 48c3-2 7-2 8 0"/>
+  <!-- saffron / lemon -->
+  <circle cx="34" cy="48" r="7"/>
+</svg>

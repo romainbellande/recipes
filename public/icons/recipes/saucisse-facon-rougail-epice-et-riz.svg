@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+  <!-- wok pan -->
+  <path d="M18 56a32 20 0 0 0 64 0z"/>
+  <path d="M18 56h64"/>
+  <!-- sausage coin with cross-hatch -->
+  <circle cx="40" cy="52" r="11"/>
+  <path d="M34 52h12M40 46v12"/>
+  <!-- rice mound -->
+  <path d="M66 52c-4 0-4-8 0-10 1 2 6 2 7 0 1 8-2 10-7 10z"/>
+</svg>
