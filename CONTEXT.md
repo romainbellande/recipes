@@ -75,6 +75,10 @@ _Avoid_: completed ingredient, used ingredient
 A manually started countdown associated with a Recipe preparation step and shown in cooking mode. Multiple active Timers may run concurrently, finish with an alarm and visual notice, and are discarded when cooking mode is exited.
 _Avoid_: duration, alarm
 
+**Cooking mode**:
+A Recipe-view state focused on preparation steps and Timers, with interactive ingredient and preparation checklists, reached from the Recipe view and exited to return to it.
+_Avoid_: chef view, cook screen
+
 **Timer definition**:
 Recipe front-matter metadata that associates a 1-based preparation step with a Timer title and default duration.
 _Avoid_: timer marker, countdown tag
