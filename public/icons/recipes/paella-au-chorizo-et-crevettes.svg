@@ -1,11 +1,13 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-  <!-- paella pan -->
-  <path d="M14 62h72"/>
-  <path d="M14 62a36 18 0 0 0 72 0"/>
-  <path d="M22 62v-8M78 62v-8"/>
-  <!-- shrimp -->
-  <path d="M56 26c-6 2-8 8-6 12s6 6 8 12 1 11-2 14"/>
-  <path d="M54 38c3-3 7-3 8 0M58 48c3-2 7-2 8 0"/>
-  <!-- saffron / lemon -->
-  <circle cx="34" cy="48" r="7"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" aria-hidden="true">
+  <path d="M10 46a40 40 0 0 0 80 0z" fill="#3a3a3a"/>
+  <path d="M6 46h8M86 46h8" stroke="#3a3a3a" stroke-width="6" stroke-linecap="round"/>
+  <ellipse cx="50" cy="46" rx="40" ry="11" fill="#e8a52e"/>
+  <path d="M36 40q8-6 10 2t-10 4q-6-4 0-6z" fill="#e2603c"/>
+  <path d="M60 42q8-6 10 2t-10 4q-6-4 0-6z" fill="#e2603c"/>
+  <circle cx="28" cy="48" r="4.5" fill="#b3402a"/>
+  <circle cx="50" cy="52" r="4.5" fill="#b3402a"/>
+  <circle cx="70" cy="48" r="4.5" fill="#b3402a"/>
+  <circle cx="40" cy="52" r="1.8" fill="#4d9448"/>
+  <circle cx="60" cy="54" r="1.8" fill="#4d9448"/>
+  <path d="M44 30q3-6 0-10M56 30q3-6 0-10" stroke="#c9c9c9" stroke-width="3" fill="none" stroke-linecap="round"/>
 </svg>

@@ -1,14 +1,13 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-  <!-- salad bowl -->
-  <path d="M20 46h60"/>
-  <path d="M20 46a6 6 0 0 0 6 6h48a6 6 0 0 0 6-6"/>
-  <path d="M24 52l-3 10a6 6 0 0 0 6 6h46a6 6 0 0 0 6-6l-3-10"/>
-  <!-- assorted leaves -->
-  <path d="M32 38c-1-7 5-11 4-16M44 34c1-5-2-9 0-14M56 36c3-5 0-10 4-14"/>
-  <!-- couscous pearls -->
-  <circle cx="46" cy="58" r="2"/><circle cx="54" cy="62" r="2"/><circle cx="50" cy="54" r="2"/>
-  <!-- chèvre crumble -->
-  <circle cx="62" cy="56" r="2.5"/><circle cx="68" cy="60" r="2.5"/>
-  <!-- roasted carrot -->
-  <path d="M30 56l-8 6"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" aria-hidden="true">
+  <path d="M14 48a36 36 0 0 0 72 0z" fill="#7fa8c9"/>
+  <ellipse cx="50" cy="48" rx="36" ry="10" fill="#f2e3c6"/>
+  <circle cx="34" cy="44" r="3" fill="#e3c98f"/>
+  <circle cx="46" cy="42" r="3" fill="#e3c98f"/>
+  <circle cx="58" cy="44" r="3" fill="#e3c98f"/>
+  <circle cx="66" cy="42" r="3" fill="#e3c98f"/>
+  <path d="M28 34q8-10 16-2t0 10q-10 2-16-8z" fill="#e8842e"/>
+  <path d="M30 32q6-8 12-2" stroke="#c96a1c" stroke-width="2" fill="none"/>
+  <circle cx="60" cy="32" r="8" fill="#fdf6ec"/>
+  <circle cx="60" cy="32" r="8" fill="none" stroke="#d9c9a8" stroke-width="2"/>
+  <ellipse cx="48" cy="30" rx="7" ry="4" fill="#4d9448" transform="rotate(-16 48 30)"/>
 </svg>

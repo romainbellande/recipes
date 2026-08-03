@@ -1,10 +1,11 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-  <!-- rolled wrap -->
-  <path d="M30 20c0 12 0 28 0 40 0 8 8 16 18 16h4c10 0 18-8 18-16V20"/>
-  <path d="M30 20c0 12 0 28 0 40"/>
-  <path d="M70 20c0 12 0 28 0 40"/>
-  <!-- inner swirl -->
-  <path d="M40 24a4 4 0 0 0-4 4M48 24a4 4 0 0 0-4 4M56 24a4 4 0 0 0-4 4"/>
-  <!-- coleslaw / tomato peek at open end -->
-  <path d="M38 66q-2 8 4 10M56 66q-2 8 4 10M70 66v8"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" aria-hidden="true">
+  <path d="M30 22h34a8 8 0 0 1 8 8v44a10 10 0 0 1-10 10H32a10 10 0 0 1-10-10V30a8 8 0 0 1 8-8z" fill="#e8c98f"/>
+  <path d="M22 34q24 8 50 0v-4a8 8 0 0 0-8-8H30a8 8 0 0 0-8 8z" fill="#f2dcae"/>
+  <ellipse cx="47" cy="26" rx="20" ry="7" fill="#fdf6ec"/>
+  <rect x="34" y="22" width="10" height="7" rx="2" fill="#f3e6d4"/>
+  <path d="M48 24q6-4 12 0" stroke="#4d9448" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <path d="M52 28q6-3 12 0" stroke="#8fae3f" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <circle cx="66" cy="25" r="3.5" fill="#f6ede2"/>
+  <circle cx="40" cy="27" r="2.5" fill="#c9803a"/>
+  <path d="M22 50q25 10 50 0M22 62q25 10 50 0" stroke="#d9b26a" stroke-width="3" fill="none"/>
 </svg>

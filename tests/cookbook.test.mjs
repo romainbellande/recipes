@@ -353,8 +353,9 @@ test(
     assert.match(recipe, /id="cook-timers" aria-label="Minuteries actives"/);
     assert.match(
       recipe,
-      /<aside class="timers-rail">[\s\S]*?<details class="cook-timers-panel" open>[\s\S]*?<summary>Minuteries/,
+      /<aside class="timers-rail">[\s\S]*?<div class="cook-timers-panel">[\s\S]*?<h2 class="cook-timers-title">Minuteries/,
     );
+    assert.match(recipe, /id="timer-live"[^>]*aria-live="polite"/);
     assert.match(recipeSource, /function playAlarm\(\)/);
     assert.match(recipeSource, /recipe\.timers/);
     assert.match(recipeSource, /clock-button/);

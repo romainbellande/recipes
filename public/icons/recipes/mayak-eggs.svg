@@ -1,11 +1,12 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-  <!-- egg white cup -->
-  <path d="M34 36c0-8 7-16 16-16s16 8 16 16l3 26a12 12 0 0 1-12 12H43a12 12 0 0 1-12-12z"/>
-  <path d="M38 34h24"/>
-  <!-- runny yolk -->
-  <path d="M46 44h8"/>
-  <circle cx="50" cy="50" r="4"/>
-  <path d="M50 54v6"/>
-  <!-- soy splash -->
-  <path d="M26 72q-4 1-4 5M74 64q5 1 5 6"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" aria-hidden="true">
+  <path d="M16 52a34 34 0 0 0 68 0z" fill="#5b3a1e"/>
+  <ellipse cx="50" cy="52" rx="34" ry="9" fill="#4a2e16"/>
+  <ellipse cx="42" cy="42" rx="13" ry="16" fill="#fdf6ec"/>
+  <ellipse cx="42" cy="46" rx="7" ry="8" fill="#f2b93b"/>
+  <ellipse cx="63" cy="44" rx="11" ry="14" fill="#f3e2c8"/>
+  <ellipse cx="63" cy="47" rx="6" ry="7" fill="#e8a52e"/>
+  <circle cx="30" cy="60" r="2" fill="#8fae3f"/>
+  <circle cx="70" cy="62" r="2" fill="#8fae3f"/>
+  <circle cx="52" cy="64" r="2" fill="#fdf6ec"/>
+  <circle cx="40" cy="66" r="2" fill="#fdf6ec"/>
 </svg>

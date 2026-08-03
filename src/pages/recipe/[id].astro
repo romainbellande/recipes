@@ -270,10 +270,11 @@ const serializedRecipe = JSON.stringify({
           </div>
         </section>
         <aside class="timers-rail">
-          <details class="cook-timers-panel" open>
-            <summary>Minuteries</summary>
+          <div class="cook-timers-panel">
+            <h2 class="cook-timers-title">Minuteries</h2>
             <section id="cook-timers" aria-label="Minuteries actives"></section>
-          </details>
+          </div>
+          <p id="timer-live" class="sr-only" aria-live="polite"></p>
         </aside>
       </section>
     </main>
@@ -336,6 +337,7 @@ const serializedRecipe = JSON.stringify({
       const stepText = document.querySelector("#step-text");
       const stepTimer = document.querySelector("#step-timer");
       const cookTimers = document.querySelector("#cook-timers");
+      const timersRail = document.querySelector(".timers-rail");
       const previous = document.querySelector("#previous-step");
       const next = document.querySelector("#next-step");
       const exitCook = document.querySelector("#exit-cook");
@@ -463,6 +465,7 @@ const serializedRecipe = JSON.stringify({
             playAlarm();
           }
         }
+        timersRail.hidden = timers.length === 0;
         cookTimers.replaceChildren(
           ...timers.map((timer) => {
             const item = document.createElement("div");
@@ -471,9 +474,16 @@ const serializedRecipe = JSON.stringify({
               0,
               Math.ceil((timer.endsAt - now) / 1000),
             );
-            item.textContent = timer.finished
-              ? `⏱ ${timer.title} — terminé`
-              : `⏱ ${timer.title} — ${formatTime(remaining)}`;
+            const title = document.createElement("span");
+            title.className = "cook-timer-title";
+            title.textContent = timer.title;
+            const count = document.createElement("span");
+            count.className = "cook-timer-count";
+            count.textContent = timer.finished
+              ? "terminé"
+              : formatTime(remaining);
+            title.setAttribute("aria-hidden", "true");
+            count.setAttribute("aria-hidden", "true");
             const stop = document.createElement("button");
             stop.type = "button";
             stop.textContent = timer.finished ? "Arrêter l’alarme" : "Arrêter";
@@ -481,7 +491,7 @@ const serializedRecipe = JSON.stringify({
               timers = timers.filter(({ id }) => id !== timer.id);
               renderTimers();
             });
-            item.append(" ", stop);
+            item.append(title, count, stop);
             return item;
           }),
         );
@@ -597,7 +607,19 @@ const serializedRecipe = JSON.stringify({
         exitCook.focus();
       }
 
+      const timerLive = document.querySelector("#timer-live");
+      const formatLive = (t) =>
+        t.finished
+          ? `${t.title} terminé`
+          : `${t.title} : ${formatTime(Math.max(0, Math.ceil((t.endsAt - Date.now()) / 1000)))}`;
+      const announceTimers = () => {
+        const msg = timers.length
+          ? timers.map(formatLive).join(", ")
+          : "Aucune minuterie active";
+        if (timerLive.textContent !== msg) timerLive.textContent = msg;
+      };
       setInterval(renderTimers, 250);
+      setInterval(announceTimers, 1000);
 
       updateDecrementButtons();
       renderNutrition();
@@ -852,6 +874,7 @@ const serializedRecipe = JSON.stringify({
     position: relative;
     width: 3.5rem;
     height: 3.5rem;
+    flex-shrink: 0;
     border: 3px solid #803c20;
     border-radius: 50%;
     background: #fffaf4;
@@ -885,14 +908,31 @@ const serializedRecipe = JSON.stringify({
     gap: 0.5rem;
     margin: 1.5rem 0;
   }
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    border: 0;
+  }
   .cook-timer {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
+    text-align: center;
+    gap: 0.5rem;
+    min-width: 0;
+    overflow-wrap: anywhere;
     border-top: 1px solid var(--line);
     padding-top: 0.5rem;
     font-family: system-ui, sans-serif;
+  }
+  .cook-timer button {
+    align-self: center;
   }
   details {
     margin-top: 2rem;
@@ -1283,15 +1323,41 @@ const serializedRecipe = JSON.stringify({
   }
   .cook-timers-panel {
     border: 1px solid var(--line);
-    background: rgb(255 253 248 / 70%);
+    border-radius: 0.5rem;
+    background: rgb(255 253 248 / 92%);
     padding: 0 1rem 1rem;
+    box-shadow: 0 0.6rem 2rem rgb(70 45 26 / 18%);
   }
-  .cook-timers-panel summary {
+  .cook-timers-panel .cook-timers-title {
+    margin: 0;
     padding: 1rem 0 0.5rem;
-    cursor: pointer;
+    font-size: 1rem;
+    text-align: center;
   }
   .cook-timers-panel #cook-timers {
     margin: 0;
+  }
+  .cook-timers-panel .cook-timer {
+    font-size: clamp(1.4rem, 2.5vw, 2rem);
+    font-weight: 600;
+  }
+  .cook-timers-panel .cook-timer button {
+    min-height: 44px;
+    padding: 0.3rem 0.7rem;
+    border: 1px solid var(--line);
+    background: transparent;
+    color: var(--ink);
+  }
+  @media (min-width: 721px) {
+    .cook-timers-panel .cook-timer .cook-timer-title {
+      font-size: 1rem;
+      font-weight: 400;
+      color: var(--muted);
+    }
+    .cook-timers-panel .cook-timer .cook-timer-count {
+      font-size: clamp(1.8rem, 3vw, 2.75rem);
+      font-weight: 700;
+    }
   }
   .current-step {
     background: #e9ddcb;
@@ -1306,6 +1372,7 @@ const serializedRecipe = JSON.stringify({
   .current-step p:not(.eyebrow) {
     max-width: 30rem;
     font-size: clamp(1.35rem, 3vw, 1.75rem);
+    font-weight: 300;
     line-height: 1.35;
   }
   footer {
@@ -1339,7 +1406,49 @@ const serializedRecipe = JSON.stringify({
       padding: 1.75rem;
     }
     .timers-rail {
-      position: static;
+      position: fixed;
+      top: auto;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      z-index: 20;
+      width: 100%;
+      max-width: none;
+      max-height: 45vh;
+      display: flex;
+      transform: none;
+      box-shadow: 0 -0.6rem 2rem rgb(70 45 26 / 25%);
+    }
+    .timers-rail .cook-timers-panel {
+      flex: 1 1 auto;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      max-height: 100%;
+      overflow: hidden;
+    }
+    .timers-rail .cook-timers-panel #cook-timers {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      overflow-y: auto;
+      min-height: 0;
+    }
+    .timers-rail .cook-timer {
+      flex: 1 1 100%;
+      font-size: 1rem;
+      font-weight: 600;
+      border: 1px solid var(--line);
+      border-radius: 0.5rem;
+      padding: 0.5rem;
+      background: #fffaf4;
+    }
+    .timers-rail .cook-timer .cook-timer-count {
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+    .current-step {
+      margin-bottom: 6rem;
     }
   }
   #print-servings {

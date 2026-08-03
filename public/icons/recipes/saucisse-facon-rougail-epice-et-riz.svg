@@ -1,10 +1,10 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-  <!-- wok pan -->
-  <path d="M18 56a32 20 0 0 0 64 0z"/>
-  <path d="M18 56h64"/>
-  <!-- sausage coin with cross-hatch -->
-  <circle cx="40" cy="52" r="11"/>
-  <path d="M34 52h12M40 46v12"/>
-  <!-- rice mound -->
-  <path d="M66 52c-4 0-4-8 0-10 1 2 6 2 7 0 1 8-2 10-7 10z"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" aria-hidden="true">
+  <ellipse cx="50" cy="58" rx="36" ry="22" fill="#f0d9b5"/>
+  <ellipse cx="38" cy="56" rx="18" ry="14" fill="#fdf6ec"/>
+  <path d="M30 52q4-3 8 0M36 60q4-3 8 0" stroke="#e3d5b8" stroke-width="2" fill="none"/>
+  <path d="M56 44q16-2 18 10t-16 14q-14 2-14-8t12-16z" fill="#a8432b"/>
+  <path d="M56 44q16-2 18 10" stroke="#8a321e" stroke-width="3" fill="none"/>
+  <circle cx="64" cy="52" r="2" fill="#d94f30"/>
+  <circle cx="58" cy="60" r="2" fill="#4d9448"/>
+  <path d="M30 30q3-6 0-10M42 30q3-6 0-10" stroke="#c9a27e" stroke-width="3" fill="none" stroke-linecap="round"/>
 </svg>
