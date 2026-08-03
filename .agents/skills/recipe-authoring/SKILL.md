@@ -21,3 +21,5 @@ Use a **sequence**: every timed cooking action becomes an explicit Timer definit
 
 5. **Verify.** Run `bun run validate`, `bun run test`, and `bun run check`. Report the Recipe path, checks run, and the nutrition estimate with its assumptions.
    - Done when all three commands pass.
+
+6. **Check all steps** to add missing timers if any.

@@ -6,7 +6,8 @@ import test from "node:test";
 import {
   collectionFiltersFromSearch,
   collectionSearchParams,
-  matchingRecipeIndices,
+  ingredientTerms,
+  matchingRecipes,
   parseInlineRecipeMarkup,
   scaleIngredient,
   durationInSeconds,
@@ -35,13 +36,54 @@ const recipes = [
   },
 ];
 
-test("filters titles, summaries, ingredients, and tags", () => {
-  assert.deepEqual(matchingRecipeIndices(recipes, "PÔMME", []), [0]);
-  assert.deepEqual(matchingRecipeIndices(recipes, "poivron", []), [1]);
-  assert.deepEqual(matchingRecipeIndices(recipes, "citron", []), [2]);
+test("filters complete ingredient entries and selected tags", () => {
+  const ingredientRecipes = [
+    ...recipes,
+    {
+      title: "Salade croquante",
+      summary: "Un accompagnement frais",
+      ingredients: ["tomates concassées", "oignons", "pois", "noix"],
+      tags: ["main", "vegetarian"],
+    },
+    {
+      title: "Omelette",
+      summary: "Un repas simple",
+      ingredients: ["œufs"],
+      tags: ["main", "vegetarian"],
+    },
+  ];
+  assert.deepEqual(ingredientTerms(" tomate, , TOMATES, oignon "), [
+    "tomate",
+    "oignon",
+  ]);
   assert.deepEqual(
-    matchingRecipeIndices(recipes, "", ["main", "vegetarian"]),
-    [1],
+    matchingRecipes(ingredientRecipes, "tomate, oignon", [
+      "main",
+      "vegetarian",
+    ]).map(({ index, matchedIngredients }) => ({ index, matchedIngredients })),
+    [{ index: 3, matchedIngredients: ["tomates concassées", "oignons"] }],
+  );
+  assert.deepEqual(
+    matchingRecipes(ingredientRecipes, "PÔMME", []).map(({ index }) => index),
+    [0],
+  );
+  assert.deepEqual(
+    matchingRecipes(ingredientRecipes, "poivron", []).map(({ index }) => index),
+    [],
+  );
+  assert.deepEqual(
+    matchingRecipes(ingredientRecipes, "pois, noix", []).map(
+      ({ index }) => index,
+    ),
+    [3],
+  );
+  assert.deepEqual(
+    matchingRecipes(ingredientRecipes, "poi", []).map(({ index }) => index),
+    [],
+  );
+  assert.deepEqual(
+    matchingRecipes(ingredientRecipes, "oeuf", []).map(({ index }) => index),
+    [4],
   );
 });
 
@@ -289,7 +331,7 @@ test(
     );
     assert.match(
       firstCard,
-      /class="image-placeholder" aria-hidden="true">\s*🍗\s*<\/div>/,
+      /class="image-placeholder" aria-hidden="true">\s*\p{Extended_Pictographic}\s*<\/div>/u,
     );
     assert.ok(
       firstCard.indexOf("image-placeholder") <
