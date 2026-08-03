@@ -367,7 +367,6 @@ const serializedRecipe = JSON.stringify({
               ),
             ),
           );
-        renderNutrition();
         [shoppingIngredients, ingredients].forEach((list) =>
           list.querySelectorAll("label").forEach((label, index) => {
             const check = label.querySelector("input");
@@ -401,11 +400,13 @@ const serializedRecipe = JSON.stringify({
         `${new Intl.NumberFormat("fr-FR", {
           maximumFractionDigits: unit === "g" ? 1 : 0,
         }).format(value)} ${unit}`;
+      // One portion is always one serving of the recipe as authored; the
+      // servings selector scales ingredients only, not nutrition values.
       function renderNutrition() {
         const multiplier =
           nutritionView === "100g"
             ? 1
-            : recipe.nutrition.weight_g / 100 / selectedServings;
+            : recipe.nutrition.weight_g / 100 / recipe.servings;
         nutritionValues.replaceChildren(
           ...nutritionFields.flatMap(([label, field, unit]) => {
             const term = document.createElement("dt");

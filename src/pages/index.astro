@@ -81,12 +81,12 @@ const serializedRecipes = JSON.stringify(recipes).replace(/</g, "\\u003c");
         <h1 id="collection-title">Recettes du quotidien</h1>
         <div class="filters">
           <label class="search-label" for="recipe-search"
-            >Rechercher une Recette</label
+            >Rechercher par ingrédient</label
           >
           <input
             id="recipe-search"
             type="search"
-            placeholder="Titre, résumé ou ingrédient"
+            placeholder="tomates, oignons"
             aria-describedby="collection-results"
           />
           <fieldset class="tag-filters">
@@ -94,7 +94,12 @@ const serializedRecipes = JSON.stringify(recipes).replace(/</g, "\\u003c");
             {
               controlledTags.map((tag) => (
                 <label>
-                  <input type="checkbox" value={tag} data-tag-filter />
+                  <input
+                    type="checkbox"
+                    value={tag}
+                    data-tag-filter
+                    data-tag-label={tagLabels[tag]}
+                  />
                   {tagLabels[tag]}
                 </label>
               ))
@@ -131,6 +136,11 @@ const serializedRecipes = JSON.stringify(recipes).replace(/</g, "\\u003c");
                     </p>
                     <h2>{recipe.title}</h2>
                     <p>{recipe.summary}</p>
+                    <p
+                      class="matched-ingredients"
+                      data-matched-ingredients
+                      hidden
+                    />
                   </div>
                 </a>
               </li>
@@ -158,7 +168,8 @@ const serializedRecipes = JSON.stringify(recipes).replace(/</g, "\\u003c");
       import {
         collectionFiltersFromSearch,
         collectionSearchParams,
-        matchingRecipeIndices,
+        ingredientTerms,
+        matchingRecipes,
       } from "../scripts/collection.js";
 
       const recipes = JSON.parse(
@@ -168,6 +179,7 @@ const serializedRecipes = JSON.stringify(recipes).replace(/</g, "\\u003c");
       const filters = [...document.querySelectorAll("[data-tag-filter]")];
       const results = document.querySelector("#collection-results");
       const emptyState = document.querySelector("#empty-state");
+      const recipeItems = [...document.querySelectorAll("[data-recipe-item]")];
       const controlledTags = filters.map((filter) => filter.value);
       const initialFilters = collectionFiltersFromSearch(
         window.location.search,
@@ -182,24 +194,41 @@ const serializedRecipes = JSON.stringify(recipes).replace(/</g, "\\u003c");
         const selectedTags = filters
           .filter((filter) => filter.checked)
           .map((filter) => filter.value);
-        const matches = matchingRecipeIndices(
-          recipes,
-          search.value,
-          selectedTags,
+        const ingredients = ingredientTerms(search.value);
+        const ingredientQuery = ingredients.join(", ");
+        const matches = matchingRecipes(recipes, ingredientQuery, selectedTags);
+        const matchesByIndex = new Map(
+          matches.map(({ index, matchedIngredients }) => [
+            index,
+            matchedIngredients,
+          ]),
         );
-        document
-          .querySelectorAll("[data-recipe-item]")
-          .forEach((item, index) => {
-            item.hidden = !matches.includes(index);
-          });
+        recipeItems.forEach((item, index) => {
+          const matchedIngredients = matchesByIndex.get(index);
+          item.hidden = !matchedIngredients;
+          const evidence = item.querySelector("[data-matched-ingredients]");
+          evidence.hidden = ingredients.length === 0 || !matchedIngredients;
+          evidence.textContent = matchedIngredients
+            ? `Ingrédients : ${matchedIngredients.join(" · ")}`
+            : "";
+        });
         const hasMatches = matches.length > 0;
+        const details = [
+          ingredients.length && `avec ${ingredients.join(" et ")}`,
+          ...selectedTags.map(
+            (tag) =>
+              filters.find((filter) => filter.value === tag).dataset.tagLabel,
+          ),
+        ]
+          .filter(Boolean)
+          .join(" · ");
         results.textContent = hasMatches
-          ? `${matches.length} Recette${matches.length === 1 ? "" : "s"}`
+          ? `${matches.length} Recette${matches.length === 1 ? "" : "s"}${details ? ` ${details}` : ""}`
           : "Aucune Recette ne correspond à votre recherche.";
         emptyState.hidden = hasMatches;
 
         const parameters = collectionSearchParams(
-          search.value,
+          ingredientQuery,
           selectedTags,
           controlledTags,
         );
@@ -610,6 +639,13 @@ const serializedRecipes = JSON.stringify(recipes).replace(/</g, "\\u003c");
   .card-content p:not(.card-meta) {
     margin: 0;
     font-size: 1.08rem;
+  }
+  .matched-ingredients {
+    margin-top: 1rem !important;
+    color: var(--leaf);
+    font:
+      500 0.8rem / 1.35 "DM Sans",
+      sans-serif;
   }
   #reset-filters {
     border-color: var(--accent);

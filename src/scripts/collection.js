@@ -10,21 +10,57 @@ export const normalizeText = (value) =>
   value
     .normalize("NFD")
     .replace(/\p{Diacritic}/gu, "")
-    .toLowerCase();
+    .toLowerCase()
+    .replaceAll("œ", "oe")
+    .replaceAll("æ", "ae");
 
-export const matchingRecipeIndices = (recipes, query, selectedTags) => {
-  const normalizedQuery = normalizeText(query);
-  return recipes
-    .map((recipe, index) => ({ recipe, index }))
-    .filter(
-      ({ recipe }) =>
-        (!normalizedQuery ||
-          normalizeText(
-            [recipe.title, recipe.summary, ...recipe.ingredients].join(" "),
-          ).includes(normalizedQuery)) &&
-        selectedTags.every((tag) => recipe.tags.includes(tag)),
+const invariantIngredientWords = new Set(["mais", "noix", "pois", "radis"]);
+
+const ingredientTokens = (value) =>
+  (normalizeText(value).match(/\p{L}+/gu) ?? []).map((word) =>
+    invariantIngredientWords.has(word) ? word : word.replace(/(?:s|x)$/u, ""),
+  );
+
+export const ingredientTerms = (query) => {
+  const terms = new Map();
+  for (const term of query.split(",").map((term) => term.trim())) {
+    const key = ingredientTokens(term).join(" ");
+    if (key && !terms.has(key)) terms.set(key, term);
+  }
+  return [...terms.values()];
+};
+
+const includesIngredient = (ingredient, term) => {
+  const tokens = ingredientTokens(ingredient);
+  const termTokens = ingredientTokens(term);
+  return (
+    termTokens.length > 0 &&
+    tokens.some((_, index) =>
+      termTokens.every((token, offset) => tokens[index + offset] === token),
     )
-    .map(({ index }) => index);
+  );
+};
+
+export const matchingRecipes = (recipes, query, selectedTags) => {
+  const terms = ingredientTerms(query);
+  return recipes
+    .map((recipe, index) => ({
+      recipe,
+      index,
+      matchedIngredients: recipe.ingredients.filter((ingredient) =>
+        terms.some((term) => includesIngredient(ingredient, term)),
+      ),
+    }))
+    .filter(
+      ({ recipe, matchedIngredients }) =>
+        (!terms.length ||
+          terms.every((term) =>
+            matchedIngredients.some((ingredient) =>
+              includesIngredient(ingredient, term),
+            ),
+          )) &&
+        selectedTags.every((tag) => recipe.tags.includes(tag)),
+    );
 };
 
 const vulgarFractions = {

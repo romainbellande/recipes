@@ -4,7 +4,7 @@ A static, open Collection of everyday Recipes for home cooks.
 
 ## Features
 
-- Browse Recipes with text search and tag filters; filter state is shareable in the URL.
+- Browse Recipes with ingredient search and tag filters; filter state is shareable in the URL.
 - Read focused Recipe pages with adjustable servings and automatically scaled Ingredients.
 - Switch to a checkable shopping list or step-by-step cooking mode with editable timers and audio alerts.
 - Print Recipes or save them as PDFs.
