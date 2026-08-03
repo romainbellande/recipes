@@ -1,6 +1,9 @@
 ---
 title: Paëlla au chorizo et crevettes
-icon: 🥘
+icon: /icons/recipes/paella-au-chorizo-et-crevettes.svg
+protein: meat
+method:
+  - one-pot
 summary: Une paëlla au poulet, chorizo et crevettes, accompagnée d'une salade citronnée.
 prep_time: 15 min
 cook_time: 25 min

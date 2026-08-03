@@ -2,6 +2,12 @@ import { readdir, readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { basename, join } from "node:path";
 import { parseInlineRecipeMarkup } from "../src/scripts/collection.js";
+import {
+  COURSES,
+  METHOD_VALUES,
+  PROTEIN_VALUES,
+  QUALIFIERS,
+} from "../src/scripts/taxonomy.js";
 
 const requiredFields = [
   "title",
@@ -12,24 +18,20 @@ const requiredFields = [
   "servings",
   "nutrition",
   "tags",
+  "protein",
 ];
 const allowedFields = new Set([
   ...requiredFields,
+  "method",
   "aliases",
-  "image",
   "timers",
 ]);
 const recipeId = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
-const courses = new Set(["breakfast", "main", "side", "dessert"]);
-const qualifiers = new Set([
-  "weeknight",
-  "make-ahead",
-  "vegetarian",
-  "pantry",
-  "healthy",
-]);
+const courses = new Set(Object.keys(COURSES));
+const qualifiers = new Set(Object.keys(QUALIFIERS));
 const duration = /^(?:(?:[1-9]\d*) h(?: [1-9]\d* min)?|[1-9]\d* min)$/;
 const servings = /^[1-9]\d*(?:\s*[–-]\s*[1-9]\d*)?$/;
+const localPath = /^\/[^\s](?:[^\s]|\s+[^\s])*\/[^\s]+$/;
 
 function parseRecipe(source) {
   const errors = [];
@@ -112,11 +114,8 @@ function validateRecipe(filename, source) {
     if (typeof fields[field] !== "string" || !fields[field].trim())
       fail(`${field} must be a non-empty string`);
   }
-  if (
-    typeof fields.icon === "string" &&
-    !/^\p{Extended_Pictographic}$/u.test(fields.icon)
-  )
-    fail("icon must be a single icon");
+  if (typeof fields.icon === "string" && !localPath.test(fields.icon))
+    fail("icon must be a repository-local path beginning with /");
   for (const field of ["prep_time", "cook_time"])
     if (typeof fields[field] === "string" && !duration.test(fields[field]))
       fail(`${field} must be a duration such as "20 min" or "1 h 15 min"`);
@@ -156,20 +155,26 @@ function validateRecipe(filename, source) {
       if (!courses.has(tag) && !qualifiers.has(tag))
         fail(`controlled tag required; found "${tag}"`);
   }
+  if (!PROTEIN_VALUES.has(fields.protein))
+    fail(`protein must be one of ${[...PROTEIN_VALUES].join(", ")}`);
+  if ("method" in fields) {
+    if (!Array.isArray(fields.method) || !fields.method.length)
+      fail("method must be a non-empty list");
+    else {
+      const method = fields.method;
+      if (new Set(method).size !== method.length)
+        fail("method must be distinct");
+      for (const value of method)
+        if (!METHOD_VALUES.has(value))
+          fail(`controlled method required; found "${value}"`);
+    }
+  }
   const aliases = Array.isArray(fields.aliases) ? fields.aliases : [];
   if ("aliases" in fields && !Array.isArray(fields.aliases))
     fail("aliases must be a list");
   for (const alias of aliases)
     if (!recipeId.test(alias))
       fail(`alias must be a Recipe ID; found "${alias}"`);
-  if (
-    "image" in fields &&
-    (typeof fields.image !== "string" ||
-      !fields.image.startsWith("/") ||
-      fields.image.includes("..") ||
-      /^https?:/i.test(fields.image))
-  )
-    fail("image must be a repository-local image path beginning with /");
   const ingredientSections = [...body.matchAll(/^## Ingrédients\s*$/gm)];
   const methodSections = [...body.matchAll(/^## Préparation\s*$/gm)];
   if (ingredientSections.length !== 1)

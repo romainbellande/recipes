@@ -1,16 +1,11 @@
 ---
 import { getCollection } from "astro:content";
+import { readFileSync } from "node:fs";
+import { COURSES, METHODS, PROTEINS, QUALIFIERS } from "../scripts/taxonomy.js";
 
 const tagLabels: Record<string, string> = {
-  breakfast: "Petit-déjeuner",
-  main: "Plat principal",
-  side: "Accompagnement",
-  dessert: "Dessert",
-  weeknight: "Rapide en semaine",
-  "make-ahead": "À préparer à l'avance",
-  vegetarian: "Végétarien",
-  pantry: "Du placard",
-  healthy: "Équilibré",
+  ...COURSES,
+  ...QUALIFIERS,
 };
 const controlledTags = Object.keys(tagLabels);
 const durationMinutes = (value: string) => {
@@ -38,11 +33,15 @@ const recipes = (await getCollection("recipes"))
       durationMinutes(recipe.data.prep_time) +
         durationMinutes(recipe.data.cook_time),
     ),
-    course: recipe.data.tags.find((tag) =>
-      ["breakfast", "main", "side", "dessert"].includes(tag),
-    )!,
+    course: recipe.data.tags.find((tag) => Object.keys(COURSES).includes(tag))!,
   }));
 const serializedRecipes = JSON.stringify(recipes).replace(/</g, "\\u003c");
+const iconSvgs = Object.fromEntries(
+  recipes.map(({ id }) => [
+    id,
+    readFileSync(`public/icons/recipes/${id}.svg`, "utf8"),
+  ]),
+);
 ---
 
 <html lang="fr">
@@ -90,6 +89,39 @@ const serializedRecipes = JSON.stringify(recipes).replace(/</g, "\\u003c");
             aria-describedby="collection-results"
           />
           <fieldset class="tag-filters">
+            <legend>Filtrer par protéine</legend>
+            {
+              Object.entries(PROTEINS).map(([value, label]) => (
+                <label>
+                  <input
+                    type="radio"
+                    name="protein"
+                    value={value}
+                    data-protein-filter
+                    data-protein-label={label}
+                  />
+                  {label}
+                </label>
+              ))
+            }
+          </fieldset>
+          <fieldset class="tag-filters">
+            <legend>Filtrer par méthode</legend>
+            {
+              Object.entries(METHODS).map(([value, label]) => (
+                <label>
+                  <input
+                    type="checkbox"
+                    value={value}
+                    data-method-filter
+                    data-method-label={label}
+                  />
+                  {label}
+                </label>
+              ))
+            }
+          </fieldset>
+          <fieldset class="tag-filters">
             <legend>Filtrer par étiquette</legend>
             {
               controlledTags.map((tag) => (
@@ -123,13 +155,11 @@ const serializedRecipes = JSON.stringify(recipes).replace(/</g, "\\u003c");
                   href={`${import.meta.env.BASE_URL}/recipe/${recipe.id}/#recipe-${recipe.id}`}
                   aria-label={recipe.title}
                 >
-                  {recipe.image ? (
-                    <img class="card-image" src={recipe.image} alt="" />
-                  ) : (
-                    <div class="image-placeholder" aria-hidden="true">
-                      {recipe.icon}
-                    </div>
-                  )}
+                  <div
+                    class="image-placeholder"
+                    aria-hidden="true"
+                    set:html={iconSvgs[recipe.id]}
+                  />
                   <div class="card-content">
                     <p class="card-meta">
                       {tagLabels[recipe.course]} · {recipe.totalTime}
@@ -176,27 +206,47 @@ const serializedRecipes = JSON.stringify(recipes).replace(/</g, "\\u003c");
         document.querySelector("#recipes-json").textContent,
       );
       const search = document.querySelector("#recipe-search");
-      const filters = [...document.querySelectorAll("[data-tag-filter]")];
+      const tagFilters = [...document.querySelectorAll("[data-tag-filter]")];
+      const methodFilters = [
+        ...document.querySelectorAll("[data-method-filter]"),
+      ];
+      const proteinFilters = [
+        ...document.querySelectorAll("[data-protein-filter]"),
+      ];
       const results = document.querySelector("#collection-results");
       const emptyState = document.querySelector("#empty-state");
       const recipeItems = [...document.querySelectorAll("[data-recipe-item]")];
-      const controlledTags = filters.map((filter) => filter.value);
       const initialFilters = collectionFiltersFromSearch(
         window.location.search,
-        controlledTags,
       );
       search.value = initialFilters.query;
-      filters.forEach((filter) => {
-        filter.checked = initialFilters.selectedTags.includes(filter.value);
+      tagFilters.forEach((filter) => {
+        filter.checked = initialFilters.tags.includes(filter.value);
       });
+      methodFilters.forEach((filter) => {
+        filter.checked = initialFilters.method.includes(filter.value);
+      });
+      const selectedProtein = proteinFilters.find(
+        (filter) => filter.value === initialFilters.protein,
+      );
+      if (selectedProtein) selectedProtein.checked = true;
 
       function updateCollection() {
-        const selectedTags = filters
+        const tags = tagFilters
           .filter((filter) => filter.checked)
           .map((filter) => filter.value);
+        const method = methodFilters
+          .filter((filter) => filter.checked)
+          .map((filter) => filter.value);
+        const protein =
+          proteinFilters.find((filter) => filter.checked)?.value ?? "";
         const ingredients = ingredientTerms(search.value);
         const ingredientQuery = ingredients.join(", ");
-        const matches = matchingRecipes(recipes, ingredientQuery, selectedTags);
+        const matches = matchingRecipes(recipes, ingredientQuery, {
+          tags,
+          protein,
+          method,
+        });
         const matchesByIndex = new Map(
           matches.map(({ index, matchedIngredients }) => [
             index,
@@ -215,10 +265,19 @@ const serializedRecipes = JSON.stringify(recipes).replace(/</g, "\\u003c");
         const hasMatches = matches.length > 0;
         const details = [
           ingredients.length && `avec ${ingredients.join(" et ")}`,
-          ...selectedTags.map(
+          ...tags.map(
             (tag) =>
-              filters.find((filter) => filter.value === tag).dataset.tagLabel,
+              tagFilters.find((filter) => filter.value === tag).dataset
+                .tagLabel,
           ),
+          ...method.map(
+            (value) =>
+              methodFilters.find((filter) => filter.value === value).dataset
+                .methodLabel,
+          ),
+          protein &&
+            proteinFilters.find((filter) => filter.value === protein).dataset
+              .proteinLabel,
         ]
           .filter(Boolean)
           .join(" · ");
@@ -227,11 +286,12 @@ const serializedRecipes = JSON.stringify(recipes).replace(/</g, "\\u003c");
           : "Aucune Recette ne correspond à votre recherche.";
         emptyState.hidden = hasMatches;
 
-        const parameters = collectionSearchParams(
-          ingredientQuery,
-          selectedTags,
-          controlledTags,
-        );
+        const parameters = collectionSearchParams({
+          query: ingredientQuery,
+          tags,
+          method,
+          protein,
+        });
         const query = parameters.toString();
         document.querySelectorAll("[data-recipe-card]").forEach((card) => {
           card.href = `${card.dataset.recipeUrl}${query ? `?${query}` : ""}#${card.id}`;
@@ -244,14 +304,16 @@ const serializedRecipes = JSON.stringify(recipes).replace(/</g, "\\u003c");
       }
 
       search.addEventListener("input", updateCollection);
-      filters.forEach((filter) =>
+      [...tagFilters, ...methodFilters, ...proteinFilters].forEach((filter) =>
         filter.addEventListener("change", updateCollection),
       );
       document.querySelector("#reset-filters").addEventListener("click", () => {
         search.value = "";
-        filters.forEach((filter) => {
-          filter.checked = false;
-        });
+        [...tagFilters, ...methodFilters, ...proteinFilters].forEach(
+          (filter) => {
+            filter.checked = false;
+          },
+        );
         updateCollection();
         search.focus();
       });
@@ -383,14 +445,10 @@ const serializedRecipes = JSON.stringify(recipes).replace(/</g, "\\u003c");
     color: inherit;
     text-decoration: none;
   }
-  .card-image,
   .image-placeholder {
     width: 100%;
     aspect-ratio: 4 / 3;
     min-height: 12rem;
-  }
-  .card-image {
-    object-fit: cover;
   }
   .image-placeholder {
     display: grid;
@@ -398,6 +456,10 @@ const serializedRecipes = JSON.stringify(recipes).replace(/</g, "\\u003c");
     background: #e9dfd3;
     color: #6b5d53;
     font-family: system-ui, sans-serif;
+  }
+  .image-placeholder svg {
+    width: clamp(4rem, 12vw, 7rem);
+    height: clamp(4rem, 12vw, 7rem);
   }
   .card-content {
     padding: 1.25rem;
@@ -441,7 +503,6 @@ const serializedRecipes = JSON.stringify(recipes).replace(/</g, "\\u003c");
       padding-left: 1rem;
       padding-right: 1rem;
     }
-    .card-image,
     .image-placeholder {
       min-height: 0;
     }
@@ -613,7 +674,7 @@ const serializedRecipes = JSON.stringify(recipes).replace(/</g, "\\u003c");
   .image-placeholder {
     min-height: 10rem;
     background: linear-gradient(135deg, #d7c3a3, #f0e5d4 55%, #c4d0bb);
-    font-size: clamp(4rem, 12vw, 7rem);
+    color: #8a5a34;
   }
   .card-content {
     display: grid;
@@ -680,6 +741,10 @@ const serializedRecipes = JSON.stringify(recipes).replace(/</g, "\\u003c");
     }
     .image-placeholder {
       aspect-ratio: 16 / 7;
+    }
+    .image-placeholder svg {
+      width: clamp(5rem, 20vw, 8rem);
+      height: clamp(5rem, 20vw, 8rem);
     }
   }
 </style>

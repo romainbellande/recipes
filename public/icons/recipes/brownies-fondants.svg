@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+  <!-- top brownie block with scored lines -->
+  <rect x="26" y="20" width="48" height="30" rx="3"/>
+  <path d="M35 20v30M44 20v30M53 20v30M62 20v30"/>
+  <!-- chocolate drips from top edge -->
+  <path d="M32 50q-3 8 2 12M50 50v8"/>
+  <!-- bottom slabs -->
+  <rect x="26" y="56" width="48" height="16" rx="3"/>
+  <rect x="26" y="76" width="48" height="6" rx="3"/>
+</svg>

@@ -1,6 +1,9 @@
 ---
 title: Curry doux de poulet au lait de coco
-icon: 🍛
+icon: /icons/recipes/curry-doux-de-poulet-au-lait-de-coco.svg
+protein: meat
+method:
+  - one-pot
 summary: Des hauts de cuisse dorés mijotés dans une sauce douce au curry et au lait de coco, avec petits pois et riz basmati.
 prep_time: 15 min
 cook_time: 25 min

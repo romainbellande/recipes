@@ -1,6 +1,9 @@
 ---
 title: Velouté de patate douce et poivron
-icon: 🍠
+icon: /icons/recipes/veloute-patate-douce-poivron.svg
+protein: vegetarian
+method:
+  - one-pot
 summary: Une soupe douce et crémeuse, relevée de poivron grillé et servie avec des graines de courge.
 prep_time: 10 min
 cook_time: 25 min
@@ -25,7 +28,7 @@ timers:
     duration: 3 min
 tags:
   - main
-  - vegetarian
+
   - weeknight
   - healthy
 ---

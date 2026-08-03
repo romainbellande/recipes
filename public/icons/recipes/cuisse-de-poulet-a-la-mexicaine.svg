@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+  <!-- bone -->
+  <path d="M62 34l14 14"/>
+  <circle cx="63" cy="32" r="4"/>
+  <circle cx="79" cy="48" r="4"/>
+  <!-- drumstick meat -->
+  <path d="M56 52a20 20 0 1 0 24-8"/>
+  <path d="M54 54a18 18 0 0 1 16-14"/>
+  <!-- spice / chili kick -->
+  <path d="M30 26c-3 5 2 7-1 11M22 20c4 6 10 6 8 14"/>
+</svg>

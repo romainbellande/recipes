@@ -1,6 +1,9 @@
 ---
 title: Brownies fondants
-icon: 🍰
+icon: /icons/recipes/brownies-fondants.svg
+protein: vegetarian
+method:
+  - oven
 summary: Des brownies riches et fondants, au chocolat noir et chocolat au lait, nappés d'un glaçage chocolaté. Un dessert gourmand à partager.
 prep_time: 20 min
 cook_time: 30 min
@@ -28,7 +31,6 @@ timers:
     duration: 15 min
 tags:
   - dessert
-  - vegetarian
 ---
 
 ## Ingrédients

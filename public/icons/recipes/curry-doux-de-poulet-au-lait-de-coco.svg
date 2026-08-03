@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+  <!-- bowl -->
+  <path d="M20 52h60"/>
+  <path d="M22 52a8 8 0 0 0 8 8h40a8 8 0 0 0 8-8"/>
+  <path d="M24 60l-4 12a6 6 0 0 0 6 6h48a6 6 0 0 0 6-6l-4-12"/>
+  <path d="M16 52v-8M84 52v-8M30 44h40"/>
+  <!-- steam -->
+  <path d="M40 28q-3-5-1-9M50 30q3-5 1-10M60 28q-3-5-1-9"/>
+</svg>

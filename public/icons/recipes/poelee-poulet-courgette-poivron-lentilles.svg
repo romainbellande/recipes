@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+  <!-- skillet -->
+  <path d="M16 62h60"/>
+  <path d="M16 62a14 7 0 0 0 28 0h0"/>
+  <path d="M16 62a28 14 0 0 0 56 0l-56 0z"/>
+  <path d="M78 62h10"/>
+  <path d="M88 62l-5-6M78 62l-6 0"/>
+  <!-- chicken + veg in pan -->
+  <path d="M34 56c-3 2-3 6 0 8M44 54c-3 2-3 7 0 9"/>
+  <circle cx="56" cy="58" r="4"/>
+  <path d="M64 60v-6M67 56h-6"/>
+</svg>

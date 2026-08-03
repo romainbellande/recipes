@@ -1,6 +1,9 @@
 ---
 title: Saucisse façon rougail épicé et riz
-icon: 🌭
+icon: /icons/recipes/saucisse-facon-rougail-epice-et-riz.svg
+protein: meat
+method:
+  - one-pot
 summary: Des rondelles de saucisse mijotées dans une sauce tomate épicée, servies avec du riz et une crème citronnée à la coriandre.
 prep_time: 15 min
 cook_time: 20 min

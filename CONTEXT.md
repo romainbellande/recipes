@@ -44,12 +44,20 @@ The canonical Recipe URL copied for sharing; it identifies the Recipe by its Rec
 _Avoid_: deep link, filtered URL
 
 **Recipe icon**:
-An icon in a Recipe's front matter that represents the Recipe when it has no image.
-_Avoid_: title icon, emoji title
+An AI-generated SVG, committed as a repository-local asset and referenced by the Recipe's front matter, that serves as the Recipe's visual identity in both the Collection and the Recipe view. It is always shown; there is no photo field.
+_Avoid_: title icon, emoji title, image, photo
 
 **Healthy tag**:
 A controlled Recipe qualifier for a balanced, plant-rich meal with a protein source. It is editorial guidance, not a medical or nutritional claim.
 _Avoid_: health claim, diet label
+
+**Protein**:
+A singleton facet describing the main protein source of a Recipe, with exactly one of three values: `fish`, `meat`, or `vegetarian`. It is a filterable attribute, not a nutritional claim.
+_Avoid_: protein type, meat/fish category, main ingredient
+
+**Method**:
+An optional, repeatable facet describing how a Recipe is prepared, choosing independently from `one-pot` and `oven`. A Recipe carries a Method value only when the description genuinely applies; it is absent otherwise.
+_Avoid_: cooking method, preparation type, technique
 
 **Nutrition estimate**:
 An AI-generated, Recipe-specific approximation stored with a Recipe and expressed per Serving and per 100 g. It is not a medical or nutritional claim.

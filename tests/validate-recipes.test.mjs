@@ -7,11 +7,12 @@ import { validateCollection } from "../scripts/validate-recipes.mjs";
 
 const valid = `---
 title: Pâtes rapides
-icon: 🍝
+icon: /icons/recipes/quick-pasta.svg
 summary: Un dîner fiable.
 prep_time: 10 min
 cook_time: 20 min
 servings: 4
+protein: vegetarian
 nutrition:
   weight_g: 1000
   energy_kj: 500
@@ -23,6 +24,8 @@ nutrition:
   fibre_g: 2
   protein_g: 4
   salt_g: 0.5
+method:
+  - one-pot
 tags:
   - main
   - weeknight
@@ -72,6 +75,20 @@ test("accepts the healthy qualifier", async () => {
     ),
     [],
   );
+});
+
+test("accepts each Protein value", async () => {
+  for (const protein of ["fish", "meat", "vegetarian"]) {
+    const recipe = valid.replace(/protein: .*/, `protein: ${protein}`);
+    assert.deepEqual(await validateCollection(await collection(recipe)), []);
+  }
+});
+
+test("accepts a multi-select Method and omitting it", async () => {
+  const both = valid.replace("  - one-pot", "  - one-pot\n  - oven");
+  assert.deepEqual(await validateCollection(await collection(both)), []);
+  const none = valid.replace("method:\n  - one-pot\n", "");
+  assert.deepEqual(await validateCollection(await collection(none)), []);
 });
 
 test("accepts Timer definitions in front matter", async () => {
@@ -168,15 +185,60 @@ for (const [name, recipe, filename, rule] of [
   ],
   [
     "missing icon",
-    valid.replace("icon: 🍝\n", ""),
+    valid.replace("icon: /icons/recipes/quick-pasta.svg\n", ""),
     "quick-pasta.md",
     "missing required front-matter field: icon",
   ],
   [
     "invalid icon",
-    valid.replace("icon: 🍝", "icon: pâtes"),
+    valid.replace("icon: /icons/recipes/quick-pasta.svg", "icon: pâtes.svg"),
     "quick-pasta.md",
-    "icon must be a single icon",
+    "icon must be a repository-local path",
+  ],
+  [
+    "missing protein",
+    valid.replace("protein: vegetarian\n", ""),
+    "quick-pasta.md",
+    "missing required front-matter field: protein",
+  ],
+  [
+    "invalid protein",
+    valid.replace("protein: vegetarian", "protein: lapin"),
+    "quick-pasta.md",
+    "protein must be one of fish, meat, vegetarian",
+  ],
+  [
+    "invalid method",
+    valid.replace("  - one-pot", "  - microwave"),
+    "quick-pasta.md",
+    "controlled method required",
+  ],
+  [
+    "duplicate method",
+    valid.replace("  - one-pot", "  - one-pot\n  - one-pot"),
+    "quick-pasta.md",
+    "method must be distinct",
+  ],
+  [
+    "empty method",
+    valid.replace("method:\n  - one-pot\n", "method:\n"),
+    "quick-pasta.md",
+    "method must be a non-empty list",
+  ],
+  [
+    "vegetarian tag removed",
+    valid.replace("  - weeknight", "  - weeknight\n  - vegetarian"),
+    "quick-pasta.md",
+    "controlled tag required",
+  ],
+  [
+    "dropped image field",
+    valid.replace(
+      "protein: vegetarian\n",
+      "image: https://example.com/pasta.jpg\nprotein: vegetarian\n",
+    ),
+    "quick-pasta.md",
+    "unknown front-matter field: image",
   ],
   [
     "duration",
@@ -213,15 +275,6 @@ for (const [name, recipe, filename, rule] of [
     valid.replace("  - weeknight", "  - side"),
     "quick-pasta.md",
     "exactly one course tag",
-  ],
-  [
-    "image path",
-    valid.replace(
-      "---\n\n## Ingrédients",
-      "image: https://example.com/pasta.jpg\n---\n\n## Ingrédients",
-    ),
-    "quick-pasta.md",
-    "repository-local image path",
   ],
   [
     "ingredients",
