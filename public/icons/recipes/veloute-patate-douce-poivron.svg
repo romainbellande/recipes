@@ -1,10 +1,11 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-  <!-- soup bowl -->
-  <path d="M22 50h56"/>
-  <path d="M22 50a6 6 0 0 0 6 6h44a6 6 0 0 0 6-6"/>
-  <path d="M26 56l-3 12a6 6 0 0 0 6 6h42a6 6 0 0 0 6-6l-3-12"/>
-  <!-- swirl -->
-  <path d="M50 30c-7 0-7 12 0 12s14-4 10-10-14-8-18 2"/>
-  <!-- steam -->
-  <path d="M38 20q-3-5-1-9M60 22q3-5 1-9"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" aria-hidden="true">
+  <path d="M16 46a34 34 0 0 0 68 0z" fill="#e8e0d0"/>
+  <ellipse cx="50" cy="46" rx="34" ry="10" fill="#e8842e"/>
+  <ellipse cx="50" cy="45" rx="28" ry="7" fill="#f09a45"/>
+  <path d="M34 44q8-5 16 0t16 0" stroke="#f7c98f" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <circle cx="42" cy="44" r="2.5" fill="#b3402a"/>
+  <circle cx="58" cy="46" r="2.5" fill="#b3402a"/>
+  <ellipse cx="50" cy="48" rx="4" ry="2.5" fill="#4d9448"/>
+  <path d="M42 30q3-6 0-10M54 30q3-6 0-10" stroke="#c9c9c9" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <path d="M70 70l10 8" stroke="#b8b0a0" stroke-width="5" stroke-linecap="round"/>
 </svg>

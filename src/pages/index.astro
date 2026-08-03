@@ -90,6 +90,17 @@ const iconSvgs = Object.fromEntries(
           />
           <fieldset class="tag-filters">
             <legend>Filtrer par protéine</legend>
+            <label>
+              <input
+                type="radio"
+                name="protein"
+                value=""
+                data-protein-filter
+                data-protein-label="Toutes"
+                checked
+              />
+              Toutes
+            </label>
             {
               Object.entries(PROTEINS).map(([value, label]) => (
                 <label>
@@ -314,6 +325,7 @@ const iconSvgs = Object.fromEntries(
             filter.checked = false;
           },
         );
+        proteinFilters.find((filter) => filter.value === "").checked = true;
         updateCollection();
         search.focus();
       });
@@ -458,8 +470,8 @@ const iconSvgs = Object.fromEntries(
     font-family: system-ui, sans-serif;
   }
   .image-placeholder svg {
-    width: clamp(4rem, 12vw, 7rem);
-    height: clamp(4rem, 12vw, 7rem);
+    width: clamp(5rem, 14vw, 9rem);
+    height: clamp(5rem, 14vw, 9rem);
   }
   .card-content {
     padding: 1.25rem;

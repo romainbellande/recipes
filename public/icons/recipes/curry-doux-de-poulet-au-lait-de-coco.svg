@@ -1,9 +1,12 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-  <!-- bowl -->
-  <path d="M20 52h60"/>
-  <path d="M22 52a8 8 0 0 0 8 8h40a8 8 0 0 0 8-8"/>
-  <path d="M24 60l-4 12a6 6 0 0 0 6 6h48a6 6 0 0 0 6-6l-4-12"/>
-  <path d="M16 52v-8M84 52v-8M30 44h40"/>
-  <!-- steam -->
-  <path d="M40 28q-3-5-1-9M50 30q3-5 1-10M60 28q-3-5-1-9"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" aria-hidden="true">
+  <path d="M14 50a36 36 0 0 0 72 0z" fill="#f0d9b5"/>
+  <ellipse cx="50" cy="50" rx="36" ry="10" fill="#e0a13e"/>
+  <ellipse cx="50" cy="48" rx="30" ry="7" fill="#eab154"/>
+  <rect x="34" y="40" width="12" height="9" rx="2" fill="#f3e6d4"/>
+  <rect x="54" y="42" width="11" height="8" rx="2" fill="#f3e6d4"/>
+  <ellipse cx="64" cy="34" rx="11" ry="8" fill="#8a5432"/>
+  <ellipse cx="64" cy="33" rx="7" ry="4.5" fill="#fdf6ec"/>
+  <path d="M40 26q3-6 0-10M52 26q3-6 0-10" stroke="#c9a27e" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <circle cx="46" cy="46" r="2" fill="#b3402a"/>
+  <circle cx="58" cy="50" r="2" fill="#4d9448"/>
 </svg>

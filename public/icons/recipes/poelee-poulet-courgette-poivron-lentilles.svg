@@ -1,12 +1,13 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-  <!-- skillet -->
-  <path d="M16 62h60"/>
-  <path d="M16 62a14 7 0 0 0 28 0h0"/>
-  <path d="M16 62a28 14 0 0 0 56 0l-56 0z"/>
-  <path d="M78 62h10"/>
-  <path d="M88 62l-5-6M78 62l-6 0"/>
-  <!-- chicken + veg in pan -->
-  <path d="M34 56c-3 2-3 6 0 8M44 54c-3 2-3 7 0 9"/>
-  <circle cx="56" cy="58" r="4"/>
-  <path d="M64 60v-6M67 56h-6"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" aria-hidden="true">
+  <circle cx="46" cy="52" r="32" fill="#3a3a3a"/>
+  <circle cx="46" cy="52" r="26" fill="#545454"/>
+  <path d="M74 44l16-8" stroke="#3a3a3a" stroke-width="8" stroke-linecap="round"/>
+  <rect x="32" y="40" width="13" height="11" rx="2" fill="#f3e6d4"/>
+  <circle cx="56" cy="44" r="6" fill="#4d9448"/>
+  <circle cx="56" cy="44" r="3" fill="#79b36f"/>
+  <path d="M38 60q6-6 12 0t0 0z" fill="#e2603c"/>
+  <rect x="52" y="56" width="10" height="8" rx="2" fill="#f2b93b"/>
+  <circle cx="42" cy="52" r="2" fill="#8a5a2b"/>
+  <circle cx="60" cy="58" r="2" fill="#8a5a2b"/>
+  <circle cx="50" cy="64" r="2" fill="#8a5a2b"/>
 </svg>
