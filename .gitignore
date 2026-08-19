@@ -22,3 +22,6 @@ pnpm-debug.log*
 
 # direnv
 .envrc
+
+.pi/fabric
+settings.local.json
