@@ -45,14 +45,14 @@ tags:
 - 400 g de rigatoni secs
 - 500 g d'escalopes de poulet, coupées en dés
 - 300 g de champignons de Paris, émincés
-- 2 oignons (environ 200 g), émincés
+- 2 oignons, émincés
 - 2 gousses d'ail, émincées
-- 5 g de pimentón fumé demi-doux (environ 2 cuillères à café)
+- 5 g de pimentón fumé demi-doux
 - 400 g de tomates concassées
 - 100 ml de vin blanc sec
 - 500 ml de bouillon de volaille
 - 150 g de feta
-- 10 g de feuilles de basilic frais (1 poignée)
+- 10 g de feuilles de basilic frais
 - 2 cuillères à soupe d'huile d'olive
 - Sel, poivre
 

@@ -32,8 +32,8 @@ export const ingredientTerms = (query) => {
   return [...terms.values()];
 };
 
-const includesIngredient = (ingredient, term) => {
-  const tokens = ingredientTokens(ingredient);
+const includesTerm = (text, term) => {
+  const tokens = ingredientTokens(text);
   const termTokens = ingredientTokens(term);
   return (
     termTokens.length > 0 &&
@@ -51,21 +51,21 @@ export const matchingRecipes = (recipes, query, filters = {}) => {
       recipe,
       index,
       matchedIngredients: recipe.ingredients.filter((ingredient) =>
-        terms.some((term) => includesIngredient(ingredient, term)),
+        terms.some((term) => includesTerm(ingredient, term)),
       ),
     }))
-    .filter(
-      ({ recipe, matchedIngredients }) =>
-        (!terms.length ||
-          terms.every((term) =>
-            matchedIngredients.some((ingredient) =>
-              includesIngredient(ingredient, term),
-            ),
-          )) &&
+    .filter(({ recipe, matchedIngredients }) => {
+      const matchesTerm = (term) =>
+        matchedIngredients.some((ingredient) =>
+          includesTerm(ingredient, term),
+        ) || includesTerm(recipe.title, term);
+      return (
+        (!terms.length || terms.every(matchesTerm)) &&
         tags.every((tag) => recipe.tags.includes(tag)) &&
         (!protein || recipe.protein === protein) &&
-        method.every((value) => (recipe.method ?? []).includes(value)),
-    );
+        method.every((value) => (recipe.method ?? []).includes(value))
+      );
+    });
 };
 
 const vulgarFractions = {
