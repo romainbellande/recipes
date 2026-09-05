@@ -98,6 +98,17 @@ test("filters complete ingredient entries and selected facets", () => {
     matchingRecipes(ingredientRecipes, "oeuf", {}).map(({ index }) => index),
     [4],
   );
+  // title search
+  assert.deepEqual(
+    matchingRecipes(ingredientRecipes, "tarte", {}).map(({ index }) => index),
+    [0],
+  );
+  assert.deepEqual(
+    matchingRecipes(ingredientRecipes, "poulet rôti", {}).map(
+      ({ index }) => index,
+    ),
+    [2],
+  );
   // protein single-select
   assert.deepEqual(
     matchingRecipes(ingredientRecipes, "", {

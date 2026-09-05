@@ -39,7 +39,7 @@ tags:
 
 ## Ingrédients
 
-- 200g à 250g de pâtes (les spaghettis, linguines ou pennes se marient à merveille avec cette sauce)
+- 200g de pâtes (les spaghettis, linguines ou pennes se marient à merveille avec cette sauce)
 - 1 boîte(s) de sardines à la tomate
 - 200g de coulis de tomate ou de tomates concassées
 - 100g de feta émiettée
