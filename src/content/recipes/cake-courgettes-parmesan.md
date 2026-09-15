@@ -30,7 +30,7 @@ tags:
 ## Ingrédients
 
 - 250 g de courgettes
-- 6 échalotes (ou 150 g d'oignons rouges)
+- 6 échalotes (ou des oignons rouges)
 - 100 g de parmesan
 - 100 g d'emmental (ou de gruyère)
 - 200 g de farine

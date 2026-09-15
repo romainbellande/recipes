@@ -31,7 +31,7 @@ tags:
 ## Ingrédients
 
 - 4 pommes de terre
-- 2 boîtes de thon au naturel (2 × 150 g)
+- 300 g de thon au naturel
 - 2 œufs
 - 2 échalotes
 - 4 cornichons

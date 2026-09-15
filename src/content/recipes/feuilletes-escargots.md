@@ -29,7 +29,7 @@ tags:
 
 ## Ingrédients
 
-- 5 douzaines d'escargots de Bourgogne (pour 20 bouchées)
+- 5 douzaines d'escargots de Bourgogne
 - 60 g de beurre
 - 20 g d'échalote
 - 10 g de persil
