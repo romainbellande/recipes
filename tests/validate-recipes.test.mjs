@@ -283,6 +283,18 @@ for (const [name, recipe, filename, rule] of [
     "exactly one ## Ingrédients section",
   ],
   [
+    "a second quantity on an ingredient line",
+    valid.replace("- 400 g de pâtes", "- 400 g de pâtes (soit 2 boîtes)"),
+    "quick-pasta.md",
+    "must carry one quantity, the leading one",
+  ],
+  [
+    "a slash fraction",
+    valid.replace("- 400 g de pâtes", "- 1/2 c. à café de sel"),
+    "quick-pasta.md",
+    "write fractions with the vulgar glyph",
+  ],
+  [
     "method",
     valid.replace("1. Faites cuire les pâtes.", "- Faites cuire les pâtes."),
     "quick-pasta.md",

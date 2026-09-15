@@ -49,13 +49,13 @@ tags:
 ## Ingrédients
 
 - 700g de blancs de poulet
-- 1/2 c. à café de sel
-- 1/2 c. à café de poivre noir moulu
-- 1/2 c. à café de thym séché
+- ½ c. à café de sel
+- ½ c. à café de poivre noir moulu
+- ½ c. à café de thym séché
 - 1 c. à café d'origan séché
-- 1 1/2 c. à café de paprika
+- 1½ c. à café de paprika
 - 2 c. à soupe d'huile d'olive
-- 1 oignon (environ 130 g)
+- 130 g d'oignon
 - 2 gousses d'ail
 - 160 g de tomates séchées à l'huile, égouttées
 - 1 poivron rouge

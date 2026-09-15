@@ -42,11 +42,11 @@ tags:
 
 ## Ingrédients
 
-- 6 hauts de cuisse de poulet avec peau (environ 1,2 kg)
+- 1,2 kg de hauts de cuisse de poulet avec peau
 - 200 g de lardons fumés
 - 250 g de champignons de Paris, coupés en quartiers
-- 2 oignons jaunes (environ 200 g), émincés
-- 3 carottes (environ 300 g), coupées en rondelles
+- 200 g d'oignons jaunes, émincés
+- 300 g de carottes, coupées en rondelles
 - 2 gousses d'ail, émincées
 - 1 bouquet garni (thym, laurier)
 - 30 g de farine

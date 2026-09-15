@@ -29,7 +29,7 @@ tags:
 
 ## Ingrédients
 
-- 600 g de crevettes décortiquées (soit 1,2 kg de crevettes entières)
+- 600 g de crevettes décortiquées
 - 1 oignon
 - ½ c. à café de curry
 - 20 cl de lait de coco

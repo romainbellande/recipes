@@ -38,10 +38,10 @@ timers:
 
 ## Ingrédients
 
-- 1,5 kg de calamars entiers (soit 900 g nettoyés)
+- 900 g de calamars nettoyés
 - 2 oignons
 - 4 tomates
-- 1 grosse brique de coulis de tomate (500 g)
+- 500 g de coulis de tomate
 - 1 gousse d'ail
 - 1 c. à soupe rase de farine
 - 1 pincée de piment de Cayenne

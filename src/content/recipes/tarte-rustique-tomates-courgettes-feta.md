@@ -34,7 +34,7 @@ tags:
 
 ## Ingrédients
 
-- 1 pâte brisée (ou feuilletée) d'environ 250 g
+- 250 g de pâte brisée (ou feuilletée)
 - 3 grandes tomates bien mûres (de type Cœur de bœuf ou Marmande)
 - 1 courgette moyenne
 - 150 g de feta

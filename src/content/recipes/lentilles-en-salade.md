@@ -29,7 +29,7 @@ tags:
 ## Ingrédients
 
 - 150 g de lentilles
-- 7 à 8 tomates cerises
+- 8 tomates cerises
 - 2 échalotes
 - 3 c. à soupe d'huile
 - 1 c. à soupe de vinaigre

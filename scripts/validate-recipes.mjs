@@ -30,6 +30,15 @@ const recipeId = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const courses = new Set(Object.keys(COURSES));
 const qualifiers = new Set(Object.keys(QUALIFIERS));
 const duration = /^(?:(?:[1-9]\d*) h(?: [1-9]\d* min)?|[1-9]\d* min)$/;
+// An ingredient line carries exactly one quantity because scaleIngredient
+// recalculates only the leading one; any other figure stays frozen when
+// Servings change and contradicts the line it annotates.
+const leadingIngredientQuantity =
+  /^-\s*(?:\*\*|_)*(?:\d+(?:[.,]\d+)?[¼½¾⅓⅔⅛⅜⅝⅞]?|[¼½¾⅓⅔⅛⅜⅝⅞])/;
+const anyQuantity = /\d|[¼½¾⅓⅔⅛⅜⅝⅞]/;
+const slashFraction = /^-\s*(?:\*\*|_)*\d+\s*\/\s*\d+/;
+// Product attributes are not quantities: "(30 % de matière grasse)".
+const productAttribute = /\(\s*\d+(?:[.,]\d+)?\s*%[^)]*\)/g;
 const servings = /^[1-9]\d*(?:\s*[–-]\s*[1-9]\d*)?$/;
 const localPath = /^\/[^\s](?:[^\s]|\s+[^\s])*\/[^\s]+$/;
 
@@ -194,6 +203,19 @@ function validateRecipe(filename, source) {
     const ingredientItems = ingredients.match(/^\s*-\s+(.+)$/gm) ?? [];
     const steps = method.match(/^\s*\d+\.\s+(.+)$/gm) ?? [];
     if (!ingredientItems.length) fail("Ingrédients must contain bullet items");
+    for (const item of ingredientItems) {
+      if (slashFraction.test(item))
+        fail(
+          `write fractions with the vulgar glyph, such as ½: ${item.trim()}`,
+        );
+      const rest = item
+        .replace(productAttribute, "")
+        .replace(leadingIngredientQuantity, "");
+      if (anyQuantity.test(rest))
+        fail(
+          `an ingredient line must carry one quantity, the leading one: ${item.trim()}`,
+        );
+    }
     if (!steps.some((step) => /^\s*1\.\s+/.test(step)))
       fail("Préparation must contain numbered steps");
     try {

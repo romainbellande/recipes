@@ -33,7 +33,7 @@ tags:
 - 150 g de lardons
 - 150 g de talon de jambon
 - 100 g de gruyère
-- 1 pot d'olives vertes dénoyautées (180 g égouttées)
+- 180 g d'olives vertes dénoyautées
 - 4 œufs
 - 80 g de lait
 - 80 g d'huile d'olive
