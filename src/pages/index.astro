@@ -207,7 +207,8 @@ const iconSvgs = Object.fromEntries(
       import {
         collectionFiltersFromSearch,
         collectionSearchParams,
-        ingredientTerms,
+        searchTerms,
+        showsIngredientEvidence,
         matchingRecipes,
       } from "../scripts/collection.js";
 
@@ -249,9 +250,9 @@ const iconSvgs = Object.fromEntries(
           .map((filter) => filter.value);
         const protein =
           proteinFilters.find((filter) => filter.checked)?.value ?? "";
-        const ingredients = ingredientTerms(search.value);
-        const ingredientQuery = ingredients.join(", ");
-        const matches = matchingRecipes(recipes, ingredientQuery, {
+        const terms = searchTerms(search.value);
+        const searchQuery = terms.join(", ");
+        const matches = matchingRecipes(recipes, searchQuery, {
           tags,
           protein,
           method,
@@ -266,14 +267,14 @@ const iconSvgs = Object.fromEntries(
           const matchedIngredients = matchesByIndex.get(index);
           item.hidden = !matchedIngredients;
           const evidence = item.querySelector("[data-matched-ingredients]");
-          evidence.hidden = ingredients.length === 0 || !matchedIngredients;
-          evidence.textContent = matchedIngredients
-            ? `Ingrédients : ${matchedIngredients.join(" · ")}`
-            : "";
+          evidence.hidden = !showsIngredientEvidence(terms, matchedIngredients);
+          evidence.textContent = evidence.hidden
+            ? ""
+            : `Ingrédients : ${matchedIngredients.join(" · ")}`;
         });
         const hasMatches = matches.length > 0;
         const details = [
-          ingredients.length && `avec ${ingredients.join(" et ")}`,
+          terms.length && `avec ${terms.join(" et ")}`,
           ...tags.map(
             (tag) =>
               tagFilters.find((filter) => filter.value === tag).dataset
@@ -296,7 +297,7 @@ const iconSvgs = Object.fromEntries(
         emptyState.hidden = hasMatches;
 
         const parameters = collectionSearchParams({
-          query: ingredientQuery,
+          query: searchQuery,
           tags,
           method,
           protein,
@@ -662,16 +663,18 @@ const iconSvgs = Object.fromEntries(
     text-transform: uppercase;
   }
   .recipe-cards {
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+    /* auto-fill, not auto-fit: auto-fit collapses the empty tracks and a single
+       result would stretch to the full width. */
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 16rem), 1fr));
+    grid-auto-rows: 1fr;
     gap: 1rem;
-    border: 1px solid var(--line);
-    background: var(--line);
   }
   .recipe-cards > li {
     min-width: 0;
   }
   .recipe-card {
     height: 100%;
+    border: 1px solid var(--line);
     background: #fcfaf5;
     transition:
       transform 180ms ease,
@@ -707,7 +710,11 @@ const iconSvgs = Object.fromEntries(
     letter-spacing: -0.04em;
     line-height: 0.95;
   }
-  .card-content p:not(.card-meta) {
+  .card-content p:not(.card-meta):not(.matched-ingredients) {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 4;
+    overflow: hidden;
     margin: 0;
     font-size: 1.08rem;
   }
@@ -748,6 +755,8 @@ const iconSvgs = Object.fromEntries(
     }
     .recipe-cards {
       grid-template-columns: 1fr;
+      /* One column: equal rows would stretch every card to the tallest one. */
+      grid-auto-rows: auto;
     }
     .image-placeholder {
       aspect-ratio: 16 / 7;

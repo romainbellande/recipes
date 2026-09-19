@@ -23,7 +23,7 @@ const ingredientTokens = (value) =>
     invariantIngredientWords.has(word) ? word : word.replace(/(?:s|x)$/u, ""),
   );
 
-export const ingredientTerms = (query) => {
+export const searchTerms = (query) => {
   const terms = new Map();
   for (const term of query.split(",").map((term) => term.trim())) {
     const key = ingredientTokens(term).join(" ");
@@ -32,33 +32,51 @@ export const ingredientTerms = (query) => {
   return [...terms.values()];
 };
 
-const includesTerm = (text, term) => {
+const minimumMatchLength = 3;
+
+// An ingredient line matches a query word exactly; a shorter word matches nothing.
+const matchesIngredientTerm = (text, term) => {
   const tokens = ingredientTokens(text);
   const termTokens = ingredientTokens(term);
   return (
     termTokens.length > 0 &&
-    tokens.some((_, index) =>
-      termTokens.every((token, offset) => tokens[index + offset] === token),
+    termTokens.every(
+      (token) => token.length >= minimumMatchLength && tokens.includes(token),
+    )
+  );
+};
+
+// A title matches a query word anywhere inside its words; a shorter word matches
+// nothing. Titles glob, ingredient lines do not.
+const matchesTitleTerm = (title, term) => {
+  const tokens = ingredientTokens(title);
+  const termTokens = ingredientTokens(term);
+  return (
+    termTokens.length > 0 &&
+    termTokens.every(
+      (token) =>
+        token.length >= minimumMatchLength &&
+        tokens.some((titleToken) => titleToken.includes(token)),
     )
   );
 };
 
 export const matchingRecipes = (recipes, query, filters = {}) => {
-  const terms = ingredientTerms(query);
+  const terms = searchTerms(query);
   const { tags = [], protein = "", method = [] } = filters;
   return recipes
     .map((recipe, index) => ({
       recipe,
       index,
       matchedIngredients: recipe.ingredients.filter((ingredient) =>
-        terms.some((term) => includesTerm(ingredient, term)),
+        terms.some((term) => matchesIngredientTerm(ingredient, term)),
       ),
     }))
     .filter(({ recipe, matchedIngredients }) => {
       const matchesTerm = (term) =>
         matchedIngredients.some((ingredient) =>
-          includesTerm(ingredient, term),
-        ) || includesTerm(recipe.title, term);
+          matchesIngredientTerm(ingredient, term),
+        ) || matchesTitleTerm(recipe.title, term);
       return (
         (!terms.length || terms.every(matchesTerm)) &&
         tags.every((tag) => recipe.tags.includes(tag)) &&
@@ -67,6 +85,9 @@ export const matchingRecipes = (recipes, query, filters = {}) => {
       );
     });
 };
+
+export const showsIngredientEvidence = (terms, matchedIngredients) =>
+  terms.length > 0 && (matchedIngredients?.length ?? 0) > 0;
 
 const vulgarFractions = {
   "¼": 1 / 4,

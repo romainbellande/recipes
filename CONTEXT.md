@@ -4,13 +4,17 @@ A static, open recipe collection for home cooks.
 
 ## Language
 
-**Ingredient search**:
-A Collection search for Recipes by their ingredient lists.
-_Avoid_: full-text search, recipe-content search
+**Recipe search**:
+A Collection search for Recipes by their titles or ingredient lists.
+_Avoid_: full-text search, recipe-content search, ingredient search
 
 **Matched ingredient**:
-An ingredient list entry shown on a Recipe card to explain an Ingredient search result.
+An ingredient list entry shown on a Recipe card to explain a Recipe search result.
 _Avoid_: search hit, highlighted query
+
+**Summary**:
+The short prose text of a Recipe, shown in full in the Recipe view and truncated on a Recipe card.
+_Avoid_: description, excerpt, intro
 
 **Recipe**:
 A French-language, human-readable Markdown document with YAML front matter that is the canonical source of cooking knowledge.

@@ -6,7 +6,8 @@ import test from "node:test";
 import {
   collectionFiltersFromSearch,
   collectionSearchParams,
-  ingredientTerms,
+  searchTerms,
+  showsIngredientEvidence,
   matchingRecipes,
   parseInlineRecipeMarkup,
   scaleIngredient,
@@ -64,8 +65,15 @@ test("filters complete ingredient entries and selected facets", () => {
       protein: "meat",
       method: ["one-pot"],
     },
+    {
+      title: "Blanquette de veau",
+      summary: "Un plat mijoté",
+      ingredients: ["carottes"],
+      tags: ["main"],
+      protein: "meat",
+    },
   ];
-  assert.deepEqual(ingredientTerms(" tomate, , TOMATES, oignon "), [
+  assert.deepEqual(searchTerms(" tomate, , TOMATES, oignon "), [
     "tomate",
     "oignon",
   ]);
@@ -109,6 +117,47 @@ test("filters complete ingredient entries and selected facets", () => {
     ),
     [2],
   );
+  // title and ingredient terms match in any word order
+  assert.deepEqual(
+    matchingRecipes(ingredientRecipes, "veau blanquette", {}).map(
+      ({ index }) => index,
+    ),
+    [6],
+  );
+  assert.deepEqual(
+    matchingRecipes(ingredientRecipes, "concassées tomates", {}).map(
+      ({ index }) => index,
+    ),
+    [3],
+  );
+  // titles glob inside a word, ingredient lines stay whole-word
+  assert.deepEqual(
+    matchingRecipes(ingredientRecipes, "quett", {}).map(({ index }) => index),
+    [6],
+  );
+  assert.deepEqual(
+    matchingRecipes(ingredientRecipes, "blan", {}).map(({ index }) => index),
+    [6],
+  );
+  assert.deepEqual(
+    matchingRecipes(ingredientRecipes, "concas", {}).map(({ index }) => index),
+    [],
+  );
+  // a word shorter than three characters matches nothing, and fails its whole query
+  assert.deepEqual(
+    matchingRecipes(ingredientRecipes, "au", {}).map(({ index }) => index),
+    [],
+  );
+  assert.deepEqual(
+    matchingRecipes(ingredientRecipes, "bl", {}).map(({ index }) => index),
+    [],
+  );
+  assert.deepEqual(
+    matchingRecipes(ingredientRecipes, "au, blan", {}).map(
+      ({ index }) => index,
+    ),
+    [],
+  );
   // protein single-select
   assert.deepEqual(
     matchingRecipes(ingredientRecipes, "", {
@@ -138,6 +187,13 @@ test("filters complete ingredient entries and selected facets", () => {
     }).map(({ index }) => index),
     [5],
   );
+});
+
+test("explains a Recipe card only when an ingredient matched", () => {
+  assert.equal(showsIngredientEvidence(["cake"], []), false);
+  assert.equal(showsIngredientEvidence(["cake"], undefined), false);
+  assert.equal(showsIngredientEvidence([], ["pommes"]), false);
+  assert.equal(showsIngredientEvidence(["pomme"], ["pommes"]), true);
 });
 
 test("parses nested Inline Recipe markup and preserves it when scaling", () => {
@@ -417,6 +473,7 @@ test(
     );
     assert.match(source, /collectionFiltersFromSearch\(/);
     assert.match(source, /collectionSearchParams\(/);
+    assert.match(source, /showsIngredientEvidence\(/);
     assert.match(source, /a:focus-visible/);
     assert.match(source, /\.recipe-card \{\s*display: block;/);
     assert.match(source, /\.image-placeholder \{[\s\S]*?aspect-ratio: 4 \/ 3;/);
